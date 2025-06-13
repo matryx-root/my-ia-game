@@ -1,0 +1,138 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id            Int           @id @default(autoincrement())
+  nombre        String
+  email         String        @unique
+  password      String
+  rol           String        @default("usuario")
+  edad          Int?
+  celular       String?
+  progreso      ProgresoUsuario[]
+  logsIngreso   LogIngreso[]
+  logsJuego     LogJuego[]
+  mensajes      MensajeSoporte[]
+  configuracion ConfiguracionUsuario?
+  logros        Achievement[]
+  errores       LogError[]
+}
+
+model Juego {
+  id         Int         @id @default(autoincrement())
+  nombre     String
+  descripcion String?
+  preguntas  Pregunta[]
+  logsJuego  LogJuego[]
+  progreso   ProgresoUsuario[]
+  logros     Achievement[]
+  errores    LogError[]
+}
+
+model NivelIA {
+  id           Int         @id @default(autoincrement())
+  nombre       String
+  descripcion  String?
+  preguntas    Pregunta[]
+}
+
+model Pregunta {
+  id           Int         @id @default(autoincrement())
+  texto        String
+  juego        Juego       @relation(fields: [juegoId], references: [id])
+  juegoId      Int
+  nivelIA      NivelIA     @relation(fields: [nivelIAId], references: [id])
+  nivelIAId    Int
+  respuestas   Respuesta[]
+  progreso     ProgresoUsuario[]
+}
+
+model Respuesta {
+  id           Int         @id @default(autoincrement())
+  texto        String
+  correcta     Boolean
+  pregunta     Pregunta    @relation(fields: [preguntaId], references: [id])
+  preguntaId   Int
+}
+
+model LogIngreso {
+  id         Int       @id @default(autoincrement())
+  usuario    Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int
+  fechaHora  DateTime  @default(now())
+  ip         String?
+  userAgent  String?
+}
+
+model LogJuego {
+  id         Int      @id @default(autoincrement())
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int
+  juego      Juego    @relation(fields: [juegoId], references: [id])
+  juegoId    Int
+  fechaHora  DateTime @default(now())
+  accion     String?  // Ej: "Empezó", "Terminó", "Respondió Pregunta"
+  detalle    String?  // Ej: "Pregunta 4 respondida correctamente"
+  duracion   Int?     // Segundos o milisegundos
+}
+
+model LogError {
+  id         Int      @id @default(autoincrement())
+  usuario    Usuario? @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int?
+  juego      Juego?   @relation(fields: [juegoId], references: [id])
+  juegoId    Int?
+  fechaHora  DateTime @default(now())
+  mensaje    String
+  detalle    String?
+}
+
+model MensajeSoporte {
+  id         Int      @id @default(autoincrement())
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int
+  mensaje    String
+  fechaHora  DateTime @default(now())
+  estado     String   @default("pendiente") // pendiente, respondido, cerrado
+  respuesta  String?
+}
+
+model ProgresoUsuario {
+  id           Int       @id @default(autoincrement())
+  usuario      Usuario   @relation(fields: [usuarioId], references: [id])
+  usuarioId    Int
+  juego        Juego?    @relation(fields: [juegoId], references: [id])
+  juegoId      Int?
+  pregunta     Pregunta? @relation(fields: [preguntaId], references: [id])
+  preguntaId   Int?
+  avance       Int?      // Ej: porcentaje o nivel
+  completado   Boolean?  // true/false
+  fechaActualizacion DateTime @default(now())
+}
+
+model Achievement {
+  id         Int      @id @default(autoincrement())
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int
+  juego      Juego?   @relation(fields: [juegoId], references: [id])
+  juegoId    Int?
+  nombre     String
+  descripcion String?
+  fechaHora  DateTime @default(now())
+}
+
+model ConfiguracionUsuario {
+  id         Int      @id @default(autoincrement())
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuarioId  Int      @unique
+  tema       String?  // claro, oscuro
+  idioma     String?  // es, en, etc
+  sonido     Boolean? // true/false
+  notificaciones Boolean? // true/false
+}
