@@ -5,7 +5,7 @@ export default function NavBar({ usuario, onLogout }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
-    navigate("/"); // <--- LandingPage, NO /login
+    navigate("/"); // LandingPage
     onLogout();
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
@@ -33,15 +33,24 @@ export default function NavBar({ usuario, onLogout }) {
                 Categorías
               </button>
 
-              {/* Si el usuario es admin, muestra el botón de PanelAdmin */}
+              {/* Si el usuario es admin, muestra los botones de administración */}
               {usuario.rol === "admin" && (
-                <button
-                  className="btn btn-outline-warning me-3"
-                  onClick={() => navigate("/admin")}
-                >
-                  <i className="bi bi-gear-fill me-1"></i>
-                  Panel Admin
-                </button>
+                <>
+                  <button
+                    className="btn btn-outline-warning me-3"
+                    onClick={() => navigate("/admin")}
+                  >
+                    <i className="bi bi-gear-fill me-1"></i>
+                    Panel Admin
+                  </button>
+                  <button
+                    className="btn btn-outline-info me-3"
+                    onClick={() => navigate("/panel-game")}
+                  >
+                    <i className="bi bi-bar-chart-fill me-1"></i>
+                    Juegos por Usuario
+                  </button>
+                </>
               )}
               <span className="text-light me-3 d-none d-sm-block">
                 Bienvenido, <span className="fw-bold">{usuario.nombre}</span>

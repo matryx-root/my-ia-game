@@ -8,11 +8,12 @@ const ANIMALES = [
   { nombre: "Pajaro", head: "pajaro-head.png", body: "pajaro-body.png", feet: "pajaro-feet.png" }
 ];
 
+// Para obtener un índice aleatorio
 function getRandomIndex() {
   return Math.floor(Math.random() * ANIMALES.length);
 }
 
-export default function VAEGame() {
+export default function VAEGame({ usuario }) {
   const navigate = useNavigate();
   const [instruccion, setInstruccion] = useState(true);
   const [feedback, setFeedback] = useState(null);

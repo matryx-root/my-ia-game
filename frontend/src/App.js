@@ -4,6 +4,7 @@ import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Registro from "./components/Registro";
 import PanelAdmin from "./components/PanelAdmin";
+import PanelGame from "./components/PanelGame"; // <--- IMPORTANTE
 import NavBar from "./components/NavBar";
 import CategoriasPage from "./components/CategoriasPage";
 import CategoriaDetallePage from "./components/CategoriaDetallePage";
@@ -103,6 +104,13 @@ function App() {
         <Route path="/admin" element={
           <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
             <PanelAdmin />
+          </RutaPrivada>
+        } />
+
+        {/* PANEL JUEGOS POR USUARIO */}
+        <Route path="/panel-game" element={
+          <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+            <PanelGame usuario={usuario} />
           </RutaPrivada>
         } />
 

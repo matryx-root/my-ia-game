@@ -28,37 +28,10 @@ model Juego {
   id         Int         @id @default(autoincrement())
   nombre     String
   descripcion String?
-  preguntas  Pregunta[]
   logsJuego  LogJuego[]
   progreso   ProgresoUsuario[]
   logros     Achievement[]
   errores    LogError[]
-}
-
-model NivelIA {
-  id           Int         @id @default(autoincrement())
-  nombre       String
-  descripcion  String?
-  preguntas    Pregunta[]
-}
-
-model Pregunta {
-  id           Int         @id @default(autoincrement())
-  texto        String
-  juego        Juego       @relation(fields: [juegoId], references: [id])
-  juegoId      Int
-  nivelIA      NivelIA     @relation(fields: [nivelIAId], references: [id])
-  nivelIAId    Int
-  respuestas   Respuesta[]
-  progreso     ProgresoUsuario[]
-}
-
-model Respuesta {
-  id           Int         @id @default(autoincrement())
-  texto        String
-  correcta     Boolean
-  pregunta     Pregunta    @relation(fields: [preguntaId], references: [id])
-  preguntaId   Int
 }
 
 model LogIngreso {
@@ -77,8 +50,8 @@ model LogJuego {
   juego      Juego    @relation(fields: [juegoId], references: [id])
   juegoId    Int
   fechaHora  DateTime @default(now())
-  accion     String?  // Ej: "Empezó", "Terminó", "Respondió Pregunta"
-  detalle    String?  // Ej: "Pregunta 4 respondida correctamente"
+  accion     String?  // Ej: "Empezó", "Terminó", "Logró Puntaje"
+  detalle    String?  // Ej: "Nivel 3 completado"
   duracion   Int?     // Segundos o milisegundos
 }
 
@@ -99,7 +72,7 @@ model MensajeSoporte {
   usuarioId  Int
   mensaje    String
   fechaHora  DateTime @default(now())
-  estado     String   @default("pendiente") // pendiente, respondido, cerrado
+  estado     String   @default("pendiente")
   respuesta  String?
 }
 
@@ -107,11 +80,9 @@ model ProgresoUsuario {
   id           Int       @id @default(autoincrement())
   usuario      Usuario   @relation(fields: [usuarioId], references: [id])
   usuarioId    Int
-  juego        Juego?    @relation(fields: [juegoId], references: [id])
-  juegoId      Int?
-  pregunta     Pregunta? @relation(fields: [preguntaId], references: [id])
-  preguntaId   Int?
-  avance       Int?      // Ej: porcentaje o nivel
+  juego        Juego     @relation(fields: [juegoId], references: [id])
+  juegoId      Int
+  avance       Int?      // Puntaje o porcentaje o nivel
   completado   Boolean?  // true/false
   fechaActualizacion DateTime @default(now())
 }
@@ -131,8 +102,8 @@ model ConfiguracionUsuario {
   id         Int      @id @default(autoincrement())
   usuario    Usuario  @relation(fields: [usuarioId], references: [id])
   usuarioId  Int      @unique
-  tema       String?  // claro, oscuro
-  idioma     String?  // es, en, etc
-  sonido     Boolean? // true/false
-  notificaciones Boolean? // true/false
+  tema       String?
+  idioma     String?
+  sonido     Boolean?
+  notificaciones Boolean?
 }

@@ -2,18 +2,15 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 
-// CRUD usuarios (admin)
-// Listar todos los usuarios
+// Usuarios
 exports.listarUsuarios = async (req, res) => {
   try {
     const usuarios = await prisma.usuario.findMany();
-    res.json(usuarios);  // <-- ESTA LÍNEA es la que React espera
+    res.json(usuarios);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
-
-
 exports.crearUsuario = async (req, res) => {
   const { nombre, email, password, rol = 'usuario', edad, celular } = req.body;
   try {
@@ -26,7 +23,6 @@ exports.crearUsuario = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
-
 exports.editarUsuario = async (req, res) => {
   const id = Number(req.params.id);
   const { nombre, email, rol, edad, celular } = req.body;
@@ -40,7 +36,6 @@ exports.editarUsuario = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
-
 exports.eliminarUsuario = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -50,8 +45,7 @@ exports.eliminarUsuario = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
-// CRUD juegos (admin)
+// Juegos
 exports.listarJuegos = async (req, res) => {
   try {
     const juegos = await prisma.juego.findMany();
@@ -60,7 +54,6 @@ exports.listarJuegos = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-
 exports.crearJuego = async (req, res) => {
   try {
     const { nombre, descripcion } = req.body;
@@ -70,7 +63,6 @@ exports.crearJuego = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
-
 exports.editarJuego = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -84,12 +76,26 @@ exports.editarJuego = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
-
 exports.eliminarJuego = async (req, res) => {
   try {
     const id = Number(req.params.id);
     await prisma.juego.delete({ where: { id } });
     res.json({ mensaje: "Juego eliminado" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+// Listar progreso de juegos para un usuario
+exports.progresoUsuario = async (req, res) => {
+  try {
+    const usuarioId = Number(req.params.id);
+    // Incluye los datos del juego relacionado
+    const progresos = await prisma.progresoUsuario.findMany({
+      where: { usuarioId },
+      include: { juego: true }
+    });
+    res.json(progresos);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }

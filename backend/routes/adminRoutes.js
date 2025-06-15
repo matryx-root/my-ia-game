@@ -13,5 +13,5 @@ router.get('/juegos', adminController.listarJuegos);
 router.post('/juegos', adminController.crearJuego);
 router.put('/juegos/:id', adminController.editarJuego);
 router.delete('/juegos/:id', adminController.eliminarJuego);
-
+router.get('/progreso-usuario/:id', adminController.progresoUsuario);
 module.exports = router;
