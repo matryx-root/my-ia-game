@@ -1,14 +1,18 @@
+// src/games/mlGame.js
 import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import api from '../utils/api';
 
-export default function MLClusterGame() {
+export default function MLClusterGame({ usuario }) {
   const navigate = useNavigate();
-  const { id } = useParams();
   const gameRef = useRef(null);
   const [instruccion, setInstruccion] = useState(true);
   const [resultado, setResultado] = useState(null);
   const [juegoKey, setJuegoKey] = useState(0);
+
+  // Cambia este valor según el ID REAL del juego en tu tabla Juego
+  const ML_GAME_ID = 2;
 
   const iniciarJuego = () => setInstruccion(false);
 
@@ -20,7 +24,6 @@ export default function MLClusterGame() {
         { color: 0xffca28, name: 'Amarillo' }
       ];
       let puntos = [];
-      let asignados = 0;
 
       gameRef.current = new Phaser.Game({
         type: Phaser.AUTO,
@@ -31,19 +34,17 @@ export default function MLClusterGame() {
         scene: {
           create: function () {
             this.completed = false;
+            this.asignados = 0;
             puntos = [];
-            asignados = 0;
 
             this.add.text(50, 20, '🤖 ML: Agrupa los puntos por color (Clustering)', { fontSize: '22px', fill: '#333' });
             this.add.text(70, 65, 'Haz clic en cada punto y arrástralo al grupo correcto', { fontSize: '17px', fill: '#444' });
 
-            // Dibuja los "clusters" como círculos grandes en la parte inferior
             clusters.forEach((cl, idx) => {
               this.add.circle(220 + idx * 180, 520, 70, cl.color, 0.18).setStrokeStyle(4, cl.color);
               this.add.text(180 + idx * 180, 580, cl.name, { fontSize: 19, fill: '#555' });
             });
 
-            // Genera 12 puntos de colores mezclados
             for (let i = 0; i < 12; i++) {
               const clusterIdx = Phaser.Math.Between(0, clusters.length - 1);
               const color = clusters[clusterIdx].color;
@@ -54,23 +55,20 @@ export default function MLClusterGame() {
                 color
               ).setStrokeStyle(3, 0x555555).setAlpha(0.95).setInteractive({ draggable: true, useHandCursor: true });
 
-              punto.setData('clusterIdx', clusterIdx); // Usar setData en vez de sobrescribir .data
+              punto.setData('clusterIdx', clusterIdx);
 
-              // Arrastrar
               this.input.setDraggable(punto);
               puntos.push(punto);
 
               punto.on('pointerover', function () { punto.setScale(1.2); });
               punto.on('pointerout', function () { punto.setScale(1); });
 
-              // Evento drag
               punto.on('drag', (pointer, dragX, dragY) => {
                 punto.x = dragX;
                 punto.y = dragY;
               });
 
               punto.on('dragend', (pointer) => {
-                // Verifica si el punto fue soltado sobre el cluster correcto
                 let correcto = false;
                 clusters.forEach((cl, idx) => {
                   const cx = 220 + idx * 180, cy = 520, r = 70;
@@ -78,13 +76,11 @@ export default function MLClusterGame() {
                   if (dist < r && idx === punto.getData('clusterIdx') && punto.visible) {
                     correcto = true;
                     punto.setVisible(false);
-                    asignados++;
-                    // Feedback de agrupamiento correcto
+                    this.asignados++;
                     this.add.text(punto.x - 40, punto.y - 40, "¡Correcto!", { fontSize: 14, fill: "#388e3c" }).setDepth(10);
                   }
                 });
 
-                // Si se soltó pero no es correcto, vuelve al lugar original
                 if (!correcto && punto.visible) {
                   this.tweens.add({
                     targets: punto,
@@ -95,12 +91,31 @@ export default function MLClusterGame() {
                   });
                 }
 
-                if (asignados === 12 && !this.completed) {
+                if (this.asignados === 12 && !this.completed) {
                   this.completed = true;
                   this.add.text(110, 500, '¡Muy bien! Agrupaste los datos como una IA de clustering', { fontSize: '27px', fill: '#00796B' });
                   setResultado(
                     "¡Aprendiste cómo las IA de ML pueden agrupar datos automáticamente por similitud! Así organizan fotos, canciones y mucho más."
                   );
+
+                  // -------- GUARDAR PROGRESO Y LOGRO CORRECTAMENTE --------
+                  if (usuario && usuario.id) {
+                    // PROGRESO:
+                    api.post('/juegos/progreso', {
+                      usuarioId: usuario.id,
+                      juegoId: ML_GAME_ID, // Usa el ID real de este juego
+                      avance: 100,
+                      completado: true
+                    }).catch(() => {});
+
+                    // LOGRO:
+                    api.post('/juegos/logro', {
+                      usuarioId: usuario.id,
+                      juegoId: ML_GAME_ID,
+                      nombre: 'Clustering completado',
+                      descripcion: 'Agrupó correctamente los datos por color en ML.'
+                    }).catch(() => {});
+                  }
                 }
               });
             }
@@ -118,7 +133,7 @@ export default function MLClusterGame() {
         gameRef.current = null;
       }
     };
-  }, [instruccion, juegoKey]);
+  }, [instruccion, juegoKey, usuario]);
 
   // Reset
   const handleReset = () => {
