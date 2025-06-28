@@ -2,49 +2,79 @@ import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
-
-export default function PanelAdmin() {
+export default function PanelAdmin({ usuario }) {
   const [usuarios, setUsuarios] = useState([]);
+  const [colegios, setColegios] = useState([]);
   const [error, setError] = useState(null);
   const [nuevo, setNuevo] = useState(null);
   const [editar, setEditar] = useState(null);
 
   const navigate = useNavigate();
-  // Cargar usuarios
-  const cargarUsuarios = () => {
-    api.get("/admin/usuarios")
-      .then(res => {
-        if (res.error) setError(res.error);
-        else setUsuarios(res);
-      })
-      .catch(() => setError("No se pudo conectar"));
-  };
 
-  useEffect(cargarUsuarios, []);
+  // Solo admin puede acceder
+  useEffect(() => {
+    if (!usuario || usuario.rol !== "admin") {
+      alert("No tienes permiso para acceder a este panel.");
+      navigate("/");
+    }
+    // eslint-disable-next-line
+  }, [usuario]);
+
+  // Cargar usuarios y colegios
+  const cargarDatos = () => {
+    api.get("/admin/usuarios")
+      .then(res => setUsuarios(res))
+      .catch(() => setError("No se pudo conectar a usuarios"));
+    api.get("/admin/colegios")
+      .then(res => setColegios(res))
+      .catch(() => setError("No se pudo conectar a colegios"));
+  };
+  useEffect(cargarDatos, []);
 
   // Eliminar usuario
-const eliminarUsuario = id => {
-  if (!window.confirm("¿Eliminar este usuario?")) return;
-  api.delete(`/admin/usuarios/${id}`).then(cargarUsuarios);
-};
+  const eliminarUsuario = id => {
+    if (!window.confirm("¿Eliminar este usuario?")) return;
+    api.delete(`/admin/usuarios/${id}`).then(cargarDatos);
+  };
 
   // Agregar usuario
   const handleAgregar = e => {
     e.preventDefault();
-    api.post("/admin/usuarios", nuevo).then(() => {
+    if (
+      !nuevo.nombre ||
+      !nuevo.email ||
+      !nuevo.password ||
+      !nuevo.rol ||
+      nuevo.colegioId === undefined
+    ) {
+      alert("Todos los campos obligatorios, incluido el colegio y rol, deben estar completos.");
+      return;
+    }
+    // Enviar null si el colegio no está seleccionado
+    const data = {
+      ...nuevo,
+      colegioId: nuevo.colegioId ? Number(nuevo.colegioId) : null,
+      edad: nuevo.edad ? Number(nuevo.edad) : null
+    };
+    api.post("/admin/usuarios", data).then(() => {
       setNuevo(null);
-      cargarUsuarios();
+      cargarDatos();
     });
   };
 
   // Guardar edición
-const handleEditar = e => {
-  e.preventDefault();
-  api.put(`/admin/usuarios/${editar.id}`, editar).then(() => {
-    setEditar(null);
-    cargarUsuarios();
-  });
-};
+  const handleEditar = e => {
+    e.preventDefault();
+    const data = {
+      ...editar,
+      colegioId: editar.colegioId ? Number(editar.colegioId) : null,
+      edad: editar.edad ? Number(editar.edad) : null
+    };
+    api.put(`/admin/usuarios/${editar.id}`, data).then(() => {
+      setEditar(null);
+      cargarDatos();
+    });
+  };
 
   return (
     <div className="container-fluid px-4 mt-5">
@@ -60,7 +90,9 @@ const handleEditar = e => {
           {/* Botón para crear usuario */}
           {!nuevo && (
             <div className="mb-3">
-              <button className="btn btn-success" onClick={() => setNuevo({ nombre: "", email: "", password: "", rol: "usuario", edad: "", celular: "" })}>
+              <button className="btn btn-success" onClick={() => setNuevo({
+                nombre: "", email: "", password: "", rol: "alumno", edad: "", celular: "", colegioId: ""
+              })}>
                 Crear usuario
               </button>
             </div>
@@ -79,7 +111,19 @@ const handleEditar = e => {
                 <input className="form-control" placeholder="Contraseña" required type="password" value={nuevo.password} onChange={e => setNuevo({ ...nuevo, password: e.target.value })} />
               </div>
               <div className="col-md">
-                <input className="form-control" placeholder="Rol" value={nuevo.rol} onChange={e => setNuevo({ ...nuevo, rol: e.target.value })} />
+                <select className="form-control" required value={nuevo.rol} onChange={e => setNuevo({ ...nuevo, rol: e.target.value })}>
+                  <option value="">Rol</option>
+                  <option value="alumno">Alumno</option>
+                  <option value="docente">Docente</option>
+                </select>
+              </div>
+              <div className="col-md">
+                <select className="form-control" value={nuevo.colegioId || ""} onChange={e => setNuevo({ ...nuevo, colegioId: e.target.value })}>
+                  <option value="">Sin colegio</option>
+                  {colegios.map(c => (
+                    <option key={c.id} value={c.id}>{c.nombre} ({c.nivel})</option>
+                  ))}
+                </select>
               </div>
               <div className="col-md">
                 <input className="form-control" placeholder="Edad" type="number" value={nuevo.edad} onChange={e => setNuevo({ ...nuevo, edad: e.target.value })} />
@@ -89,7 +133,7 @@ const handleEditar = e => {
               </div>
               <div className="col-auto">
                 <button className="btn btn-success me-2" type="submit">Guardar</button>
-                <button className="btn btn-secondary" onClick={() => setNuevo(null)}>Cancelar</button>
+                <button className="btn btn-secondary" type="button" onClick={() => setNuevo(null)}>Cancelar</button>
               </div>
             </form>
           )}
@@ -101,6 +145,7 @@ const handleEditar = e => {
                   <th>Nombre</th>
                   <th>Email</th>
                   <th>Rol</th>
+                  <th>Colegio</th>
                   <th>Edad</th>
                   <th>Celular</th>
                   <th className="text-center">Acciones</th>
@@ -110,14 +155,39 @@ const handleEditar = e => {
                 {usuarios.map(u => (
                   editar && editar.id === u.id ? (
                     <tr key={u.id}>
-                      <td><input className="form-control" value={editar.nombre} onChange={e => setEditar({ ...editar, nombre: e.target.value })} /></td>
-                      <td><input className="form-control" value={editar.email} onChange={e => setEditar({ ...editar, email: e.target.value })} /></td>
-                      <td><input className="form-control" value={editar.rol} onChange={e => setEditar({ ...editar, rol: e.target.value })} /></td>
-                      <td><input className="form-control" value={editar.edad} onChange={e => setEditar({ ...editar, edad: e.target.value })} /></td>
-                      <td><input className="form-control" value={editar.celular} onChange={e => setEditar({ ...editar, celular: e.target.value })} /></td>
+                      <td>
+                        <input className="form-control" value={editar.nombre} onChange={e => setEditar({ ...editar, nombre: e.target.value })} />
+                      </td>
+                      <td>
+                        <input className="form-control" value={editar.email} onChange={e => setEditar({ ...editar, email: e.target.value })} />
+                      </td>
+                      <td>
+                        <select className="form-control" value={editar.rol} onChange={e => setEditar({ ...editar, rol: e.target.value })}>
+                          <option value="alumno">Alumno</option>
+                          <option value="docente">Docente</option>
+                        </select>
+                      </td>
+                      <td>
+                        <select
+                          className="form-control"
+                          value={editar.colegioId || ""}
+                          onChange={e => setEditar({ ...editar, colegioId: e.target.value })}
+                        >
+                          <option value="">Sin colegio</option>
+                          {colegios.map(c => (
+                            <option key={c.id} value={c.id}>{c.nombre} ({c.nivel})</option>
+                          ))}
+                        </select>
+                      </td>
+                      <td>
+                        <input className="form-control" value={editar.edad || ""} onChange={e => setEditar({ ...editar, edad: e.target.value })} />
+                      </td>
+                      <td>
+                        <input className="form-control" value={editar.celular || ""} onChange={e => setEditar({ ...editar, celular: e.target.value })} />
+                      </td>
                       <td className="text-center">
                         <button className="btn btn-success btn-sm me-2" onClick={handleEditar}>Guardar</button>
-                        <button className="btn btn-secondary btn-sm" onClick={() => setEditar(null)}>Cancelar</button>
+                        <button className="btn btn-secondary btn-sm" type="button" onClick={() => setEditar(null)}>Cancelar</button>
                       </td>
                     </tr>
                   ) : (
@@ -125,10 +195,16 @@ const handleEditar = e => {
                       <td>{u.nombre}</td>
                       <td>{u.email}</td>
                       <td>{u.rol}</td>
+                      <td>{u.colegio?.nombre || "-"}</td>
                       <td>{u.edad}</td>
                       <td>{u.celular}</td>
                       <td className="text-center">
-                        <button className="btn btn-warning btn-sm me-2" onClick={() => setEditar(u)}>Editar</button>
+                        <button className="btn btn-warning btn-sm me-2" onClick={() => setEditar({
+                          ...u,
+                          colegioId: u.colegioId || "",
+                          edad: u.edad || "",
+                          celular: u.celular || ""
+                        })}>Editar</button>
                         <button className="btn btn-danger btn-sm" onClick={() => eliminarUsuario(u.id)}>Eliminar</button>
                       </td>
                     </tr>

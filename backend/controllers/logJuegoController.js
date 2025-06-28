@@ -1,4 +1,6 @@
-// controllers/logJuegoController.js
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+
 exports.registrarLogJuego = async (req, res) => {
   try {
     const { usuarioId, juegoId, accion, detalle, duracion } = req.body;

@@ -1,5 +1,7 @@
 class LogIngreso {
-  constructor({ id, usuarioId, fechaHora, ip, userAgent }) {
+  constructor({
+    id, usuarioId, fechaHora, ip, userAgent
+  }) {
     this.id = id;
     this.usuarioId = usuarioId;
     this.fechaHora = fechaHora;

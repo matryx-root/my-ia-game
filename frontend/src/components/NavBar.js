@@ -24,7 +24,7 @@ export default function NavBar({ usuario, onLogout }) {
         <div className="d-flex align-items-center">
           {usuario && (
             <>
-              {/* Botón Categorías SIEMPRE para usuario logueado */}
+              {/* Botón Categorías SIEMPRE */}
               <button
                 className="btn btn-outline-info me-3"
                 onClick={() => navigate("/categorias")}
@@ -33,7 +33,7 @@ export default function NavBar({ usuario, onLogout }) {
                 Categorías
               </button>
 
-              {/* Si el usuario es admin, muestra los botones de administración */}
+              {/* Botones para admin */}
               {usuario.rol === "admin" && (
                 <>
                   <button
@@ -52,10 +52,37 @@ export default function NavBar({ usuario, onLogout }) {
                   </button>
                 </>
               )}
+
+              {/* Botón docente para ver progreso de alumnos */}
+              {usuario.rol === "docente" && (
+                <button
+                  className="btn btn-outline-info me-3"
+                  onClick={() => navigate("/panel-game")}
+                >
+                  <i className="bi bi-bar-chart-fill me-1"></i>
+                  Progreso Alumnos
+                </button>
+              )}
+
               <span className="text-light me-3 d-none d-sm-block">
                 Bienvenido, <span className="fw-bold">{usuario.nombre}</span>
+                {/* Mostrar badge de colegio si existe */}
+                {(usuario.rol === "alumno" || usuario.rol === "docente") && usuario.colegio?.nombre && (
+                  <span
+                    className="badge bg-info ms-2"
+                    style={{ color: "#222", fontWeight: 600 }}
+                  >
+                    Colegio {usuario.colegio.nombre}
+                  </span>
+                )}
                 {usuario.rol === "admin" && (
                   <span className="badge bg-danger ms-2">ADMIN</span>
+                )}
+                {usuario.rol === "docente" && (
+                  <span className="badge bg-primary ms-2">DOCENTE</span>
+                )}
+                {usuario.rol === "alumno" && (
+                  <span className="badge bg-success ms-2">ALUMNO</span>
                 )}
               </span>
               <button

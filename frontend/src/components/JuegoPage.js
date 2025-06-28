@@ -2,7 +2,7 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 
-// Importa todos los juegos correctamente, con mayúscula
+// Importación de componentes de juegos (asegúrate que existan y estén bien exportados)
 import IaGame from "../games/iaGame";
 import MlGame from "../games/mlGame";
 import NlpGame from "../games/nlpGame";
@@ -19,9 +19,9 @@ import GanGame from "../games/ganGame";
 import VaeGame from "../games/vaeGame";
 import DiffusionGame from "../games/diffusionGame";
 import SelfSupervisedGame from "../games/selfSupervisedGame";
-// etc...
+// ...agrega aquí más imports de juegos según vayas creando
 
-// Relaciona el nombre de archivo (string) con el componente real
+// Relaciona el string del "archivo" con el componente React correspondiente
 const juegosComponentes = {
   iaGame: IaGame,
   mlGame: MlGame,
@@ -39,15 +39,22 @@ const juegosComponentes = {
   vaeGame: VaeGame,
   diffusionGame: DiffusionGame,
   selfSupervisedGame: SelfSupervisedGame,
-  // ...agrega todos los juegos que tengas
+  // ...agrega aquí nuevos juegos
 };
 
 export default function JuegoPage() {
   const { juego } = useParams();
   const GameComponent = juegosComponentes[juego];
+
   return (
     <div>
-      {GameComponent ? <GameComponent /> : <div>Juego no encontrado.</div>}
+      {GameComponent ? (
+        <GameComponent />
+      ) : (
+        <div className="alert alert-danger text-center my-5" style={{ fontSize: 22 }}>
+          Juego no encontrado.
+        </div>
+      )}
     </div>
   );
 }

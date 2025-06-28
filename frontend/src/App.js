@@ -1,16 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Registro from "./components/Registro";
 import PanelAdmin from "./components/PanelAdmin";
-import PanelGame from "./components/PanelGame"; // <--- IMPORTANTE
+import PanelGame from "./components/PanelGame";
 import NavBar from "./components/NavBar";
 import CategoriasPage from "./components/CategoriasPage";
 import CategoriaDetallePage from "./components/CategoriaDetallePage";
 import JuegoPage from "./components/JuegoPage";
+import api from "./utils/api";
 
-// Juegos IA
 import IAGame from "./games/iaGame";
 import MLGame from "./games/mlGame";
 import DLGame from "./games/dlGame";
@@ -30,7 +30,7 @@ import SelfSupervisedGame from "./games/selfSupervisedGame";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-// Juegos por clave
+// Juegos por clave para uso dinámico
 export const juegosComponentes = {
   iaGame: <IAGame />,
   mlGame: <MLGame />,
@@ -59,11 +59,60 @@ function RutaPrivada({ usuario, children }) {
 
 function App() {
   const [usuario, setUsuario] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // Cargar perfil usuario al montar (y traer colegio)
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      api.get("/usuarios/perfil/me")
+        .then(res => {
+          if (res && !res.error) {
+            setUsuario(res); // Debe traer colegio dentro
+          } else {
+            localStorage.removeItem("token");
+            localStorage.removeItem("userId");
+            setUsuario(null);
+          }
+        })
+        .catch(() => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("userId");
+          setUsuario(null);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      setUsuario(null);
+      setLoading(false);
+    }
+  }, []);
+
+  // Cuando haces login, actualiza estado y guarda id (el token ya está guardado)
+  const handleLogin = (user) => {
+    setUsuario(user);
+    localStorage.setItem("userId", user.id);
+  };
+
+  const handleLogout = () => {
+    setUsuario(null);
+    localStorage.removeItem("userId");
+    localStorage.removeItem("token");
+  };
+
+  if (loading) return <div style={{
+    width: "100vw",
+    height: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    fontSize: 28,
+    color: "#888"
+  }}>Cargando...</div>;
 
   return (
     <Router>
-      {/* El NavBar SIEMPRE visible. El botón 'Salir' debe navegar a "/" */}
-      <NavBar usuario={usuario} onLogout={() => setUsuario(null)} />
+      {/* NavBar siempre visible */}
+      <NavBar usuario={usuario} onLogout={handleLogout} />
 
       <Routes>
         {/* LANDING: siempre accesible */}
@@ -71,7 +120,7 @@ function App() {
 
         {/* LOGIN */}
         <Route path="/login" element={
-          usuario ? <Navigate to="/categorias" /> : <Login onLogin={u => setUsuario(u)} />
+          usuario ? <Navigate to="/categorias" /> : <Login onLogin={handleLogin} />
         } />
 
         {/* REGISTRO */}
@@ -100,16 +149,16 @@ function App() {
           </RutaPrivada>
         } />
 
-        {/* PANEL ADMIN */}
+        {/* PANEL ADMIN - solo admin */}
         <Route path="/admin" element={
           <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
-            <PanelAdmin />
+            <PanelAdmin usuario={usuario} />
           </RutaPrivada>
         } />
 
-        {/* PANEL JUEGOS POR USUARIO */}
+        {/* PANEL JUEGOS POR USUARIO - solo admin o docente */}
         <Route path="/panel-game" element={
-          <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+          <RutaPrivada usuario={usuario && (usuario.rol === "admin" || usuario.rol === "docente")}>
             <PanelGame usuario={usuario} />
           </RutaPrivada>
         } />

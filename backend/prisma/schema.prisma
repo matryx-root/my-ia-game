@@ -7,14 +7,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// ENUM para roles de usuario
+enum RolUsuario {
+  alumno
+  docente
+}
+
+// Colegio: cada colegio puede tener muchos usuarios (alumnos o docentes)
+model Colegio {
+  id       Int      @id @default(autoincrement())
+  nombre   String
+  nivel    String   // Ej: "Primaria" o "Secundaria"
+  usuarios Usuario[]
+}
+
+// Usuario: pertenece a un colegio y tiene un rol (alumno/docente)
 model Usuario {
-  id            Int           @id @default(autoincrement())
+  id            Int                    @id @default(autoincrement())
   nombre        String
-  email         String        @unique
+  email         String                 @unique
   password      String
-  rol           String        @default("usuario")
+  rol RolUsuario @default(alumno)
   edad          Int?
   celular       String?
+  colegio       Colegio?               @relation(fields: [colegioId], references: [id])
+  colegioId     Int?
   progreso      ProgresoUsuario[]
   logsIngreso   LogIngreso[]
   logsJuego     LogJuego[]
@@ -25,41 +42,41 @@ model Usuario {
 }
 
 model Juego {
-  id         Int         @id @default(autoincrement())
-  nombre     String
+  id          Int                 @id @default(autoincrement())
+  nombre      String
   descripcion String?
-  logsJuego  LogJuego[]
-  progreso   ProgresoUsuario[]
-  logros     Achievement[]
-  errores    LogError[]
+  logsJuego   LogJuego[]
+  progreso    ProgresoUsuario[]
+  logros      Achievement[]
+  errores     LogError[]
 }
 
 model LogIngreso {
-  id         Int       @id @default(autoincrement())
-  usuario    Usuario   @relation(fields: [usuarioId], references: [id])
+  id         Int      @id @default(autoincrement())
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   usuarioId  Int
-  fechaHora  DateTime  @default(now())
+  fechaHora  DateTime @default(now())
   ip         String?
   userAgent  String?
 }
 
 model LogJuego {
   id         Int      @id @default(autoincrement())
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   usuarioId  Int
-  juego      Juego    @relation(fields: [juegoId], references: [id])
+  juego      Juego    @relation(fields: [juegoId], references: [id], onDelete: Cascade)
   juegoId    Int
   fechaHora  DateTime @default(now())
-  accion     String?  // Ej: "Empezó", "Terminó", "Logró Puntaje"
-  detalle    String?  // Ej: "Nivel 3 completado"
-  duracion   Int?     // Segundos o milisegundos
+  accion     String?  // Ej: "Empezó", "Terminó", "Puntaje"
+  detalle    String?
+  duracion   Int?
 }
 
 model LogError {
   id         Int      @id @default(autoincrement())
-  usuario    Usuario? @relation(fields: [usuarioId], references: [id])
+  usuario    Usuario? @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   usuarioId  Int?
-  juego      Juego?   @relation(fields: [juegoId], references: [id])
+  juego      Juego?   @relation(fields: [juegoId], references: [id], onDelete: Cascade)
   juegoId    Int?
   fechaHora  DateTime @default(now())
   mensaje    String
@@ -68,7 +85,7 @@ model LogError {
 
 model MensajeSoporte {
   id         Int      @id @default(autoincrement())
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
   usuarioId  Int
   mensaje    String
   fechaHora  DateTime @default(now())
@@ -77,33 +94,33 @@ model MensajeSoporte {
 }
 
 model ProgresoUsuario {
-  id           Int       @id @default(autoincrement())
-  usuario      Usuario   @relation(fields: [usuarioId], references: [id])
-  usuarioId    Int
-  juego        Juego     @relation(fields: [juegoId], references: [id])
-  juegoId      Int
-  avance       Int?      // Puntaje o porcentaje o nivel
-  completado   Boolean?  // true/false
-  fechaActualizacion DateTime @default(now())
+  id                  Int      @id @default(autoincrement())
+  usuario             Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId           Int
+  juego               Juego    @relation(fields: [juegoId], references: [id], onDelete: Cascade)
+  juegoId             Int
+  avance              Int?     // Puntaje, porcentaje, nivel
+  completado          Boolean? // true/false
+  fechaActualizacion  DateTime @default(now())
 }
 
 model Achievement {
-  id         Int      @id @default(autoincrement())
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
-  usuarioId  Int
-  juego      Juego?   @relation(fields: [juegoId], references: [id])
-  juegoId    Int?
-  nombre     String
+  id          Int      @id @default(autoincrement())
+  usuario     Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId   Int
+  juego       Juego?   @relation(fields: [juegoId], references: [id], onDelete: Cascade)
+  juegoId     Int?
+  nombre      String
   descripcion String?
-  fechaHora  DateTime @default(now())
+  fechaHora   DateTime @default(now())
 }
 
 model ConfiguracionUsuario {
-  id         Int      @id @default(autoincrement())
-  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
-  usuarioId  Int      @unique
-  tema       String?
-  idioma     String?
-  sonido     Boolean?
-  notificaciones Boolean?
+  id              Int      @id @default(autoincrement())
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId       Int      @unique
+  tema            String?
+  idioma          String?
+  sonido          Boolean?
+  notificaciones  Boolean?
 }

@@ -2,15 +2,33 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 
-// Usuarios
+// controllers/adminController.js
 exports.listarUsuarios = async (req, res) => {
   try {
-    const usuarios = await prisma.usuario.findMany();
+    // Puedes usar Prisma o tu ORM aquí
+    // Ejemplo: const usuarios = await prisma.usuario.findMany();
+    // Si tienes colegios, puedes incluirlos: include: { colegio: true }
+    const usuarios = await prisma.usuario.findMany({
+      include: { colegio: true }
+    });
     res.json(usuarios);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
+// controllers/adminController.js
+exports.listarColegios = async (req, res) => {
+  try {
+    const colegios = await prisma.colegio.findMany();
+    res.json(colegios);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
+
 exports.crearUsuario = async (req, res) => {
   const { nombre, email, password, rol = 'usuario', edad, celular } = req.body;
   try {
@@ -39,12 +57,23 @@ exports.editarUsuario = async (req, res) => {
 exports.eliminarUsuario = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    await prisma.usuario.delete({ where: { id } });
+
+    // Primero elimina los logs relacionados (cambia el nombre si tu modelo es diferente)
+    await prisma.logIngreso.deleteMany({
+      where: { usuarioId: id }
+    });
+
+    // Ahora elimina el usuario
+    await prisma.usuario.delete({
+      where: { id }
+    });
+
     res.json({ mensaje: "Usuario eliminado" });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 // Juegos
 exports.listarJuegos = async (req, res) => {
   try {

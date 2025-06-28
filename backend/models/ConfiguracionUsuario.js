@@ -1,6 +1,6 @@
 class ConfiguracionUsuario {
   constructor({
-    id, usuarioId, tema, idioma, sonido, notificaciones
+    id, usuarioId, tema = null, idioma = null, sonido = null, notificaciones = null
   }) {
     this.id = id;
     this.usuarioId = usuarioId;

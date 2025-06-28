@@ -69,6 +69,8 @@ export default function CategoriasPage() {
         {categorias.map(cat => (
           <div
             key={cat.id}
+            role="button"
+            tabIndex={0}
             style={{
               background: cat.color,
               borderRadius: 20,
@@ -85,6 +87,11 @@ export default function CategoriasPage() {
               transition: "transform 0.2s, box-shadow 0.2s"
             }}
             onClick={() => navigate(`/categoria/${cat.id}`)}
+            onKeyPress={e => {
+              if (e.key === "Enter" || e.key === " ") {
+                navigate(`/categoria/${cat.id}`);
+              }
+            }}
             onMouseEnter={e => {
               e.currentTarget.style.transform = "scale(1.035)";
               e.currentTarget.style.boxShadow = "0 12px 40px #0004";

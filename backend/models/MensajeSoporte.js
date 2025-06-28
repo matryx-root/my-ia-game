@@ -1,6 +1,6 @@
 class MensajeSoporte {
   constructor({
-    id, usuarioId, mensaje, fechaHora, estado = "pendiente", respuesta
+    id, usuarioId, mensaje, fechaHora, estado = "pendiente", respuesta = null
   }) {
     this.id = id;
     this.usuarioId = usuarioId;

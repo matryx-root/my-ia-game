@@ -11,12 +11,28 @@ export default function CategoriaDetallePage() {
   // Consigue los juegos de la categoría seleccionada
   const juegos = categoriasJuegos[id] || [];
 
+  // Si la categoría no existe (opcional)
+  if (!categoriasJuegos.hasOwnProperty(id)) {
+    return (
+      <div className="container mt-5">
+        <div className="alert alert-danger text-center">
+          Categoría no encontrada.
+        </div>
+        <div className="text-center mt-3">
+          <button className="btn btn-secondary" onClick={() => navigate("/categorias")}>
+            Volver a Categorías
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{
       minHeight: "90vh", background: "#f4fafd", padding: 40
     }}>
       <h2 className="text-center mb-5 text-primary" style={{ fontSize: 38 }}>
-        Juegos de la categoría
+        Juegos de la categoría <span className="fw-bold">{id}</span>
       </h2>
       <div className="text-center mt-5">
         <button className="btn btn-secondary" onClick={() => navigate("/categorias")}>

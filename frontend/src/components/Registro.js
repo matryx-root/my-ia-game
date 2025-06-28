@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 
@@ -9,12 +9,27 @@ export default function Registro({ onRegister }) {
     password: "",
     edad: "",
     celular: "",
+    rol: "",
+    colegioId: ""
   });
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({});
+  const [colegios, setColegios] = useState([]);
+  const [cargandoColegios, setCargandoColegios] = useState(true);
   const navigate = useNavigate();
 
-  // Validación simple
+  // Cargar colegios desde endpoint público al montar el componente
+  useEffect(() => {
+    // Ruta pública, asegúrate que backend la sirva como /api/colegios
+    api.get("/colegios")
+      .then(res => {
+        setColegios(Array.isArray(res) ? res : []);
+      })
+      .catch(() => setColegios([]))
+      .finally(() => setCargandoColegios(false));
+  }, []);
+
+  // Validación básica de campos
   const validate = () => {
     const newErrors = {};
     if (!data.nombre) newErrors.nombre = "Nombre es requerido";
@@ -22,28 +37,34 @@ export default function Registro({ onRegister }) {
     else if (!/\S+@\S+\.\S+/.test(data.email)) newErrors.email = "Email no válido";
     if (!data.password) newErrors.password = "Contraseña es requerida";
     else if (data.password.length < 6) newErrors.password = "Mínimo 6 caracteres";
-    if (data.edad && (data.edad < 5 || data.edad > 120)) newErrors.edad = "Edad no válida";
+    if (!data.rol) newErrors.rol = "Debes seleccionar tu rol";
+    if (!data.colegioId) newErrors.colegioId = "Debes seleccionar un colegio";
+    if (data.edad && (Number(data.edad) < 5 || Number(data.edad) > 120)) newErrors.edad = "Edad no válida";
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Manejar cambios de campos
+  // Manejar cambios en los campos
   const handleChange = (e) => {
     setData({ ...data, [e.target.name]: e.target.value });
     if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: null });
   };
 
-  // Manejar registro
+  // Manejar envío de registro
   const handleRegister = async (e) => {
     e.preventDefault();
     if (!validate()) return;
     setLoading(true);
     try {
-      const res = await api.post("/usuarios/register", data);
+      const res = await api.post("/usuarios/register", {
+        ...data,
+        colegioId: data.colegioId ? Number(data.colegioId) : null,
+        edad: data.edad ? Number(data.edad) : null
+      });
       if (res.mensaje) {
         alert("¡Registro exitoso!");
         if (onRegister) onRegister();
-        navigate("/login"); // Lleva a login después de registro
+        navigate("/login");
       } else {
         alert(res.error || "Error en el registro");
       }
@@ -108,6 +129,49 @@ export default function Registro({ onRegister }) {
                   />
                   {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                 </div>
+                {/* Rol */}
+                <div className="mb-3">
+                  <label htmlFor="rol" className="form-label">Rol</label>
+                  <select
+                    id="rol"
+                    name="rol"
+                    className={`form-select ${errors.rol ? "is-invalid" : ""}`}
+                    value={data.rol}
+                    onChange={handleChange}
+                    required
+                  >
+                    <option value="">Selecciona tu rol</option>
+                    <option value="alumno">Alumno</option>
+                    <option value="docente">Docente</option>
+                  </select>
+                  {errors.rol && <div className="invalid-feedback">{errors.rol}</div>}
+                </div>
+                {/* Colegio */}
+                <div className="mb-3">
+                  <label htmlFor="colegioId" className="form-label">Colegio</label>
+                  <select
+                    id="colegioId"
+                    name="colegioId"
+                    className={`form-select ${errors.colegioId ? "is-invalid" : ""}`}
+                    value={data.colegioId}
+                    onChange={handleChange}
+                    required
+                    disabled={cargandoColegios}
+                  >
+                    <option value="">
+                      {cargandoColegios
+                        ? "Cargando colegios..."
+                        : (colegios.length === 0 ? "No hay colegios disponibles" : "Selecciona tu colegio")
+                      }
+                    </option>
+                    {colegios.map(c => (
+                      <option key={c.id} value={c.id}>
+                        {c.nombre} ({c.nivel})
+                      </option>
+                    ))}
+                  </select>
+                  {errors.colegioId && <div className="invalid-feedback">{errors.colegioId}</div>}
+                </div>
                 {/* Edad y Celular en row */}
                 <div className="row">
                   <div className="col-md-6 mb-3">
@@ -140,10 +204,10 @@ export default function Registro({ onRegister }) {
                 </div>
                 {/* Botón de registro */}
                 <div className="d-grid gap-2 mt-4">
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     className="btn btn-primary btn-lg"
-                    disabled={loading}
+                    disabled={loading || cargandoColegios || colegios.length === 0}
                   >
                     {loading ? (
                       <>

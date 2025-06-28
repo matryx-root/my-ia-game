@@ -1,6 +1,6 @@
 class LogError {
   constructor({
-    id, usuarioId, juegoId, fechaHora, mensaje, detalle
+    id, usuarioId = null, juegoId = null, fechaHora, mensaje, detalle
   }) {
     this.id = id;
     this.usuarioId = usuarioId;

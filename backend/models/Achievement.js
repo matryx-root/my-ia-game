@@ -1,6 +1,6 @@
 class Achievement {
   constructor({
-    id, usuarioId, juegoId, nombre, descripcion, fechaHora
+    id, usuarioId, juegoId = null, nombre, descripcion = null, fechaHora
   }) {
     this.id = id;
     this.usuarioId = usuarioId;
