@@ -4,15 +4,26 @@ import api from "../utils/api";
 export default function MensajeSoportePage({ usuario }) {
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState("");
+  const [destinatarioId, setDestinatarioId] = useState("");
+  const [usuarios, setUsuarios] = useState([]);
   const [respuesta, setRespuesta] = useState({});
   const [error, setError] = useState(null);
   const [cargando, setCargando] = useState(false);
 
-  // Cargar mensajes: todos si admin/docente, solo propios si alumno
+  // Traer todos los usuarios (admin)
+  useEffect(() => {
+    if (usuario?.rol === "admin") {
+      api.get("/admin/usuarios")
+        .then(setUsuarios)
+        .catch(() => setUsuarios([]));
+    }
+  }, [usuario]);
+
+  // Cargar mensajes
   const cargarMensajes = () => {
     setCargando(true);
     let url = "/mensajes";
-    if (usuario.rol === "alumno") url += `?usuarioId=${usuario.id}`;
+    if (usuario.rol !== "admin") url += `?usuarioId=${usuario.id}`;
     api.get(url)
       .then(setMensajes)
       .catch(() => setError("Error al cargar mensajes"))
@@ -24,27 +35,47 @@ export default function MensajeSoportePage({ usuario }) {
     // eslint-disable-next-line
   }, [usuario]);
 
-  // Enviar nuevo mensaje de soporte
+  // Enviar mensaje (admin a cualquiera, usuarios solo a sí mismos)
   const enviarMensaje = async (e) => {
     e.preventDefault();
-    if (!nuevoMensaje.trim()) return;
-    setCargando(true);
     setError(null);
+
+    if (usuario.rol === "admin" && !destinatarioId) {
+      setError("Selecciona el destinatario");
+      return;
+    }
+    if (!nuevoMensaje.trim()) {
+      setError("El mensaje no puede estar vacío");
+      return;
+    }
+    setCargando(true);
     try {
-      await api.post("/mensajes", {
-        usuarioId: usuario.id,
-        mensaje: nuevoMensaje
-      });
+      if (usuario.rol === "admin") {
+        await api.post("/mensajes", {
+          usuarioId: Number(destinatarioId),
+          mensaje: nuevoMensaje.trim()
+        });
+      } else {
+        await api.post("/mensajes", {
+          usuarioId: usuario.id,
+          mensaje: nuevoMensaje.trim()
+        });
+      }
       setNuevoMensaje("");
+      setDestinatarioId("");
       cargarMensajes();
-    } catch {
-      setError("No se pudo enviar el mensaje");
+    } catch (err) {
+      setError(
+        err?.response?.data?.error ||
+        err.message ||
+        "No se pudo enviar el mensaje"
+      );
     } finally {
       setCargando(false);
     }
   };
 
-  // Responder mensaje (admin/docente)
+  // Responder mensaje (admin)
   const responder = async (id) => {
     if (!respuesta[id] || !respuesta[id].trim()) return;
     setCargando(true);
@@ -63,6 +94,20 @@ export default function MensajeSoportePage({ usuario }) {
     }
   };
 
+  // Marcar como leído (solo alumno/docente)
+  const marcarLeido = async (id) => {
+    setCargando(true);
+    setError(null);
+    try {
+      await api.put(`/mensajes/${id}/leido`);
+      cargarMensajes();
+    } catch {
+      setError("No se pudo marcar como leído");
+    } finally {
+      setCargando(false);
+    }
+  };
+
   return (
     <div className="container py-4">
       <h2 className="mb-4 text-primary fw-bold">
@@ -74,26 +119,47 @@ export default function MensajeSoportePage({ usuario }) {
       </h2>
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* Nuevo mensaje: alumno o docente */}
-      {(usuario.rol === "alumno" || usuario.rol === "docente") && (
-        <form className="mb-3" onSubmit={enviarMensaje}>
-          <div className="input-group">
-            <input
-              className="form-control"
-              value={nuevoMensaje}
-              placeholder="Escribe tu mensaje de soporte..."
-              onChange={e => setNuevoMensaje(e.target.value)}
+      {/* Formulario para enviar mensaje */}
+      <form className="mb-3" onSubmit={enviarMensaje}>
+        <div className="input-group">
+          {/* Si es admin, elige destinatario */}
+          {usuario.rol === "admin" && (
+            <select
+              className="form-select"
+              value={destinatarioId}
+              onChange={e => setDestinatarioId(e.target.value)}
               disabled={cargando}
-              maxLength={500}
-            />
-            <button className="btn btn-primary" type="submit" disabled={cargando}>
-              Enviar
-            </button>
-          </div>
-        </form>
-      )}
+              style={{ maxWidth: 250 }}
+              required
+            >
+              <option value="">A quién enviar (elige usuario)...</option>
+              {usuarios.map(u => (
+                <option key={u.id} value={u.id}>
+                  {u.nombre} ({u.rol}, {u.colegio?.nombre || "Sin colegio"})
+                </option>
+              ))}
+            </select>
+          )}
+          <input
+            className="form-control"
+            value={nuevoMensaje}
+            placeholder={
+              usuario.rol === "admin"
+                ? "Mensaje informativo o aviso a usuario seleccionado..."
+                : "Escribe tu mensaje de soporte..."
+            }
+            onChange={e => setNuevoMensaje(e.target.value)}
+            disabled={cargando}
+            maxLength={500}
+            required
+          />
+          <button className="btn btn-primary" type="submit" disabled={cargando}>
+            Enviar
+          </button>
+        </div>
+      </form>
 
-      {/* Listado de mensajes */}
+      {/* Tabla de mensajes */}
       {cargando ? (
         <div>Cargando...</div>
       ) : (
@@ -101,27 +167,27 @@ export default function MensajeSoportePage({ usuario }) {
           <table className="table table-bordered align-middle">
             <thead>
               <tr>
-                {(usuario.rol === "admin" || usuario.rol === "docente") && <th>Usuario</th>}
+                {usuario.rol === "admin" && <th>Usuario</th>}
                 <th>Mensaje</th>
                 <th>Fecha</th>
                 <th>Estado</th>
                 <th>Respuesta</th>
-                {(usuario.rol === "admin" || usuario.rol === "docente") && <th>Responder</th>}
+                {usuario.rol === "admin" && <th>Responder</th>}
+                {usuario.rol !== "admin" && <th>Acción</th>}
               </tr>
             </thead>
             <tbody>
               {mensajes.length === 0 && (
                 <tr>
-                  <td colSpan={usuario.rol === "admin" || usuario.rol === "docente" ? 6 : 5}>
+                  <td colSpan={usuario.rol === "admin" ? 6 : 6}>
                     No hay mensajes registrados.
                   </td>
                 </tr>
               )}
               {mensajes.map(m => (
                 <tr key={m.id}>
-                  {(usuario.rol === "admin" || usuario.rol === "docente") && (
+                  {usuario.rol === "admin" && (
                     <td>
-                      {/* Si el backend devuelve el usuario anidado puedes usar: m.usuario?.nombre */}
                       {m.usuario?.nombre || m.usuarioId}
                     </td>
                   )}
@@ -130,6 +196,8 @@ export default function MensajeSoportePage({ usuario }) {
                   <td>
                     {m.estado === "respondido" ? (
                       <span className="badge bg-success">Respondido</span>
+                    ) : m.estado === "leido" ? (
+                      <span className="badge bg-info text-dark">Leído</span>
                     ) : (
                       <span className="badge bg-warning text-dark">Pendiente</span>
                     )}
@@ -141,7 +209,8 @@ export default function MensajeSoportePage({ usuario }) {
                       <span className="text-muted">-</span>
                     )}
                   </td>
-                  {(usuario.rol === "admin" || usuario.rol === "docente") && (
+                  {/* Acciones */}
+                  {usuario.rol === "admin" && (
                     <td>
                       {m.estado === "respondido" ? (
                         <span className="text-success">✓</span>
@@ -161,6 +230,23 @@ export default function MensajeSoportePage({ usuario }) {
                             Responder
                           </button>
                         </div>
+                      )}
+                    </td>
+                  )}
+                  {usuario.rol !== "admin" && (
+                    <td>
+                      {/* Botón marcar como leído (solo para mensajes pendientes que no son propios) */}
+                      {!m.leido && m.estado === "pendiente" && (
+                        <button
+                          className="btn btn-outline-secondary btn-sm"
+                          onClick={() => marcarLeido(m.id)}
+                          disabled={cargando}
+                        >
+                          Marcar como leído
+                        </button>
+                      )}
+                      {m.leido && (
+                        <span className="badge bg-info text-dark">Leído</span>
                       )}
                     </td>
                   )}

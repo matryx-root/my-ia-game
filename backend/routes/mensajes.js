@@ -11,5 +11,6 @@ router.get('/', authMiddleware, mensajeSoporteController.listarMensajes);
 
 // Responder mensaje (solo docente o admin)
 router.put('/:id/responder', authMiddleware, mensajeSoporteController.responderMensaje);
+router.put('/:id/leido', authMiddleware, mensajeSoporteController.marcarLeido);
 
 module.exports = router;

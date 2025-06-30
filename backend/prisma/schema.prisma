@@ -92,7 +92,9 @@ model MensajeSoporte {
   fechaHora  DateTime @default(now())
   estado     String   @default("pendiente")
   respuesta  String?
+  leido      Boolean? @default(false) // <--- NUEVO
 }
+
 
 model ProgresoUsuario {
   id                  Int      @id @default(autoincrement())
