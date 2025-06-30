@@ -71,17 +71,31 @@ export default function NavBar({ usuario, onLogout }) {
                 </button>
               )}
 
+              {/* Botón Soporte/Mensajes: para alumno, docente y admin */}
+              {(usuario.rol === "alumno" ||
+                usuario.rol === "docente" ||
+                usuario.rol === "admin") && (
+                <button
+                  className="btn btn-outline-secondary me-3"
+                  onClick={() => navigate("/mensajes-soporte")}
+                >
+                  <i className="bi bi-chat-left-text me-1"></i>
+                  Soporte
+                </button>
+              )}
+
               {/* Badge y saludo */}
               <span className="text-light me-3 d-none d-sm-block">
                 Bienvenido, <span className="fw-bold">{usuario.nombre}</span>
-                {(usuario.rol === "alumno" || usuario.rol === "docente") && usuario.colegio?.nombre && (
-                  <span
-                    className="badge bg-info ms-2"
-                    style={{ color: "#222", fontWeight: 600 }}
-                  >
-                    Colegio {usuario.colegio.nombre}
-                  </span>
-                )}
+                {(usuario.rol === "alumno" || usuario.rol === "docente") &&
+                  usuario.colegio?.nombre && (
+                    <span
+                      className="badge bg-info ms-2"
+                      style={{ color: "#222", fontWeight: 600 }}
+                    >
+                      Colegio {usuario.colegio.nombre}
+                    </span>
+                  )}
                 {usuario.rol === "admin" && (
                   <span className="badge bg-danger ms-2">ADMIN</span>
                 )}

@@ -5,13 +5,19 @@ import Login from "./components/Login";
 import Registro from "./components/Registro";
 import PanelAdmin from "./components/PanelAdmin";
 import PanelGame from "./components/PanelGame";
-import DashboardAdmin from "./components/DashboardAdmin"; // <--- Nuevo componente
+import DashboardAdmin from "./components/DashboardAdmin";
 import NavBar from "./components/NavBar";
 import CategoriasPage from "./components/CategoriasPage";
 import CategoriaDetallePage from "./components/CategoriaDetallePage";
 import JuegoPage from "./components/JuegoPage";
+import MensajeSoportePage from "./components/MensajeSoporte"; // <--- nuevo
+
+
+
+
 import api from "./utils/api";
 
+// ...importaciones de juegos (igual que antes)
 import IAGame from "./games/iaGame";
 import MLGame from "./games/mlGame";
 import DLGame from "./games/dlGame";
@@ -100,15 +106,22 @@ function App() {
     localStorage.removeItem("token");
   };
 
-  if (loading) return <div style={{
-    width: "100vw",
-    height: "100vh",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-    fontSize: 28,
-    color: "#888"
-  }}>Cargando...</div>;
+  if (loading)
+    return (
+      <div
+        style={{
+          width: "100vw",
+          height: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          fontSize: 28,
+          color: "#888",
+        }}
+      >
+        Cargando...
+      </div>
+    );
 
   return (
     <Router>
@@ -120,56 +133,90 @@ function App() {
         <Route path="/" element={<LandingPage />} />
 
         {/* LOGIN */}
-        <Route path="/login" element={
-          usuario ? <Navigate to="/categorias" /> : <Login onLogin={handleLogin} />
-        } />
+        <Route
+          path="/login"
+          element={
+            usuario ? <Navigate to="/categorias" /> : <Login onLogin={handleLogin} />
+          }
+        />
 
         {/* REGISTRO */}
-        <Route path="/register" element={
-          usuario ? <Navigate to="/categorias" /> : <Registro onRegister={() => {}} />
-        } />
+        <Route
+          path="/register"
+          element={
+            usuario ? <Navigate to="/categorias" /> : <Registro onRegister={() => {}} />
+          }
+        />
 
         {/* CATEGORÍAS */}
-        <Route path="/categorias" element={
-          <RutaPrivada usuario={usuario}>
-            <CategoriasPage />
-          </RutaPrivada>
-        } />
+        <Route
+          path="/categorias"
+          element={
+            <RutaPrivada usuario={usuario}>
+              <CategoriasPage />
+            </RutaPrivada>
+          }
+        />
 
         {/* DETALLE CATEGORÍA */}
-        <Route path="/categoria/:id" element={
-          <RutaPrivada usuario={usuario}>
-            <CategoriaDetallePage />
-          </RutaPrivada>
-        } />
+        <Route
+          path="/categoria/:id"
+          element={
+            <RutaPrivada usuario={usuario}>
+              <CategoriaDetallePage />
+            </RutaPrivada>
+          }
+        />
 
         {/* JUEGO DINÁMICO */}
-        <Route path="/juego/:juego" element={
-          <RutaPrivada usuario={usuario}>
-            <JuegoPage />
-          </RutaPrivada>
-        } />
+        <Route
+          path="/juego/:juego"
+          element={
+            <RutaPrivada usuario={usuario}>
+              <JuegoPage />
+            </RutaPrivada>
+          }
+        />
 
         {/* PANEL ADMIN - solo admin */}
-        <Route path="/admin" element={
-          <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
-            <PanelAdmin usuario={usuario} />
-          </RutaPrivada>
-        } />
+        <Route
+          path="/admin"
+          element={
+            <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+              <PanelAdmin usuario={usuario} />
+            </RutaPrivada>
+          }
+        />
 
         {/* PANEL JUEGOS POR USUARIO - solo admin o docente */}
-        <Route path="/panel-game" element={
-          <RutaPrivada usuario={usuario && (usuario.rol === "admin" || usuario.rol === "docente")}>
-            <PanelGame usuario={usuario} />
-          </RutaPrivada>
-        } />
+        <Route
+          path="/panel-game"
+          element={
+            <RutaPrivada usuario={usuario && (usuario.rol === "admin" || usuario.rol === "docente")}>
+              <PanelGame usuario={usuario} />
+            </RutaPrivada>
+          }
+        />
 
         {/* DASHBOARD ADMIN - solo admin */}
-        <Route path="/dashboard-admin" element={
-          <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
-            <DashboardAdmin usuario={usuario} />
-          </RutaPrivada>
-        } />
+        <Route
+          path="/dashboard-admin"
+          element={
+            <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+              <DashboardAdmin usuario={usuario} />
+            </RutaPrivada>
+          }
+        />
+
+        {/* MENSAJE SOPORTE - alumnos, docentes, admin */}
+        <Route
+          path="/mensajes-soporte"
+          element={
+            <RutaPrivada usuario={usuario}>
+              <MensajeSoportePage usuario={usuario} />
+            </RutaPrivada>
+          }
+        />
 
         {/* Cualquier otra ruta -> vuelve a landing */}
         <Route path="*" element={<Navigate to="/" />} />
