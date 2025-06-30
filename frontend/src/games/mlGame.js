@@ -1,5 +1,3 @@
-// src/games/mlGame.js
-
 import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { useNavigate } from 'react-router-dom';
@@ -14,7 +12,6 @@ export default function MLClusterGame({ usuario }) {
   const [puedeGuardar, setPuedeGuardar] = useState(false);
   const [guardado, setGuardado] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState(null);
-  const [aciertos, setAciertos] = useState(0);
   const [desaciertos, setDesaciertos] = useState(0);
 
   // Historial SOLO de progresos (partidas)
@@ -99,6 +96,7 @@ export default function MLClusterGame({ usuario }) {
                 punto.y = dragY;
               });
 
+              // eslint-disable-next-line no-loop-func
               punto.on('dragend', (pointer) => {
                 let correcto = false;
                 clusters.forEach((cl, idx) => {
@@ -129,7 +127,6 @@ export default function MLClusterGame({ usuario }) {
                   setResultado(
                     "¡Aprendiste cómo las IA de ML pueden agrupar datos automáticamente por similitud! Así organizan fotos, canciones y mucho más."
                   );
-                  setAciertos(TOTAL_PUNTOS - desaciertosTemp); // Actualiza los aciertos
                   setDesaciertos(desaciertosTemp);
                   setPuedeGuardar(true);
                   setGuardado(false);
@@ -154,12 +151,11 @@ export default function MLClusterGame({ usuario }) {
       setPuedeGuardar(false);
       setGuardado(false);
       setErrorGuardar(null);
-      setAciertos(0);
       setDesaciertos(0);
     };
   }, [instruccion, juegoKey, usuario]);
 
-  // Acción del botón de guardar progreso y logro
+  // Acción del botón de guardar progreso
   const guardarProgresoYLogro = async () => {
     if (!usuario || !usuario.id) {
       setErrorGuardar('No hay usuario logueado.');
@@ -194,7 +190,6 @@ export default function MLClusterGame({ usuario }) {
     setPuedeGuardar(false);
     setGuardado(false);
     setErrorGuardar(null);
-    setAciertos(0);
     setDesaciertos(0);
     if (gameRef.current) {
       gameRef.current.destroy(true);

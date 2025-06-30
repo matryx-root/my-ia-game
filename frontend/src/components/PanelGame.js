@@ -1,6 +1,10 @@
+// src/components/PanelGame.js
+
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
+
+const TOTAL_PUNTOS = 12; // Igual a mlGame.js
 
 export default function PanelGame({ usuario }) {
   const [usuarios, setUsuarios] = useState([]);
@@ -13,7 +17,7 @@ export default function PanelGame({ usuario }) {
 
   const navigate = useNavigate();
 
-  // Acceso solo docente o admin
+  // Control acceso docente/admin
   useEffect(() => {
     if (!usuario || (usuario.rol !== "admin" && usuario.rol !== "docente")) {
       alert("No tienes permiso para acceder a este panel.");
@@ -22,7 +26,7 @@ export default function PanelGame({ usuario }) {
     // eslint-disable-next-line
   }, [usuario]);
 
-  // Cargar usuarios a mostrar según rol
+  // Cargar usuarios
   useEffect(() => {
     if (!usuario) return;
     setLoading(true);
@@ -44,7 +48,7 @@ export default function PanelGame({ usuario }) {
       .finally(() => setLoading(false));
   }, [usuario]);
 
-  // Cuando cambia el alumno seleccionado, cargar sus detalles
+  // Al cambiar alumno seleccionado
   useEffect(() => {
     if (!selectedId) {
       setSelectedUser(null);
@@ -57,8 +61,8 @@ export default function PanelGame({ usuario }) {
     if (user) {
       setLoading(true);
       Promise.all([
-        api.get(`/admin/progreso/${user.id}`),
-        api.get(`/admin/logros/${user.id}`)
+        api.get(`/juegos/progreso/${user.id}`),
+        api.get(`/juegos/logros/${user.id}`)
       ])
         .then(([prog, achv]) => {
           setProgreso(Array.isArray(prog) ? prog : []);
@@ -74,26 +78,17 @@ export default function PanelGame({ usuario }) {
     }
   }, [selectedId, usuarios]);
 
-  // Si no hay alumnos para mostrar:
-  if (!loading && usuarios.length === 0) {
-    return (
-      <div className="container py-5">
-        <h2 className="text-center mb-4 text-primary fw-bold">
-          Panel de Juegos y Progreso por Usuario
-        </h2>
-        {error && (
-          <div className="alert alert-danger text-center mb-3">
-            {error}
-          </div>
-        )}
-        <div className="alert alert-info text-center">
-          {usuario.rol === "docente"
-            ? "No tienes alumnos registrados en tu colegio."
-            : "No hay usuarios disponibles para mostrar."}
-        </div>
-      </div>
-    );
-  }
+  // Agrupar por juego
+  const progresoPorJuego = {};
+  progreso.forEach(p => {
+    if (!progresoPorJuego[p.juegoId]) {
+      progresoPorJuego[p.juegoId] = {
+        nombre: p.juego?.nombre || `Juego ${p.juegoId}`,
+        registros: []
+      };
+    }
+    progresoPorJuego[p.juegoId].registros.push(p);
+  });
 
   return (
     <div className="container py-5">
@@ -105,9 +100,17 @@ export default function PanelGame({ usuario }) {
           {error}
         </div>
       )}
+
+      {loading && (
+        <div className="text-center my-3">
+          <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+          <span className="ms-2">Cargando datos...</span>
+        </div>
+      )}
+
       <div className="mb-3">
         <label htmlFor="selectAlumno" className="form-label fw-semibold">
-          Selecciona un alumno para ver su detalle de juegos y logros:
+          Selecciona un alumno para ver su historial de juegos:
         </label>
         <select
           id="selectAlumno"
@@ -125,6 +128,7 @@ export default function PanelGame({ usuario }) {
         </select>
       </div>
 
+      {/* Detalle alumno y progreso */}
       {selectedUser && (
         <div className="card shadow mt-4">
           <div className="card-body">
@@ -134,42 +138,60 @@ export default function PanelGame({ usuario }) {
             <div>
               <strong>Email:</strong> {selectedUser.email}
               <br />
-              <strong>Colegio:</strong>{" "}
-              {selectedUser.colegio?.nombre || "-"}
+              <strong>Colegio:</strong> {selectedUser.colegio?.nombre || "-"}
               <br />
               <strong>Edad:</strong> {selectedUser.edad || "-"}
             </div>
             <hr />
-            <h5 className="fw-bold mt-3">Progreso en Juegos</h5>
-            {progreso.length === 0 ? (
-              <span className="text-muted">No hay progreso registrado.</span>
+
+            {/* PROGRESO */}
+            {Object.keys(progresoPorJuego).length === 0 ? (
+              <span className="text-muted">No hay progresos registrados.</span>
             ) : (
-              <div className="table-responsive">
-                <table className="table table-sm table-bordered">
-                  <thead className="table-light">
-                    <tr>
-                      <th>Juego</th>
-                      <th>Avance</th>
-                      <th>Completado</th>
-                      <th>Última actualización</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {progreso.map(p => (
-                      <tr key={p.id}>
-                        <td>{p.juego?.nombre || p.juegoId}</td>
-                        <td>{p.avance ?? "-"}</td>
-                        <td>{p.completado ? "✅" : "❌"}</td>
-                        <td>
-                          {new Date(p.fechaActualizacion).toLocaleString()}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
+              Object.entries(progresoPorJuego).map(([juegoId, juego]) => (
+                <div className="my-3" key={juegoId}>
+                  <h5 className="fw-bold mb-2">
+                    {juego.nombre} <span className="text-secondary">({juegoId})</span>
+                  </h5>
+                  <div className="table-responsive">
+                    <table className="table table-sm table-bordered align-middle">
+                      <thead className="table-light">
+                        <tr>
+                          <th>ID</th>
+                          <th>Avance</th>
+                          <th>Completado</th>
+                          <th>Fecha y Hora</th>
+                          <th>Aciertos</th>
+                          <th>Desaciertos</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {juego.registros
+                          .sort((a, b) => new Date(b.fechaActualizacion) - new Date(a.fechaActualizacion))
+                          .map((p) => (
+                            <tr key={p.id}>
+                              <td>{p.id}</td>
+                              <td>{p.avance ?? "-"}</td>
+                              <td>{p.completado ? "✅" : "❌"}</td>
+                              <td>{new Date(p.fechaActualizacion).toLocaleString()}</td>
+                              <td>
+                                {typeof p.desaciertos === "number"
+                                  ? (TOTAL_PUNTOS - p.desaciertos)
+                                  : (typeof p.aciertos === "number"
+                                    ? p.aciertos
+                                    : "-")}
+                              </td>
+                              <td>{p.desaciertos ?? "-"}</td>
+                            </tr>
+                          ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              ))
             )}
 
+            {/* LOGROS */}
             <h5 className="fw-bold mt-3">Logros</h5>
             {logros.length === 0 ? (
               <span className="text-muted">No hay logros registrados.</span>
