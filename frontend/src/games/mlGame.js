@@ -14,35 +14,35 @@ export default function MLClusterGame({ usuario }) {
   const [puedeGuardar, setPuedeGuardar] = useState(false);
   const [guardado, setGuardado] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState(null);
-  const [progresoGuardado, setProgresoGuardado] = useState(null);
-  const [logroGuardado, setLogroGuardado] = useState(null);
+  const [aciertos, setAciertos] = useState(0);
+  const [desaciertos, setDesaciertos] = useState(0);
 
-  // NUEVO: para historial
+  // Historial SOLO de progresos (partidas)
   const [historialProgreso, setHistorialProgreso] = useState([]);
-  const [historialLogros, setHistorialLogros] = useState([]);
 
   const ML_GAME_ID = 2;
+  const TOTAL_PUNTOS = 12;
 
-  // NUEVO: cargar historial de partidas
+  // Cargar historial de partidas
   const cargarHistorial = async () => {
     if (!usuario || !usuario.id) return;
     try {
       const prog = await api.get(`/juegos/progreso/${usuario.id}`);
-      const logs = await api.get(`/juegos/logros/${usuario.id}`);
-      setHistorialProgreso(Array.isArray(prog) ? prog.filter(p => p.juegoId === ML_GAME_ID) : []);
-      setHistorialLogros(Array.isArray(logs) ? logs.filter(l => l.juegoId === ML_GAME_ID) : []);
-    } catch (err) {
-      // Si hay error de API, ignorar para no romper UI
+      setHistorialProgreso(
+        Array.isArray(prog)
+          ? prog.filter(p => p.juegoId === ML_GAME_ID)
+          : []
+      );
+    } catch {
       setHistorialProgreso([]);
-      setHistorialLogros([]);
     }
   };
 
   const iniciarJuego = () => setInstruccion(false);
 
   useEffect(() => {
-    // Al cargar el juego, si está logueado, carga historial
     if (usuario && usuario.id) cargarHistorial();
+    // eslint-disable-next-line
   }, [usuario, juegoKey]);
 
   useEffect(() => {
@@ -53,6 +53,7 @@ export default function MLClusterGame({ usuario }) {
         { color: 0xffca28, name: 'Amarillo' }
       ];
       let puntos = [];
+      let desaciertosTemp = 0;
 
       gameRef.current = new Phaser.Game({
         type: Phaser.AUTO,
@@ -65,6 +66,7 @@ export default function MLClusterGame({ usuario }) {
             this.completed = false;
             this.asignados = 0;
             puntos = [];
+            desaciertosTemp = 0;
 
             this.add.text(50, 20, '🤖 ML: Agrupa los puntos por color (Clustering)', { fontSize: '22px', fill: '#333' });
             this.add.text(70, 65, 'Haz clic en cada punto y arrástralo al grupo correcto', { fontSize: '17px', fill: '#444' });
@@ -74,7 +76,7 @@ export default function MLClusterGame({ usuario }) {
               this.add.text(180 + idx * 180, 580, cl.name, { fontSize: 19, fill: '#555' });
             });
 
-            for (let i = 0; i < 12; i++) {
+            for (let i = 0; i < TOTAL_PUNTOS; i++) {
               const clusterIdx = Phaser.Math.Between(0, clusters.length - 1);
               const color = clusters[clusterIdx].color;
               const punto = this.add.circle(
@@ -111,6 +113,7 @@ export default function MLClusterGame({ usuario }) {
                 });
 
                 if (!correcto && punto.visible) {
+                  desaciertosTemp++;
                   this.tweens.add({
                     targets: punto,
                     x: punto.input.dragStartX,
@@ -120,18 +123,18 @@ export default function MLClusterGame({ usuario }) {
                   });
                 }
 
-                if (this.asignados === 12 && !this.completed) {
+                if (this.asignados === TOTAL_PUNTOS && !this.completed) {
                   this.completed = true;
                   this.add.text(110, 500, '¡Muy bien! Agrupaste los datos como una IA de clustering', { fontSize: '27px', fill: '#00796B' });
                   setResultado(
                     "¡Aprendiste cómo las IA de ML pueden agrupar datos automáticamente por similitud! Así organizan fotos, canciones y mucho más."
                   );
+                  setAciertos(TOTAL_PUNTOS - desaciertosTemp); // Actualiza los aciertos
+                  setDesaciertos(desaciertosTemp);
                   setPuedeGuardar(true);
                   setGuardado(false);
                   setErrorGuardar(null);
-                  setProgresoGuardado(null);
-                  setLogroGuardado(null);
-                  console.log('[MLClusterGame] Juego completado: puedes guardar progreso y logro.');
+                  console.log('[MLClusterGame] Juego completado: puedes guardar progreso.');
                 }
               });
             }
@@ -151,15 +154,14 @@ export default function MLClusterGame({ usuario }) {
       setPuedeGuardar(false);
       setGuardado(false);
       setErrorGuardar(null);
-      setProgresoGuardado(null);
-      setLogroGuardado(null);
+      setAciertos(0);
+      setDesaciertos(0);
     };
   }, [instruccion, juegoKey, usuario]);
 
   // Acción del botón de guardar progreso y logro
   const guardarProgresoYLogro = async () => {
     if (!usuario || !usuario.id) {
-      console.error('[MLClusterGame] No hay usuario logueado, no se puede guardar');
       setErrorGuardar('No hay usuario logueado.');
       return;
     }
@@ -169,37 +171,18 @@ export default function MLClusterGame({ usuario }) {
         usuarioId: usuario.id,
         juegoId: ML_GAME_ID,
         avance: 100,
-        completado: true
+        completado: true,
+        aciertos: TOTAL_PUNTOS - desaciertos,
+        desaciertos
       };
-      console.log('[MLClusterGame] Enviando progreso:', progresoPayload);
-
-      const progreso = await api.post('/juegos/progreso', progresoPayload);
-      setProgresoGuardado(progreso);
-
-      const logroPayload = {
-        usuarioId: usuario.id,
-        juegoId: ML_GAME_ID,
-        nombre: 'Clustering completado',
-        descripcion: 'Agrupó correctamente los datos por color en ML.'
-      };
-      console.log('[MLClusterGame] Enviando logro:', logroPayload);
-
-      const logro = await api.post('/juegos/logro', logroPayload);
-      setLogroGuardado(logro);
-
+      await api.post('/juegos/progreso', progresoPayload);
       setGuardado(true);
       setPuedeGuardar(false);
-      console.log('[MLClusterGame] Guardado exitoso. Progreso y logro registrados.');
-
-      // NUEVO: refrescar historial al guardar
       cargarHistorial();
     } catch (err) {
       setErrorGuardar("Error al guardar: " + (err?.message || (err?.error ?? "")));
       setGuardado(false);
       setPuedeGuardar(true);
-      setProgresoGuardado(null);
-      setLogroGuardado(null);
-      console.error('[MLClusterGame] ERROR al guardar progreso o logro:', err.message);
     }
   };
 
@@ -211,8 +194,8 @@ export default function MLClusterGame({ usuario }) {
     setPuedeGuardar(false);
     setGuardado(false);
     setErrorGuardar(null);
-    setProgresoGuardado(null);
-    setLogroGuardado(null);
+    setAciertos(0);
+    setDesaciertos(0);
     if (gameRef.current) {
       gameRef.current.destroy(true);
       gameRef.current = null;
@@ -266,98 +249,43 @@ export default function MLClusterGame({ usuario }) {
         </div>
       )}
 
-      {/* Botón para guardar progreso y logro */}
+      {/* Botón para guardar progreso */}
       {puedeGuardar && !guardado && (
         <div className="d-flex justify-content-center mt-4">
           <button className="btn btn-success" onClick={guardarProgresoYLogro}>
-            Guardar progreso y logro
+            Guardar progreso
           </button>
         </div>
       )}
 
-      {/* Mensaje de guardado en formato tabla */}
-      {guardado && (
-        <div className="alert alert-info mt-3 text-center" style={{ maxWidth: 700, margin: "auto" }}>
-          <b>¡Progreso y logro guardados correctamente!</b>
-          {progresoGuardado && (
-            <div className="mt-2">
-              <b>Progreso:</b>
-              <table className="table table-bordered table-sm my-2" style={{ maxWidth: 500, margin: "auto", fontSize: 15 }}>
-                <tbody>
-                  <tr><th>Juego ID</th><td>{progresoGuardado.juegoId}</td></tr>
-                  <tr><th>Avance</th><td>{progresoGuardado.avance ?? "-"}</td></tr>
-                  <tr><th>Completado</th><td>{progresoGuardado.completado ? "✅" : "❌"}</td></tr>
-                  <tr><th>Fecha</th><td>{new Date(progresoGuardado.fechaActualizacion).toLocaleString()}</td></tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-          {logroGuardado && (
-            <div className="mt-2">
-              <b>Logro:</b>
-              <table className="table table-bordered table-sm my-2" style={{ maxWidth: 500, margin: "auto", fontSize: 15 }}>
-                <tbody>
-                  <tr><th>Nombre</th><td>{logroGuardado.nombre}</td></tr>
-                  <tr><th>Descripción</th><td>{logroGuardado.descripcion}</td></tr>
-                  <tr><th>Fecha</th><td>{new Date(logroGuardado.fechaHora).toLocaleString()}</td></tr>
-                </tbody>
-              </table>
-            </div>
-          )}
-        </div>
-      )}
-
-      {/* TABLAS: Historial de partidas/logros */}
-      {(historialProgreso.length > 0 || historialLogros.length > 0) && (
+      {/* TABLA: Historial de partidas */}
+      {historialProgreso.length > 0 && (
         <div className="my-4" style={{ maxWidth: 800, margin: "auto" }}>
           <h5>Historial de partidas</h5>
-          {historialProgreso.length > 0 && (
-            <table className="table table-bordered table-sm">
-              <thead>
-                <tr>
-                  <th>#</th>
-                  <th>Avance</th>
-                  <th>Completado</th>
-                  <th>Fecha</th>
+          <table className="table table-bordered table-sm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Avance</th>
+                <th>Completado</th>
+                <th>Fecha y Hora</th>
+                <th>Aciertos</th>
+                <th>Desaciertos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {historialProgreso.map((p, i) => (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.avance ?? "-"}</td>
+                  <td>{p.completado ? "✅" : "❌"}</td>
+                  <td>{new Date(p.fechaActualizacion).toLocaleString()}</td>
+                  <td>{typeof p.desaciertos === "number" ? (TOTAL_PUNTOS - p.desaciertos) : "-"}</td>
+                  <td>{p.desaciertos ?? "-"}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {historialProgreso.map((p, i) => (
-                  <tr key={p.id}>
-                    <td>{i + 1}</td>
-                    <td>{p.avance ?? "-"}</td>
-                    <td>{p.completado ? "✅" : "❌"}</td>
-                    <td>{new Date(p.fechaActualizacion).toLocaleString()}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          )}
-          {historialLogros.length > 0 && (
-            <div>
-              <h6 className="mt-4">Logros obtenidos</h6>
-              <table className="table table-bordered table-sm">
-                <thead>
-                  <tr>
-                    <th>#</th>
-                    <th>Nombre</th>
-                    <th>Descripción</th>
-                    <th>Fecha</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {historialLogros.map((l, i) => (
-                    <tr key={l.id}>
-                      <td>{i + 1}</td>
-                      <td>{l.nombre}</td>
-                      <td>{l.descripcion}</td>
-                      <td>{new Date(l.fechaHora).toLocaleString()}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
