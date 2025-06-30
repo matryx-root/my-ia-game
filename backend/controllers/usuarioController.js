@@ -91,17 +91,20 @@ exports.listarUsuarios = async (req, res) => {
 
 // VER PERFIL (por id)
 exports.verPerfil = async (req, res) => {
+  const id = Number(req.params.id);
+  if (!id) return res.status(400).json({ error: "Falta id de usuario" });
   try {
-    const id = Number(req.params.id);
     const usuario = await prisma.usuario.findUnique({
       where: { id },
       include: { colegio: true, configuracion: true }
     });
+    if (!usuario) return res.status(404).json({ error: 'Usuario no encontrado' });
     res.json(usuario);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
+
 
 // EDITAR USUARIO
 exports.editarUsuario = async (req, res) => {

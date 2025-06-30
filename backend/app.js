@@ -2,31 +2,35 @@ const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
 
-// Importa solo una vez cada archivo de rutas
+// Importar rutas
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const juegoRoutes = require('./routes/juegoRoutes');
 const adminRoutes = require('./routes/adminRoutes');
-const colegioRoutes = require('./routes/colegioRoutes'); // Si tienes este archivo
-const mensajesRoutes = require('./routes/mensajes');     // Mensajes de soporte
+const colegioRoutes = require('./routes/colegioRoutes');
+const mensajesRoutes = require('./routes/mensajes');
 
+// Inicializar la app
 const app = express();
-app.use(cors());
 app.use(express.json());
+// Middlewares globales
+app.use(cors());
 
-// Rutas principales
-app.use('/api/usuarios', usuarioRoutes);    // Registro, login, perfil
+
+// Montar rutas principales
+app.use('/api/usuarios', usuarioRoutes);    // Usuarios: registro, login, perfil
 app.use('/api/juegos', juegoRoutes);        // Juegos, progreso, logros
-app.use('/api/admin', adminRoutes);         // Admin y docente (usuarios, colegios, progreso)
-app.use('/api/colegios', colegioRoutes);    // Colegios
+app.use('/api/admin', adminRoutes);         // Admin/docente: usuarios, colegios, progreso
+app.use('/api/colegios', colegioRoutes);    // Gestión de colegios
 app.use('/api/mensajes', mensajesRoutes);   // Mensajes de soporte
 
-// Ruta base de salud
+// Ruta de salud/prueba
 app.get('/', (req, res) => {
   res.send('API funcionando');
 });
 
-// Manejo global de errores (opcional)
+// Manejo global de errores (SIEMPRE al final)
 app.use((err, req, res, next) => {
+  console.error('Error global:', err);
   res.status(500).json({ error: err.message });
 });
 

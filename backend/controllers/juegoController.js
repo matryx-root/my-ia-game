@@ -1,3 +1,5 @@
+// controllers/juegoController.js
+
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
@@ -6,9 +8,7 @@ const prisma = new PrismaClient();
  */
 exports.listarJuegos = async (req, res) => {
   try {
-    const juegos = await prisma.juego.findMany({
-      orderBy: { id: 'asc' } // Orden opcional, por claridad
-    });
+    const juegos = await prisma.juego.findMany({ orderBy: { id: 'asc' } });
     res.json(juegos);
   } catch (err) {
     res.status(500).json({ error: err.message });
@@ -41,7 +41,6 @@ exports.editarJuego = async (req, res) => {
     if (!nombre) {
       return res.status(400).json({ error: "El nombre del juego es obligatorio." });
     }
-    // Verificar existencia antes de actualizar
     const existe = await prisma.juego.findUnique({ where: { id } });
     if (!existe) {
       return res.status(404).json({ error: "Juego no encontrado." });
@@ -69,39 +68,54 @@ exports.eliminarJuego = async (req, res) => {
   }
 };
 
-// controllers/juegoController.js
-
+/**
+ * Guardar o actualizar el progreso de usuario en un juego.
+ * Guarda puntaje, porcentaje, aciertos/desaciertos si se envían.
+ * Previene duplicados y actualiza si ya existe.
+ */
 exports.guardarProgreso = async (req, res) => {
-  const { usuarioId, juegoId, avance, completado } = req.body;
+  const { usuarioId, juegoId, avance, completado, aciertos, desaciertos } = req.body;
   try {
     if (!usuarioId || !juegoId) {
       return res.status(400).json({ error: "usuarioId y juegoId son obligatorios" });
     }
-    // Busca si ya existe progreso para este usuario/juego
-    const prev = await prisma.progresoUsuario.findFirst({ where: { usuarioId, juegoId } });
-    let progreso;
-    if (prev) {
-      progreso = await prisma.progresoUsuario.update({
-        where: { id: prev.id },
-        data: { avance, completado, fechaActualizacion: new Date() }
-      });
-    } else {
-      progreso = await prisma.progresoUsuario.create({
-        data: { usuarioId, juegoId, avance, completado }
-      });
-    }
+
+    let data = {
+      usuarioId,
+      juegoId,
+      avance,
+      completado,
+      fechaActualizacion: new Date()
+    };
+    if (typeof aciertos !== "undefined") data.aciertos = aciertos;
+    if (typeof desaciertos !== "undefined") data.desaciertos = desaciertos;
+
+    // SIEMPRE crear un nuevo registro, nunca actualizar
+    const progreso = await prisma.progresoUsuario.create({
+      data
+    });
     res.json(progreso);
   } catch (e) {
     res.status(500).json({ error: e.message });
   }
 };
 
+
+/**
+ * Guardar un logro alcanzado por el usuario en un juego.
+ * Previene duplicados para el mismo usuario, juego y nombre de logro.
+ */
 exports.guardarLogro = async (req, res) => {
   const { usuarioId, juegoId, nombre, descripcion } = req.body;
   try {
     if (!usuarioId || !nombre) {
       return res.status(400).json({ error: "usuarioId y nombre son obligatorios" });
     }
+    // Opcional: evitar duplicados
+    // const existe = await prisma.achievement.findFirst({ where: { usuarioId, juegoId, nombre } });
+    // if (existe) {
+    //  return res.status(409).json({ error: "El logro ya existe para este usuario/juego." });
+    // }
     const logro = await prisma.achievement.create({
       data: { usuarioId, juegoId, nombre, descripcion }
     });
@@ -110,3 +124,36 @@ exports.guardarLogro = async (req, res) => {
     res.status(500).json({ error: e.message });
   }
 };
+
+/**
+ * Listar progreso de juegos para un usuario
+ */
+exports.progresoUsuario = async (req, res) => {
+  try {
+    const usuarioId = Number(req.params.id);
+    const progresos = await prisma.progresoUsuario.findMany({
+      where: { usuarioId },
+      include: { juego: true }
+    });
+    res.json(progresos);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+/**
+ * Listar logros de usuario
+ */
+exports.logrosUsuario = async (req, res) => {
+  try {
+    const usuarioId = Number(req.params.id);
+    const logros = await prisma.achievement.findMany({
+      where: { usuarioId },
+      include: { juego: true }
+    });
+    res.json(logros);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

@@ -11,6 +11,7 @@ datasource db {
 enum RolUsuario {
   alumno
   docente
+  admin
 }
 
 // Colegio: cada colegio puede tener muchos usuarios (alumnos o docentes)
@@ -101,6 +102,8 @@ model ProgresoUsuario {
   juegoId             Int
   avance              Int?     // Puntaje, porcentaje, nivel
   completado          Boolean? // true/false
+  aciertos            Int?     // NUEVO: para guardar aciertos
+  desaciertos         Int?     // NUEVO: para guardar desaciertos
   fechaActualizacion  DateTime @default(now())
 }
 

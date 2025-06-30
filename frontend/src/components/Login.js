@@ -19,13 +19,17 @@ export default function Login({ onLogin }) {
       setLoading(false);
 
       if (res.token && res.usuario) {
-        // Guarda datos clave
-        localStorage.setItem("userId", res.usuario.id);
+        // Guarda el usuario COMPLETO (objeto), el token, y otros campos si necesitas
+        localStorage.setItem("usuario", JSON.stringify(res.usuario));
         localStorage.setItem("token", res.token);
-        localStorage.setItem("rol", res.usuario.rol || "");
-        if (res.usuario.colegioId) localStorage.setItem("colegioId", res.usuario.colegioId);
 
-        onLogin(res.usuario);
+        // Extras opcionales por compatibilidad:
+        localStorage.setItem("userId", res.usuario.id);
+        localStorage.setItem("rol", res.usuario.rol || "");
+        if (res.usuario.colegioId)
+          localStorage.setItem("colegioId", res.usuario.colegioId);
+
+        if (typeof onLogin === "function") onLogin(res.usuario);
 
         // Redirección según el rol
         if (res.usuario.rol === "admin") {

@@ -1,4 +1,5 @@
 // src/games/mlGame.js
+
 import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { useNavigate } from 'react-router-dom';
@@ -10,11 +11,39 @@ export default function MLClusterGame({ usuario }) {
   const [instruccion, setInstruccion] = useState(true);
   const [resultado, setResultado] = useState(null);
   const [juegoKey, setJuegoKey] = useState(0);
+  const [puedeGuardar, setPuedeGuardar] = useState(false);
+  const [guardado, setGuardado] = useState(false);
+  const [errorGuardar, setErrorGuardar] = useState(null);
+  const [progresoGuardado, setProgresoGuardado] = useState(null);
+  const [logroGuardado, setLogroGuardado] = useState(null);
 
-  // Cambia este valor según el ID REAL del juego en tu tabla Juego
+  // NUEVO: para historial
+  const [historialProgreso, setHistorialProgreso] = useState([]);
+  const [historialLogros, setHistorialLogros] = useState([]);
+
   const ML_GAME_ID = 2;
 
+  // NUEVO: cargar historial de partidas
+  const cargarHistorial = async () => {
+    if (!usuario || !usuario.id) return;
+    try {
+      const prog = await api.get(`/juegos/progreso/${usuario.id}`);
+      const logs = await api.get(`/juegos/logros/${usuario.id}`);
+      setHistorialProgreso(Array.isArray(prog) ? prog.filter(p => p.juegoId === ML_GAME_ID) : []);
+      setHistorialLogros(Array.isArray(logs) ? logs.filter(l => l.juegoId === ML_GAME_ID) : []);
+    } catch (err) {
+      // Si hay error de API, ignorar para no romper UI
+      setHistorialProgreso([]);
+      setHistorialLogros([]);
+    }
+  };
+
   const iniciarJuego = () => setInstruccion(false);
+
+  useEffect(() => {
+    // Al cargar el juego, si está logueado, carga historial
+    if (usuario && usuario.id) cargarHistorial();
+  }, [usuario, juegoKey]);
 
   useEffect(() => {
     if (!instruccion && !gameRef.current) {
@@ -97,25 +126,12 @@ export default function MLClusterGame({ usuario }) {
                   setResultado(
                     "¡Aprendiste cómo las IA de ML pueden agrupar datos automáticamente por similitud! Así organizan fotos, canciones y mucho más."
                   );
-
-                  // -------- GUARDAR PROGRESO Y LOGRO CORRECTAMENTE --------
-                  if (usuario && usuario.id) {
-                    // PROGRESO:
-                    api.post('/juegos/progreso', {
-                      usuarioId: usuario.id,
-                      juegoId: ML_GAME_ID, // Usa el ID real de este juego
-                      avance: 100,
-                      completado: true
-                    }).catch(() => {});
-
-                    // LOGRO:
-                    api.post('/juegos/logro', {
-                      usuarioId: usuario.id,
-                      juegoId: ML_GAME_ID,
-                      nombre: 'Clustering completado',
-                      descripcion: 'Agrupó correctamente los datos por color en ML.'
-                    }).catch(() => {});
-                  }
+                  setPuedeGuardar(true);
+                  setGuardado(false);
+                  setErrorGuardar(null);
+                  setProgresoGuardado(null);
+                  setLogroGuardado(null);
+                  console.log('[MLClusterGame] Juego completado: puedes guardar progreso y logro.');
                 }
               });
             }
@@ -132,14 +148,71 @@ export default function MLClusterGame({ usuario }) {
         gameRef.current.destroy(true);
         gameRef.current = null;
       }
+      setPuedeGuardar(false);
+      setGuardado(false);
+      setErrorGuardar(null);
+      setProgresoGuardado(null);
+      setLogroGuardado(null);
     };
   }, [instruccion, juegoKey, usuario]);
+
+  // Acción del botón de guardar progreso y logro
+  const guardarProgresoYLogro = async () => {
+    if (!usuario || !usuario.id) {
+      console.error('[MLClusterGame] No hay usuario logueado, no se puede guardar');
+      setErrorGuardar('No hay usuario logueado.');
+      return;
+    }
+    setErrorGuardar(null);
+    try {
+      const progresoPayload = {
+        usuarioId: usuario.id,
+        juegoId: ML_GAME_ID,
+        avance: 100,
+        completado: true
+      };
+      console.log('[MLClusterGame] Enviando progreso:', progresoPayload);
+
+      const progreso = await api.post('/juegos/progreso', progresoPayload);
+      setProgresoGuardado(progreso);
+
+      const logroPayload = {
+        usuarioId: usuario.id,
+        juegoId: ML_GAME_ID,
+        nombre: 'Clustering completado',
+        descripcion: 'Agrupó correctamente los datos por color en ML.'
+      };
+      console.log('[MLClusterGame] Enviando logro:', logroPayload);
+
+      const logro = await api.post('/juegos/logro', logroPayload);
+      setLogroGuardado(logro);
+
+      setGuardado(true);
+      setPuedeGuardar(false);
+      console.log('[MLClusterGame] Guardado exitoso. Progreso y logro registrados.');
+
+      // NUEVO: refrescar historial al guardar
+      cargarHistorial();
+    } catch (err) {
+      setErrorGuardar("Error al guardar: " + (err?.message || (err?.error ?? "")));
+      setGuardado(false);
+      setPuedeGuardar(true);
+      setProgresoGuardado(null);
+      setLogroGuardado(null);
+      console.error('[MLClusterGame] ERROR al guardar progreso o logro:', err.message);
+    }
+  };
 
   // Reset
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
     setJuegoKey(k => k + 1);
+    setPuedeGuardar(false);
+    setGuardado(false);
+    setErrorGuardar(null);
+    setProgresoGuardado(null);
+    setLogroGuardado(null);
     if (gameRef.current) {
       gameRef.current.destroy(true);
       gameRef.current = null;
@@ -190,6 +263,107 @@ export default function MLClusterGame({ usuario }) {
           <small>
             Las IAs de clustering se usan para organizar todo tipo de datos. ¿Dónde más crees que se usan?
           </small>
+        </div>
+      )}
+
+      {/* Botón para guardar progreso y logro */}
+      {puedeGuardar && !guardado && (
+        <div className="d-flex justify-content-center mt-4">
+          <button className="btn btn-success" onClick={guardarProgresoYLogro}>
+            Guardar progreso y logro
+          </button>
+        </div>
+      )}
+
+      {/* Mensaje de guardado en formato tabla */}
+      {guardado && (
+        <div className="alert alert-info mt-3 text-center" style={{ maxWidth: 700, margin: "auto" }}>
+          <b>¡Progreso y logro guardados correctamente!</b>
+          {progresoGuardado && (
+            <div className="mt-2">
+              <b>Progreso:</b>
+              <table className="table table-bordered table-sm my-2" style={{ maxWidth: 500, margin: "auto", fontSize: 15 }}>
+                <tbody>
+                  <tr><th>Juego ID</th><td>{progresoGuardado.juegoId}</td></tr>
+                  <tr><th>Avance</th><td>{progresoGuardado.avance ?? "-"}</td></tr>
+                  <tr><th>Completado</th><td>{progresoGuardado.completado ? "✅" : "❌"}</td></tr>
+                  <tr><th>Fecha</th><td>{new Date(progresoGuardado.fechaActualizacion).toLocaleString()}</td></tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+          {logroGuardado && (
+            <div className="mt-2">
+              <b>Logro:</b>
+              <table className="table table-bordered table-sm my-2" style={{ maxWidth: 500, margin: "auto", fontSize: 15 }}>
+                <tbody>
+                  <tr><th>Nombre</th><td>{logroGuardado.nombre}</td></tr>
+                  <tr><th>Descripción</th><td>{logroGuardado.descripcion}</td></tr>
+                  <tr><th>Fecha</th><td>{new Date(logroGuardado.fechaHora).toLocaleString()}</td></tr>
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* TABLAS: Historial de partidas/logros */}
+      {(historialProgreso.length > 0 || historialLogros.length > 0) && (
+        <div className="my-4" style={{ maxWidth: 800, margin: "auto" }}>
+          <h5>Historial de partidas</h5>
+          {historialProgreso.length > 0 && (
+            <table className="table table-bordered table-sm">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Avance</th>
+                  <th>Completado</th>
+                  <th>Fecha</th>
+                </tr>
+              </thead>
+              <tbody>
+                {historialProgreso.map((p, i) => (
+                  <tr key={p.id}>
+                    <td>{i + 1}</td>
+                    <td>{p.avance ?? "-"}</td>
+                    <td>{p.completado ? "✅" : "❌"}</td>
+                    <td>{new Date(p.fechaActualizacion).toLocaleString()}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          {historialLogros.length > 0 && (
+            <div>
+              <h6 className="mt-4">Logros obtenidos</h6>
+              <table className="table table-bordered table-sm">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Nombre</th>
+                    <th>Descripción</th>
+                    <th>Fecha</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historialLogros.map((l, i) => (
+                    <tr key={l.id}>
+                      <td>{i + 1}</td>
+                      <td>{l.nombre}</td>
+                      <td>{l.descripcion}</td>
+                      <td>{new Date(l.fechaHora).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      )}
+
+      {errorGuardar && (
+        <div className="alert alert-danger mt-3 text-center" style={{ maxWidth: 500, margin: "auto" }}>
+          {errorGuardar}
         </div>
       )}
 
