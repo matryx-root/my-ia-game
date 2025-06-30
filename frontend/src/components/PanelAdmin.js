@@ -1,3 +1,5 @@
+// src/components/PanelAdmin.js
+
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
@@ -8,6 +10,7 @@ export default function PanelAdmin({ usuario }) {
   const [error, setError] = useState(null);
   const [nuevo, setNuevo] = useState(null);
   const [editar, setEditar] = useState(null);
+  const [success, setSuccess] = useState(null);
 
   const navigate = useNavigate();
 
@@ -25,8 +28,9 @@ export default function PanelAdmin({ usuario }) {
     api.get("/admin/usuarios")
       .then(res => setUsuarios(res))
       .catch(() => setError("No se pudo conectar a usuarios"));
-    api.get("/admin/colegios")
-      .then(res => setColegios(res))
+    // Cargar colegios con endpoint público si existe
+    api.get("/colegios")
+      .then(res => setColegios(Array.isArray(res) ? res : []))
       .catch(() => setError("No se pudo conectar a colegios"));
   };
   useEffect(cargarDatos, []);
@@ -34,7 +38,10 @@ export default function PanelAdmin({ usuario }) {
   // Eliminar usuario
   const eliminarUsuario = id => {
     if (!window.confirm("¿Eliminar este usuario?")) return;
-    api.delete(`/admin/usuarios/${id}`).then(cargarDatos);
+    api.delete(`/admin/usuarios/${id}`).then(() => {
+      setSuccess("Usuario eliminado correctamente.");
+      cargarDatos();
+    }).catch(() => setError("No se pudo eliminar."));
   };
 
   // Agregar usuario
@@ -50,16 +57,18 @@ export default function PanelAdmin({ usuario }) {
       alert("Todos los campos obligatorios, incluido el colegio y rol, deben estar completos.");
       return;
     }
-    // Enviar null si el colegio no está seleccionado
     const data = {
       ...nuevo,
       colegioId: nuevo.colegioId ? Number(nuevo.colegioId) : null,
       edad: nuevo.edad ? Number(nuevo.edad) : null
     };
-    api.post("/admin/usuarios", data).then(() => {
-      setNuevo(null);
-      cargarDatos();
-    });
+    api.post("/admin/usuarios", data)
+      .then(() => {
+        setSuccess("Usuario creado correctamente.");
+        setNuevo(null);
+        cargarDatos();
+      })
+      .catch(() => setError("No se pudo crear el usuario."));
   };
 
   // Guardar edición
@@ -70,10 +79,13 @@ export default function PanelAdmin({ usuario }) {
       colegioId: editar.colegioId ? Number(editar.colegioId) : null,
       edad: editar.edad ? Number(editar.edad) : null
     };
-    api.put(`/admin/usuarios/${editar.id}`, data).then(() => {
-      setEditar(null);
-      cargarDatos();
-    });
+    api.put(`/admin/usuarios/${editar.id}`, data)
+      .then(() => {
+        setSuccess("Usuario actualizado correctamente.");
+        setEditar(null);
+        cargarDatos();
+      })
+      .catch(() => setError("No se pudo editar el usuario."));
   };
 
   return (
@@ -84,6 +96,11 @@ export default function PanelAdmin({ usuario }) {
           {error && (
             <div className="text-danger text-center mb-3">
               {typeof error === "string" ? error : JSON.stringify(error)}
+            </div>
+          )}
+          {success && (
+            <div className="alert alert-success text-center mb-3" onClick={() => setSuccess(null)} style={{ cursor: "pointer" }}>
+              {success}
             </div>
           )}
 
@@ -118,8 +135,8 @@ export default function PanelAdmin({ usuario }) {
                 </select>
               </div>
               <div className="col-md">
-                <select className="form-control" value={nuevo.colegioId || ""} onChange={e => setNuevo({ ...nuevo, colegioId: e.target.value })}>
-                  <option value="">Sin colegio</option>
+                <select className="form-control" value={nuevo.colegioId || ""} required onChange={e => setNuevo({ ...nuevo, colegioId: e.target.value })}>
+                  <option value="">Selecciona colegio</option>
                   {colegios.map(c => (
                     <option key={c.id} value={c.id}>{c.nombre} ({c.nivel})</option>
                   ))}
@@ -173,7 +190,7 @@ export default function PanelAdmin({ usuario }) {
                           value={editar.colegioId || ""}
                           onChange={e => setEditar({ ...editar, colegioId: e.target.value })}
                         >
-                          <option value="">Sin colegio</option>
+                          <option value="">Selecciona colegio</option>
                           {colegios.map(c => (
                             <option key={c.id} value={c.id}>{c.nombre} ({c.nivel})</option>
                           ))}

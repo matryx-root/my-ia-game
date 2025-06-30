@@ -45,6 +45,13 @@ export default function NavBar({ usuario, onLogout }) {
                   </button>
                   <button
                     className="btn btn-outline-info me-3"
+                    onClick={() => navigate("/dashboard-admin")}
+                  >
+                    <i className="bi bi-speedometer2 me-1"></i>
+                    Dashboard
+                  </button>
+                  <button
+                    className="btn btn-outline-info me-3"
                     onClick={() => navigate("/panel-game")}
                   >
                     <i className="bi bi-bar-chart-fill me-1"></i>
@@ -64,9 +71,9 @@ export default function NavBar({ usuario, onLogout }) {
                 </button>
               )}
 
+              {/* Badge y saludo */}
               <span className="text-light me-3 d-none d-sm-block">
                 Bienvenido, <span className="fw-bold">{usuario.nombre}</span>
-                {/* Mostrar badge de colegio si existe */}
                 {(usuario.rol === "alumno" || usuario.rol === "docente") && usuario.colegio?.nombre && (
                   <span
                     className="badge bg-info ms-2"
@@ -85,6 +92,7 @@ export default function NavBar({ usuario, onLogout }) {
                   <span className="badge bg-success ms-2">ALUMNO</span>
                 )}
               </span>
+              {/* Botón salir */}
               <button
                 onClick={handleLogout}
                 className="btn btn-outline-light"

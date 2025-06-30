@@ -30,11 +30,19 @@ exports.listarColegios = async (req, res) => {
 
 
 exports.crearUsuario = async (req, res) => {
-  const { nombre, email, password, rol = 'usuario', edad, celular } = req.body;
+  const { nombre, email, password, rol = 'usuario', edad, celular, colegioId } = req.body;
   try {
     const hashed = await bcrypt.hash(password, 10);
     const usuario = await prisma.usuario.create({
-      data: { nombre, email, password: hashed, rol, edad: edad ? Number(edad) : null, celular }
+      data: {
+        nombre,
+        email,
+        password: hashed,
+        rol,
+        edad: edad ? Number(edad) : null,
+        celular,
+        colegioId: colegioId ? Number(colegioId) : null
+      }
     });
     res.status(201).json({ mensaje: "Usuario creado", usuario });
   } catch (err) {
@@ -43,11 +51,18 @@ exports.crearUsuario = async (req, res) => {
 };
 exports.editarUsuario = async (req, res) => {
   const id = Number(req.params.id);
-  const { nombre, email, rol, edad, celular } = req.body;
+  const { nombre, email, rol, edad, celular, colegioId } = req.body;
   try {
     const usuario = await prisma.usuario.update({
       where: { id },
-      data: { nombre, email, rol, edad: edad ? Number(edad) : null, celular }
+      data: {
+        nombre,
+        email,
+        rol,
+        edad: edad ? Number(edad) : null,
+        celular,
+        colegioId: colegioId ? Number(colegioId) : null
+      }
     });
     res.json({ mensaje: "Usuario actualizado", usuario });
   } catch (err) {

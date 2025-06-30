@@ -5,6 +5,7 @@ import Login from "./components/Login";
 import Registro from "./components/Registro";
 import PanelAdmin from "./components/PanelAdmin";
 import PanelGame from "./components/PanelGame";
+import DashboardAdmin from "./components/DashboardAdmin"; // <--- Nuevo componente
 import NavBar from "./components/NavBar";
 import CategoriasPage from "./components/CategoriasPage";
 import CategoriaDetallePage from "./components/CategoriaDetallePage";
@@ -160,6 +161,13 @@ function App() {
         <Route path="/panel-game" element={
           <RutaPrivada usuario={usuario && (usuario.rol === "admin" || usuario.rol === "docente")}>
             <PanelGame usuario={usuario} />
+          </RutaPrivada>
+        } />
+
+        {/* DASHBOARD ADMIN - solo admin */}
+        <Route path="/dashboard-admin" element={
+          <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+            <DashboardAdmin usuario={usuario} />
           </RutaPrivada>
         } />
 

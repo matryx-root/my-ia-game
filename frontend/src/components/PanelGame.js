@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
-const TOTAL_PUNTOS = 12; // Igual a mlGame.js
+const TOTAL_PUNTOS = 12;
 
 export default function PanelGame({ usuario }) {
   const [usuarios, setUsuarios] = useState([]);
@@ -84,6 +84,7 @@ export default function PanelGame({ usuario }) {
     if (!progresoPorJuego[p.juegoId]) {
       progresoPorJuego[p.juegoId] = {
         nombre: p.juego?.nombre || `Juego ${p.juegoId}`,
+        descripcion: p.juego?.descripcion || "",
         registros: []
       };
     }
@@ -153,11 +154,18 @@ export default function PanelGame({ usuario }) {
                   <h5 className="fw-bold mb-2">
                     {juego.nombre} <span className="text-secondary">({juegoId})</span>
                   </h5>
+                  {juego.descripcion && (
+                    <div className="mb-1 text-muted" style={{ fontSize: 15 }}>
+                      <strong>Descripción:</strong> {juego.descripcion}
+                    </div>
+                  )}
                   <div className="table-responsive">
                     <table className="table table-sm table-bordered align-middle">
                       <thead className="table-light">
                         <tr>
                           <th>ID</th>
+                          <th>Nombre Juego</th>
+                    
                           <th>Avance</th>
                           <th>Completado</th>
                           <th>Fecha y Hora</th>
@@ -171,6 +179,8 @@ export default function PanelGame({ usuario }) {
                           .map((p) => (
                             <tr key={p.id}>
                               <td>{p.id}</td>
+                              <td>{p.juego?.nombre || "-"}</td>
+                             
                               <td>{p.avance ?? "-"}</td>
                               <td>{p.completado ? "✅" : "❌"}</td>
                               <td>{new Date(p.fechaActualizacion).toLocaleString()}</td>
