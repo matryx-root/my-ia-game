@@ -63,7 +63,7 @@ export default function CategoriasPage() {
           flexWrap: "wrap",
           justifyContent: "center",
           gap: 40,
-          padding: "24px 10px 0 10px"
+          padding: "24px 10px 60px 10px"
         }}
       >
         {categorias.map(cat => (
@@ -127,6 +127,24 @@ export default function CategoriasPage() {
           </div>
         ))}
       </div>
+
+      {/* Botón fijo para acceder a logros */}
+      <button
+        className="btn btn-outline-success"
+        style={{
+          position: "fixed",
+          right: 24,
+          bottom: 24,
+          zIndex: 1000,
+          fontWeight: 600,
+          fontSize: 18,
+          boxShadow: "0 4px 18px #0002",
+        }}
+        onClick={() => navigate("/logros")}
+      >
+        <i className="bi bi-trophy-fill me-2"></i>
+        Mis Logros
+      </button>
     </div>
   );
 }

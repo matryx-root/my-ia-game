@@ -7,22 +7,22 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ENUM para roles de usuario
+
 enum RolUsuario {
   alumno
   docente
   admin
 }
 
-// Colegio: cada colegio puede tener muchos usuarios (alumnos o docentes)
+
 model Colegio {
   id       Int      @id @default(autoincrement())
   nombre   String
-  nivel    String   // Ej: "Primaria" o "Secundaria"
+  nivel    String   
   usuarios Usuario[]
 }
 
-// Usuario: pertenece a un colegio y tiene un rol (alumno/docente)
+
 model Usuario {
   id            Int                    @id @default(autoincrement())
   nombre        String
@@ -68,7 +68,7 @@ model LogJuego {
   juego      Juego    @relation(fields: [juegoId], references: [id], onDelete: Cascade)
   juegoId    Int
   fechaHora  DateTime @default(now())
-  accion     String?  // Ej: "Empezó", "Terminó", "Puntaje"
+  accion     String?  
   detalle    String?
   duracion   Int?
 }
@@ -92,7 +92,7 @@ model MensajeSoporte {
   fechaHora  DateTime @default(now())
   estado     String   @default("pendiente")
   respuesta  String?
-  leido      Boolean? @default(false) // <--- NUEVO
+  leido      Boolean? @default(false) 
 }
 
 
@@ -102,10 +102,10 @@ model ProgresoUsuario {
   usuarioId           Int
   juego               Juego    @relation(fields: [juegoId], references: [id], onDelete: Cascade)
   juegoId             Int
-  avance              Int?     // Puntaje, porcentaje, nivel
-  completado          Boolean? // true/false
-  aciertos            Int?     // NUEVO: para guardar aciertos
-  desaciertos         Int?     // NUEVO: para guardar desaciertos
+  avance              Int?     
+  completado          Boolean? 
+  aciertos            Int?     
+  desaciertos         Int?     
   fechaActualizacion  DateTime @default(now())
 }
 

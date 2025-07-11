@@ -13,6 +13,7 @@ exports.crearAchievement = async (req, res) => {
   }
 };
 
+
 exports.listarAchievementsUsuario = async (req, res) => {
   try {
     const usuarioId = Number(req.params.usuarioId);

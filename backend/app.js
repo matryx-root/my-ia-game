@@ -9,6 +9,8 @@ const adminRoutes = require('./routes/adminRoutes');
 const colegioRoutes = require('./routes/colegioRoutes');
 const mensajesRoutes = require('./routes/mensajes');
 const dashboardAdminRoutes = require('./routes/dashboardAdminRoutes'); // <--- Nuevo
+const achievementRoutes = require('./routes/achievementRoutes');
+const configuracionUsuarioRoutes = require('./routes/configuracionUsuario'); // <--- NUEVO
 
 // Inicializar la app
 const app = express();
@@ -24,6 +26,8 @@ app.use('/api/admin', adminRoutes);         // Admin/docente: usuarios, colegios
 app.use('/api/colegios', colegioRoutes);    // Gestión de colegios
 app.use('/api/mensajes', mensajesRoutes);   // Mensajes de soporte
 app.use('/api/dashboard', dashboardAdminRoutes); // Dashboard para admin
+app.use('/api/usuarios/achievement', achievementRoutes);
+app.use('/api/configuracion', configuracionUsuarioRoutes); // <--- NUEVO
 
 // Ruta de salud/prueba
 app.get('/', (req, res) => {

@@ -1,5 +1,4 @@
 // src/components/PanelGame.js
-
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
@@ -17,7 +16,6 @@ export default function PanelGame({ usuario }) {
 
   const navigate = useNavigate();
 
-  // Control acceso docente/admin
   useEffect(() => {
     if (!usuario || (usuario.rol !== "admin" && usuario.rol !== "docente")) {
       alert("No tienes permiso para acceder a este panel.");
@@ -26,7 +24,6 @@ export default function PanelGame({ usuario }) {
     // eslint-disable-next-line
   }, [usuario]);
 
-  // Cargar usuarios
   useEffect(() => {
     if (!usuario) return;
     setLoading(true);
@@ -48,7 +45,6 @@ export default function PanelGame({ usuario }) {
       .finally(() => setLoading(false));
   }, [usuario]);
 
-  // Al cambiar alumno seleccionado
   useEffect(() => {
     if (!selectedId) {
       setSelectedUser(null);
@@ -62,7 +58,7 @@ export default function PanelGame({ usuario }) {
       setLoading(true);
       Promise.all([
         api.get(`/juegos/progreso/${user.id}`),
-        api.get(`/juegos/logros/${user.id}`)
+        api.get(`/usuarios/achievement/${user.id}`) // <-- Asegúrate de este endpoint
       ])
         .then(([prog, achv]) => {
           setProgreso(Array.isArray(prog) ? prog : []);
@@ -165,7 +161,6 @@ export default function PanelGame({ usuario }) {
                         <tr>
                           <th>ID</th>
                           <th>Nombre Juego</th>
-                    
                           <th>Avance</th>
                           <th>Completado</th>
                           <th>Fecha y Hora</th>
@@ -180,7 +175,6 @@ export default function PanelGame({ usuario }) {
                             <tr key={p.id}>
                               <td>{p.id}</td>
                               <td>{p.juego?.nombre || "-"}</td>
-                             
                               <td>{p.avance ?? "-"}</td>
                               <td>{p.completado ? "✅" : "❌"}</td>
                               <td>{new Date(p.fechaActualizacion).toLocaleString()}</td>

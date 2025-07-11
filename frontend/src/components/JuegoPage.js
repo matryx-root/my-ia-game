@@ -86,7 +86,7 @@ export default function JuegoPage() {
   return (
     <div>
       {GameComponent ? (
-        <GameComponent usuario={usuario} />
+        <GameComponent usuario={usuario} juegoKey={juego}/>
       ) : (
         <div className="alert alert-danger text-center my-5" style={{ fontSize: 22 }}>
           Juego no encontrado.

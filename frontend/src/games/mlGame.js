@@ -1,3 +1,4 @@
+// src/games/mlGame.js
 import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { useNavigate } from 'react-router-dom';
@@ -13,12 +14,13 @@ export default function MLClusterGame({ usuario }) {
   const [guardado, setGuardado] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState(null);
   const [desaciertos, setDesaciertos] = useState(0);
-
-  // Historial SOLO de progresos (partidas)
+  const [mostroLogro, setMostroLogro] = useState(false); // Nuevo: para badge de logro
   const [historialProgreso, setHistorialProgreso] = useState([]);
 
   const ML_GAME_ID = 2;
   const TOTAL_PUNTOS = 12;
+  const NOMBRE_LOGRO = "Puntaje Perfecto ML";
+  const DESC_LOGRO = "Obtuviste 12/12 aciertos en el juego de Clustering.";
 
   // Cargar historial de partidas
   const cargarHistorial = async () => {
@@ -131,6 +133,7 @@ export default function MLClusterGame({ usuario }) {
                   setPuedeGuardar(true);
                   setGuardado(false);
                   setErrorGuardar(null);
+                  setMostroLogro(false); // Resetea badge de logro
                   console.log('[MLClusterGame] Juego completado: puedes guardar progreso.');
                 }
               });
@@ -152,17 +155,20 @@ export default function MLClusterGame({ usuario }) {
       setGuardado(false);
       setErrorGuardar(null);
       setDesaciertos(0);
+      setMostroLogro(false);
     };
   }, [instruccion, juegoKey, usuario]);
 
-  // Acción del botón de guardar progreso
+  // Acción del botón de guardar progreso + logro si corresponde
   const guardarProgresoYLogro = async () => {
     if (!usuario || !usuario.id) {
       setErrorGuardar('No hay usuario logueado.');
       return;
     }
     setErrorGuardar(null);
+
     try {
+      // Guardar progreso normal
       const progresoPayload = {
         usuarioId: usuario.id,
         juegoId: ML_GAME_ID,
@@ -172,6 +178,20 @@ export default function MLClusterGame({ usuario }) {
         desaciertos
       };
       await api.post('/juegos/progreso', progresoPayload);
+
+      // Si puntaje perfecto, guardar logro
+      if (desaciertos === 0) {
+        await api.post("/usuarios/achievement", {
+          usuarioId: usuario.id,
+          juegoId: ML_GAME_ID,
+          nombre: NOMBRE_LOGRO,
+          descripcion: DESC_LOGRO
+        });
+        setMostroLogro(true); // Mostrar badge de logro
+      } else {
+        setMostroLogro(false);
+      }
+
       setGuardado(true);
       setPuedeGuardar(false);
       cargarHistorial();
@@ -191,6 +211,7 @@ export default function MLClusterGame({ usuario }) {
     setGuardado(false);
     setErrorGuardar(null);
     setDesaciertos(0);
+    setMostroLogro(false);
     if (gameRef.current) {
       gameRef.current.destroy(true);
       gameRef.current = null;
@@ -244,16 +265,24 @@ export default function MLClusterGame({ usuario }) {
         </div>
       )}
 
+      {/* Badge de logro por puntaje perfecto */}
+      {mostroLogro && (
+        <div className="alert alert-info text-center mt-3 fw-bold" style={{ maxWidth: 500, margin: "auto" }}>
+          <i className="bi bi-trophy-fill text-warning me-2"></i>
+          ¡FELICITACIONES! Lograste el <span className="text-success">Puntaje Perfecto</span> y ganaste un logro 🏆
+        </div>
+      )}
+
       {/* Botón para guardar progreso */}
       {puedeGuardar && !guardado && (
         <div className="d-flex justify-content-center mt-4">
           <button className="btn btn-success" onClick={guardarProgresoYLogro}>
-            Guardar progreso
+            Guardar progreso {desaciertos === 0 && "y registrar logro"}
           </button>
         </div>
       )}
 
-      {/* TABLA: Historial de partidas */}
+      {/* Historial de partidas */}
       {historialProgreso.length > 0 && (
         <div className="my-4" style={{ maxWidth: 800, margin: "auto" }}>
           <h5>Historial de partidas</h5>
@@ -269,7 +298,7 @@ export default function MLClusterGame({ usuario }) {
               </tr>
             </thead>
             <tbody>
-              {historialProgreso.map((p, i) => (
+              {historialProgreso.map((p) => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
                   <td>{p.avance ?? "-"}</td>
