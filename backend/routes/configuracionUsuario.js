@@ -1,14 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const configCtrl = require('../controllers/configuracionUsuarioController');
+const controller = require('../controllers/configuracionUsuarioController');
 
-// GET configuración por usuario
-router.get('/:usuarioId', configCtrl.obtenerConfiguracion);
-
-// POST nueva configuración
-router.post('/', configCtrl.crearConfiguracion);
-
-// PUT actualizar configuración
-router.put('/:usuarioId', configCtrl.actualizarConfiguracion);
+// GET config
+router.get('/:usuarioId', controller.obtenerConfiguracion);
+// POST y PUT hacen lo mismo: UPSERT (crear si no existe, actualizar si existe)
+router.post('/:usuarioId', controller.guardarConfiguracion);
+router.put('/:usuarioId', controller.guardarConfiguracion);
 
 module.exports = router;

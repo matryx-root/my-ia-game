@@ -1,5 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { useTranslation } from "react-i18next";
+
 
 export default function NavBar({ usuario, onLogout }) {
   const navigate = useNavigate();
@@ -83,6 +85,15 @@ export default function NavBar({ usuario, onLogout }) {
                   Soporte
                 </button>
               )}
+
+              {/* BOTÓN CONFIGURACIÓN: SIEMPRE VISIBLE SI HAY USUARIO */}
+              <button
+                className="btn btn-outline-success me-3"
+                onClick={() => navigate("/configuracion")}
+              >
+                <i className="bi bi-gear me-1"></i>
+                Configuración
+              </button>
 
               {/* Badge y saludo */}
               <span className="text-light me-3 d-none d-sm-block">

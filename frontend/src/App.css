@@ -1,16 +1,54 @@
+:root {
+  --color-bg: #f8fafc;
+  --color-text: #18181c;
+  --color-card: #fff;
+  --color-card-shadow: #2222;
+}
+
+.theme-default {
+  --color-bg: #f8fafc;
+  --color-text: #18181c;
+  --color-card: #fff;
+  --color-card-shadow: #2222;
+}
+.theme-dark {
+  --color-bg: #15181c;
+  --color-text: #eee;
+  --color-card: #24272e;
+  --color-card-shadow: #111a;
+}
+.theme-light {
+  --color-bg: #f5f6fa;
+  --color-text: #18181c;
+  --color-card: #fff;
+  --color-card-shadow: #2222;
+}
+
 body {
   font-family: Arial, sans-serif;
-  background: #f8f9fa;
+  background: var(--color-bg);
+  color: var(--color-text);
   margin: 0;
+  transition: background 0.3s, color 0.3s;
 }
-form, nav, div {
+
+form, nav, .card, .panel, .app-box, .main-content {
   margin: 1em auto;
   max-width: 350px;
   padding: 1em;
-  background: #fff;
+  background: var(--color-card);
   border-radius: 0.8em;
-  box-shadow: 0 2px 8px #2222;
+  box-shadow: 0 2px 8px var(--color-card-shadow);
+  transition: background 0.3s, color 0.3s;
 }
+
+/* Aumenta max-width para paneles grandes */
+@media (min-width: 650px) {
+  form, nav, .card, .panel, .app-box, .main-content {
+    max-width: 900px;
+  }
+}
+
 button {
   margin-top: 1em;
   padding: 0.6em 1.5em;
@@ -21,4 +59,5 @@ button {
   font-weight: bold;
   cursor: pointer;
 }
+
 table { width: 100%; }

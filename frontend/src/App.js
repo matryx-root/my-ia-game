@@ -10,14 +10,12 @@ import NavBar from "./components/NavBar";
 import CategoriasPage from "./components/CategoriasPage";
 import CategoriaDetallePage from "./components/CategoriaDetallePage";
 import JuegoPage from "./components/JuegoPage";
-import MensajeSoportePage from "./components/MensajeSoporte"; // <--- nuevo
-
-
-
+import MensajeSoportePage from "./components/MensajeSoporte";
+import ConfiguracionUsuarioPage from "./components/ConfiguracionUsuarioPage";
 
 import api from "./utils/api";
 
-// ...importaciones de juegos (igual que antes)
+// Importación de juegos
 import IAGame from "./games/iaGame";
 import MLGame from "./games/mlGame";
 import DLGame from "./games/dlGame";
@@ -66,44 +64,69 @@ function RutaPrivada({ usuario, children }) {
 
 function App() {
   const [usuario, setUsuario] = useState(null);
+  const [configuracion, setConfiguracion] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Cargar perfil usuario al montar (y traer colegio)
+  // Cargar perfil y configuración al montar
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
       api.get("/usuarios/perfil/me")
         .then(res => {
           if (res && !res.error) {
-            setUsuario(res); // Debe traer colegio dentro
+            setUsuario(res);
+            // Cargar configuración de usuario (ajusta si tu ruta es diferente)
+            return api.get(`/configuracion/${res.id}`);
           } else {
             localStorage.removeItem("token");
             localStorage.removeItem("userId");
             setUsuario(null);
+            setConfiguracion(null);
           }
         })
+        .then(cfg => {
+          if (cfg) setConfiguracion(cfg);
+        })
         .catch(() => {
-          localStorage.removeItem("token");
-          localStorage.removeItem("userId");
           setUsuario(null);
+          setConfiguracion(null);
         })
         .finally(() => setLoading(false));
     } else {
       setUsuario(null);
+      setConfiguracion(null);
       setLoading(false);
     }
   }, []);
+
+  // Aplicar tema visual al <body>
+
+useEffect(() => {
+  let claseTema = "theme-default";
+  if (configuracion) {
+    if (configuracion.tema === "Oscuro") claseTema = "theme-dark";
+    else if (configuracion.tema === "Claro") claseTema = "theme-light";
+    else claseTema = "theme-default";
+  }
+  document.body.className = claseTema;
+}, [configuracion]);
 
   // Cuando haces login, actualiza estado y guarda id (el token ya está guardado)
   const handleLogin = (user) => {
     setUsuario(user);
     localStorage.setItem("userId", user.id);
+    // Cargar configuración al iniciar sesión
+    api.get(`/configuracion/${user.id}`).then(cfg => {
+      if (cfg) setConfiguracion(cfg);
+    });
   };
 
   const handleLogout = () => {
     setUsuario(null);
+    setConfiguracion(null);
     localStorage.removeItem("userId");
     localStorage.removeItem("token");
+    document.body.className = "theme-default";
   };
 
   if (loading)
@@ -126,7 +149,7 @@ function App() {
   return (
     <Router>
       {/* NavBar siempre visible */}
-      <NavBar usuario={usuario} onLogout={handleLogout} />
+      <NavBar usuario={usuario} onLogout={handleLogout} configuracion={configuracion} />
 
       <Routes>
         {/* LANDING: siempre accesible */}
@@ -153,7 +176,7 @@ function App() {
           path="/categorias"
           element={
             <RutaPrivada usuario={usuario}>
-              <CategoriasPage />
+              <CategoriasPage configuracion={configuracion} />
             </RutaPrivada>
           }
         />
@@ -163,7 +186,7 @@ function App() {
           path="/categoria/:id"
           element={
             <RutaPrivada usuario={usuario}>
-              <CategoriaDetallePage />
+              <CategoriaDetallePage configuracion={configuracion} />
             </RutaPrivada>
           }
         />
@@ -173,7 +196,7 @@ function App() {
           path="/juego/:juego"
           element={
             <RutaPrivada usuario={usuario}>
-              <JuegoPage />
+              <JuegoPage configuracion={configuracion} />
             </RutaPrivada>
           }
         />
@@ -183,7 +206,21 @@ function App() {
           path="/admin"
           element={
             <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
-              <PanelAdmin usuario={usuario} />
+              <PanelAdmin usuario={usuario} configuracion={configuracion} />
+            </RutaPrivada>
+          }
+        />
+
+        {/* CONFIGURACIÓN USUARIO */}
+        <Route
+          path="/configuracion"
+          element={
+            <RutaPrivada usuario={usuario}>
+              <ConfiguracionUsuarioPage
+                usuario={usuario}
+                config={configuracion}
+                onConfigChange={setConfiguracion}
+              />
             </RutaPrivada>
           }
         />
@@ -193,7 +230,7 @@ function App() {
           path="/panel-game"
           element={
             <RutaPrivada usuario={usuario && (usuario.rol === "admin" || usuario.rol === "docente")}>
-              <PanelGame usuario={usuario} />
+              <PanelGame usuario={usuario} configuracion={configuracion} />
             </RutaPrivada>
           }
         />
@@ -203,7 +240,7 @@ function App() {
           path="/dashboard-admin"
           element={
             <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
-              <DashboardAdmin usuario={usuario} />
+              <DashboardAdmin usuario={usuario} configuracion={configuracion} />
             </RutaPrivada>
           }
         />
@@ -213,7 +250,7 @@ function App() {
           path="/mensajes-soporte"
           element={
             <RutaPrivada usuario={usuario}>
-              <MensajeSoportePage usuario={usuario} />
+              <MensajeSoportePage usuario={usuario} configuracion={configuracion} />
             </RutaPrivada>
           }
         />
