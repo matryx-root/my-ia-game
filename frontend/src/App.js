@@ -14,6 +14,7 @@ import MensajeSoportePage from "./components/MensajeSoporte";
 import ConfiguracionUsuarioPage from "./components/ConfiguracionUsuarioPage";
 import LogsJuegoPage from "./components/LogsJuegoPage";
 import LogsErrorPage from "./components/LogsErrorPage"; // ¡No olvides crear este componente!
+import MisJuegos from "./components/MisJuegos";
 
 import api from "./utils/api";
 
@@ -198,6 +199,14 @@ function App() {
             </RutaPrivada>
           }
         />
+        <Route
+  path="/mis-juegos"
+  element={
+    <RutaPrivada usuario={usuario}>
+      <MisJuegos usuario={usuario} />
+    </RutaPrivada>
+  }
+/>
         <Route
           path="/categoria/:id"
           element={

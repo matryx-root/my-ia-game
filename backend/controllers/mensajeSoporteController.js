@@ -27,14 +27,22 @@ exports.crearMensaje = async (req, res) => {
   }
 };
 
-
 // Listar mensajes de soporte (puede filtrar por usuarioId)
 exports.listarMensajes = async (req, res) => {
   const usuarioId = req.query.usuarioId ? Number(req.query.usuarioId) : undefined;
   try {
     const mensajes = await prisma.mensajeSoporte.findMany({
       where: usuarioId ? { usuarioId } : {},
-      orderBy: { fechaHora: 'desc' }
+      orderBy: { fechaHora: 'desc' },
+      include: {
+        usuario: {
+          select: {
+            nombre: true,
+            rol: true,
+            colegio: { select: { nombre: true } }
+          }
+        }
+      }
     });
     res.json(mensajes);
   } catch (err) {

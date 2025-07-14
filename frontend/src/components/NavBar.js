@@ -1,6 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import React from "react";
-import { useTranslation } from "react-i18next";
+
 
 
 export default function NavBar({ usuario, onLogout }) {
@@ -72,6 +72,16 @@ export default function NavBar({ usuario, onLogout }) {
                   Progreso Alumnos
                 </button>
               )}
+
+
+              <button
+  className="btn btn-outline-info me-3"
+  onClick={() => navigate("/mis-juegos")}
+>
+  <i className="bi bi-bar-chart-fill me-1"></i>
+  Mis Juegos y Logros
+</button>
+
 
               {/* Botón Soporte/Mensajes: para alumno, docente y admin */}
               {(usuario.rol === "alumno" ||
