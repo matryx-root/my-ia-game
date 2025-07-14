@@ -37,7 +37,15 @@ export default function NavBar({ usuario, onLogout }) {
 
               {/* Botones para admin */}
               {usuario.rol === "admin" && (
+                
                 <>
+                <button
+    className="btn btn-outline-info me-3"
+    onClick={() => navigate("/admin/juegos")}
+  >
+    <i className="bi bi-collection me-1"></i>
+    Admin Juegos
+  </button>
                   <button
                     className="btn btn-outline-warning me-3"
                     onClick={() => navigate("/admin")}

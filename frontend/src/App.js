@@ -15,7 +15,7 @@ import ConfiguracionUsuarioPage from "./components/ConfiguracionUsuarioPage";
 import LogsJuegoPage from "./components/LogsJuegoPage";
 import LogsErrorPage from "./components/LogsErrorPage"; // ¡No olvides crear este componente!
 import MisJuegos from "./components/MisJuegos";
-
+import JuegosAdmin from "./components/JuegosAdmin";
 import api from "./utils/api";
 
 // Importación de juegos
@@ -259,6 +259,14 @@ function App() {
             </RutaPrivada>
           }
         />
+        <Route
+  path="/admin/juegos"
+  element={
+    <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+      <JuegosAdmin usuario={usuario} />
+    </RutaPrivada>
+  }
+/>
         <Route path="/logs-juego" element={
           <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
             <LogsJuegoPage />

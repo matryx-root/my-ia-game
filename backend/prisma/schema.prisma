@@ -50,6 +50,7 @@ model Juego {
   progreso    ProgresoUsuario[]
   logros      Achievement[]
   errores     LogError[]
+  archivo     String?
 }
 
 model LogIngreso {

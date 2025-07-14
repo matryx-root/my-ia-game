@@ -1,13 +1,11 @@
-// utils/api.js
+// src/utils/api.js
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
-// Devuelve el token JWT almacenado localmente
 function getToken() {
   return localStorage.getItem("token");
 }
 
-// Construye las cabeceras para cada request
 function headers(custom = {}) {
   const h = { "Content-Type": "application/json", ...custom };
   const t = getToken();
@@ -15,7 +13,6 @@ function headers(custom = {}) {
   return h;
 }
 
-// Función para manejar la respuesta y errores HTTP
 async function handleResponse(response) {
   const contentType = response.headers.get("content-type");
   let data;
@@ -25,13 +22,11 @@ async function handleResponse(response) {
     data = await response.text();
   }
   if (!response.ok) {
-    // Esto permite que en tu catch puedas mostrar el error como string legible
     const errMsg =
       (typeof data === "object" && data.error) ||
       (typeof data === "object" && data.message) ||
       data ||
       response.statusText;
-    // Opcional: log
     if (process.env.NODE_ENV === "development") {
       console.error("API error:", errMsg, data);
     }
@@ -40,7 +35,7 @@ async function handleResponse(response) {
   return data;
 }
 
-// API centralizado
+// --- API centralizado (original) ---
 const api = {
   get: (url) =>
     fetch(API_URL + url, { headers: headers() }).then(handleResponse),
@@ -78,4 +73,44 @@ const api = {
 };
 
 export default api;
-// export { API_URL }; // Descomenta si necesitas la URL en otros archivos
+
+// ========== JUEGOS ADMIN ==========
+// Todas devuelven Promesa (igual que api.get, etc.)
+
+// GET /admin/juegos
+export function getJuegos() {
+  return api.get("/admin/juegos");
+}
+
+// POST /admin/juegos
+export function crearJuego(data) {
+  return api.post("/admin/juegos", data);
+}
+
+// PUT /admin/juegos/:id
+export function actualizarJuego(id, data) {
+  return api.put(`/admin/juegos/${id}`, data);
+}
+
+// DELETE /admin/juegos/:id
+export function borrarJuego(id) {
+  return api.delete(`/admin/juegos/${id}`);
+}
+
+// POST /admin/juegos/upload (archivo)
+export function uploadArchivoJuego(formData) {
+  // Usa postFile para FormData (ya añade Auth)
+  return api.postFile("/admin/juegos/upload", formData);
+}
+
+// GET /admin/juegos/download/:archivo (descarga .js)
+export function downloadArchivoJuego(nombreArchivo) {
+  // OJO: Esto retorna un blob, no texto ni json
+  return fetch(`${API_URL}/admin/juegos/download/${nombreArchivo}`, {
+    method: "GET",
+    headers: { Authorization: "Bearer " + getToken() },
+  }).then(async (res) => {
+    if (!res.ok) throw new Error("No se pudo descargar archivo");
+    return await res.blob();
+  });
+}

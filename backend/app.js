@@ -13,6 +13,7 @@ const achievementRoutes = require('./routes/achievementRoutes');
 const configuracionUsuarioRoutes = require('./routes/configuracionUsuario');
 const logJuegoRoutes = require('./routes/logJuegoRoutes');
 const logErrorRoutes = require('./routes/logErrorRoutes');
+const juegosAdminRoutes = require('./routes/juegosAdmin');
 
 // Inicializar la app
 const app = express();
@@ -32,6 +33,7 @@ app.use('/api/usuarios/achievement', achievementRoutes);
 app.use('/api/configuracion', configuracionUsuarioRoutes);
 app.use('/api/logs-juego', logJuegoRoutes);
 app.use('/api/logs-error', logErrorRoutes);
+app.use('/api/admin/juegos', juegosAdminRoutes);
 
 // Ruta de salud/prueba
 app.get('/', (req, res) => {
