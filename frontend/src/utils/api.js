@@ -1,5 +1,3 @@
-// src/utils/api.js
-
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
 function getToken() {
@@ -35,7 +33,7 @@ async function handleResponse(response) {
   return data;
 }
 
-// --- API centralizado (original) ---
+// --- API centralizado ---
 const api = {
   get: (url) =>
     fetch(API_URL + url, { headers: headers() }).then(handleResponse),
@@ -60,13 +58,13 @@ const api = {
       headers: headers(),
     }).then(handleResponse),
 
-  // Para subir archivos con FormData (sin Content-Type manual)
+  // Subir archivos con FormData (sin Content-Type manual)
   postFile: (url, formData) =>
     fetch(API_URL + url, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + getToken(),
-        // Content-Type se gestiona solo para FormData
+        // No Content-Type para FormData
       },
       body: formData,
     }).then(handleResponse),
@@ -75,7 +73,6 @@ const api = {
 export default api;
 
 // ========== JUEGOS ADMIN ==========
-// Todas devuelven Promesa (igual que api.get, etc.)
 
 // GET /admin/juegos
 export function getJuegos() {
@@ -98,19 +95,35 @@ export function borrarJuego(id) {
 }
 
 // POST /admin/juegos/upload (archivo)
-export function uploadArchivoJuego(formData) {
-  // Usa postFile para FormData (ya añade Auth)
+export function uploadArchivoJuego(file) {
+  const formData = new FormData();
+  formData.append("archivo", file);
   return api.postFile("/admin/juegos/upload", formData);
 }
 
-// GET /admin/juegos/download/:archivo (descarga .js)
+// GET /admin/juegos/download/:archivo
 export function downloadArchivoJuego(nombreArchivo) {
-  // OJO: Esto retorna un blob, no texto ni json
-  return fetch(`${API_URL}/admin/juegos/download/${nombreArchivo}`, {
+  // Forzar descarga automática usando blob y crear un enlace oculto
+  fetch(`${API_URL}/admin/juegos/download/${nombreArchivo}`, {
     method: "GET",
     headers: { Authorization: "Bearer " + getToken() },
-  }).then(async (res) => {
-    if (!res.ok) throw new Error("No se pudo descargar archivo");
-    return await res.blob();
-  });
+  })
+    .then(async (res) => {
+      if (!res.ok) throw new Error("No se pudo descargar archivo");
+      const blob = await res.blob();
+      // Descarga directa
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = nombreArchivo;
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      }, 300);
+    })
+    .catch((err) => {
+      alert("Error al descargar: " + err.message);
+    });
 }

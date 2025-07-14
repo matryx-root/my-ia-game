@@ -1,69 +1,88 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-/**
- * Página inicial de bienvenida para la plataforma de juegos de IA.
- * Redirecciona a /login con el botón principal.
- */
+const robotImg = "https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/000000/external-robot-robotics-flatart-icons-outline-flatarticons.png";
+
 export default function LandingPage() {
   const navigate = useNavigate();
 
   return (
     <div
       style={{
-        background: "linear-gradient(135deg, #6ee7b7 0%, #a7c7e7 100%)",
         minHeight: "100vh",
+        minWidth: "100vw",
         display: "flex",
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
+        background: "linear-gradient(135deg, #60a3d9 0%, #65e1c8 100%)",
+        fontFamily: "'Poppins', 'Segoe UI', Arial, sans-serif",
       }}
     >
-      <h1
-        style={{
-          fontFamily: "Comic Sans MS, Comic Sans, cursive",
-          fontSize: 54,
-          color: "#1a237e",
-          marginBottom: 24,
-        }}
-      >
-        🤖 ¡Bienvenido a <span style={{ color: "#1de9b6" }}>Mi IA Game</span>!
-      </h1>
-      <p
-        style={{
-          fontSize: 24,
-          color: "#424242",
-          marginBottom: 32,
-          fontFamily: "Comic Sans MS, Comic Sans, cursive",
-        }}
-      >
-        Aprende y juega con la Inteligencia Artificial.
-      </p>
-      <button
-        style={{
-          background: "#2196f3",
-          color: "white",
-          fontSize: 28,
-          border: "none",
-          borderRadius: 18,
-          padding: "18px 44px",
-          cursor: "pointer",
-          marginBottom: 18,
-          fontWeight: "bold",
-          boxShadow: "0 4px 20px #0003",
-        }}
-        onClick={() => navigate("/login")}
-      >
-        ¡Quiero jugar!
-      </button>
-      <img
-        src="https://img.icons8.com/external-flatart-icons-outline-flatarticons/64/000000/external-robot-robotics-flatart-icons-outline-flatarticons.png"
-        alt="robot"
-        style={{ margin: "16px 0" }}
-      />
-      <div style={{ marginTop: 32, fontSize: 14, color: "#888", textAlign: "center" }}>
-        Desarrollado para niños de primaria.<br />
-        ¿Docente o familia? También puedes jugar.
+      <div style={{
+        background: "rgba(255,255,255,0.98)",
+        borderRadius: 32,
+        boxShadow: "0 6px 32px #1d35577a",
+        padding: "48px 44px 32px 44px",
+        textAlign: "center",
+        minWidth: 370,
+        maxWidth: 520,
+      }}>
+        <img src={robotImg} alt="robot" style={{ width: 64, marginBottom: 12 }} />
+        <h1
+          style={{
+            fontWeight: 800,
+            fontSize: 40,
+            marginBottom: 12,
+            letterSpacing: 0.5,
+            color: "#222b48",
+            textShadow: "0 1px 3px #b0e0ef60"
+          }}
+        >
+          <span role="img" aria-label="robot">🤖</span> ¡Bienvenido a <span style={{ color: "#16b973", textShadow: "none" }}>Mi IA Game</span>!
+        </h1>
+        <p style={{
+          fontSize: 22,
+          color: "#1b406b",
+          fontWeight: 500,
+          margin: "18px 0 32px 0",
+          textShadow: "0 1px 2px #fff8"
+        }}>
+          Aprende y juega con la <span style={{ color: "#1864ab", fontWeight: 700 }}>Inteligencia Artificial</span>.
+        </p>
+
+        <div style={{
+          fontSize: 18,
+          color: "#383858",
+          fontWeight: 500,
+          marginBottom: 30,
+        }}>
+          <span style={{ color: "#ff9900" }}>Educativo para alumnos</span> <span style={{ fontSize: 16 }}>y</span> <span style={{ color: "#902de4" }}>herramienta para docentes</span>
+        </div>
+
+        <button
+          style={{
+            background: "linear-gradient(90deg, #1864ab 80%, #16b973 100%)",
+            color: "#fff",
+            fontSize: 25,
+            border: "none",
+            borderRadius: 16,
+            padding: "15px 46px",
+            cursor: "pointer",
+            marginBottom: 8,
+            fontWeight: "bold",
+            boxShadow: "0 2px 18px #16b97360",
+            transition: "background 0.3s",
+          }}
+          onClick={() => navigate("/login")}
+        >
+          ¡Quiero jugar!
+        </button>
+
+        <div style={{ marginTop: 38, fontSize: 15, color: "#555c6e" }}>
+          Desarrollado para estudiantes de primaria y secundaria.<br />
+          <span style={{ color: "#1864ab", fontWeight: 600 }}>¿Docente o familia?</span> También puedes crear y editar juegos.
+        </div>
       </div>
     </div>
   );

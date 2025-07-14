@@ -3,7 +3,11 @@ const prisma = new PrismaClient();
 const path = require('path');
 const fs = require('fs');
 
-// OBTENER todos los juegos
+// Ruta absoluta a la carpeta donde se guardan los .js (React puede verlos)
+const gamesPath = path.join(__dirname, '..', '..', 'frontend', 'src', 'games');
+
+// ==========================
+// LISTAR todos los juegos
 exports.getAll = async (req, res) => {
   try {
     const juegos = await prisma.juego.findMany();
@@ -13,6 +17,7 @@ exports.getAll = async (req, res) => {
   }
 };
 
+// ==========================
 // CREAR un nuevo juego
 exports.create = async (req, res) => {
   try {
@@ -23,7 +28,7 @@ exports.create = async (req, res) => {
       data: {
         nombre,
         descripcion: descripcion || null,
-        archivo: archivo || null, // nombre del archivo JS si se subió antes
+        archivo: archivo || null, // El nombre del archivo .js, si fue subido antes
       }
     });
     res.status(201).json(nuevo);
@@ -32,19 +37,23 @@ exports.create = async (req, res) => {
   }
 };
 
-// EDITAR un juego
+// ==========================
+// EDITAR un juego existente
 exports.update = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { nombre, descripcion, archivo } = req.body;
     if (!nombre) return res.status(400).json({ error: "El nombre es obligatorio" });
 
+    const existe = await prisma.juego.findUnique({ where: { id } });
+    if (!existe) return res.status(404).json({ error: "Juego no encontrado" });
+
     const actualizado = await prisma.juego.update({
       where: { id },
       data: {
         nombre,
         descripcion: descripcion || null,
-        archivo: archivo || null
+        archivo: archivo || null,
       }
     });
     res.json(actualizado);
@@ -53,17 +62,19 @@ exports.update = async (req, res) => {
   }
 };
 
-// ELIMINAR un juego
+// ==========================
+// ELIMINAR un juego (y el archivo físico si existe)
 exports.delete = async (req, res) => {
   try {
     const id = Number(req.params.id);
-    // Busca el juego antes de eliminar para obtener el archivo asociado (si lo quieres borrar del FS)
     const juego = await prisma.juego.findUnique({ where: { id } });
+    if (!juego) return res.status(404).json({ error: "Juego no encontrado" });
+
     await prisma.juego.delete({ where: { id } });
 
-    // Si quieres borrar el archivo JS asociado del FS:
-    if (juego && juego.archivo) {
-      const ruta = path.join(__dirname, '..', 'games', juego.archivo);
+    // Borra el archivo JS del sistema de archivos si existe
+    if (juego.archivo) {
+      const ruta = path.join(gamesPath, juego.archivo);
       if (fs.existsSync(ruta)) fs.unlinkSync(ruta);
     }
 
@@ -73,22 +84,24 @@ exports.delete = async (req, res) => {
   }
 };
 
-// SUBIR archivo .js (por separado, antes o después de crear/editar el juego)
+// ==========================
+// SUBIR archivo .js (llave: "archivo")
 exports.uploadArchivo = async (req, res) => {
   try {
     if (!req.file) return res.status(400).json({ error: 'No se subió archivo' });
 
-    // Puedes devolver el nombre del archivo para que el frontend lo use al crear el juego
-    res.json({ archivo: req.file.filename, original: req.file.originalname });
+    // Usamos el nombre original para que sea igual que en src/games
+    res.json({ archivo: req.file.originalname });
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 };
 
+// ==========================
 // DESCARGAR archivo .js
 exports.downloadArchivo = (req, res) => {
   const archivo = req.params.archivo;
-  const ruta = path.join(__dirname, '..', 'games', archivo);
+  const ruta = path.join(gamesPath, archivo);
   if (!fs.existsSync(ruta)) return res.status(404).json({ error: 'Archivo no existe' });
   res.download(ruta);
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Registro from "./components/Registro";
@@ -13,7 +13,7 @@ import JuegoPage from "./components/JuegoPage";
 import MensajeSoportePage from "./components/MensajeSoporte";
 import ConfiguracionUsuarioPage from "./components/ConfiguracionUsuarioPage";
 import LogsJuegoPage from "./components/LogsJuegoPage";
-import LogsErrorPage from "./components/LogsErrorPage"; // ¡No olvides crear este componente!
+import LogsErrorPage from "./components/LogsErrorPage";
 import MisJuegos from "./components/MisJuegos";
 import JuegosAdmin from "./components/JuegosAdmin";
 import api from "./utils/api";
@@ -38,7 +38,7 @@ import SelfSupervisedGame from "./games/selfSupervisedGame";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-// --- Mapa de componentes y mapa de IDs (se debe llenar después del fetch) ---
+// Mapa de componentes para render dinámico de juegos
 export const juegosComponentes = {
   iaGame: IAGame,
   mlGame: MLGame,
@@ -56,13 +56,16 @@ export const juegosComponentes = {
   vaeGame: VAEGame,
   diffusionGame: DiffusionGame,
   selfSupervisedGame: SelfSupervisedGame,
-  // ...agrega más aquí si creas otros juegos
+  // Agrega aquí nuevos juegos si los creas
 };
 
-// Mapa global de archivo (key) a ID (esto se rellenará dinámicamente)
+// Mapa global de archivo/key -> id de juego
 export const juegosMap = {};
 
 function RutaPrivada({ usuario, children }) {
+  const location = useLocation();
+  // Permitir el landing incluso si no hay usuario
+  if (!usuario && location.pathname === "/") return children;
   if (!usuario) return <Navigate to="/login" />;
   return children;
 }
@@ -73,7 +76,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [juegosCargados, setJuegosCargados] = useState(false);
 
-  // Al montar: carga usuario, config, y lista de juegos
+  // Carga de usuario, configuración y lista de juegos
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -104,19 +107,18 @@ function App() {
     }
   }, []);
 
-  // Cargar IDs de juegos desde backend y armar el juegosMap
+  // Carga del mapa juegosMap (para asociación dinámica)
   useEffect(() => {
     async function fetchJuegos() {
       try {
-        // Backend debe devolver [{id, nombre, ...archivo}]
         const juegos = await api.get("/juegos");
-        // Relacionar archivo/key con id
         for (let juego of juegos) {
-          // Considera que backend devuelva el campo "archivo" (ej: "mlGame", "vaeGame", etc)
-          if (juego.archivo) juegosMap[juego.archivo] = juego.id;
-          // Si solo tienes nombre, mapea manual: (ejemplo para "Machine Learning" => "mlGame")
-          if (!juego.archivo && juego.nombre && juegosComponentes[toKey(juego.nombre)])
+          // Si tu backend ya guarda el nombre de archivo JS (sin extensión)
+          if (juego.archivo) juegosMap[juego.archivo.replace(/\.js$/, "")] = juego.id;
+          // Alternativamente, usa el nombre con limpieza básica
+          else if (juego.nombre && juegosComponentes[toKey(juego.nombre)]) {
             juegosMap[toKey(juego.nombre)] = juego.id;
+          }
         }
         setJuegosCargados(true);
       } catch (err) {
@@ -125,9 +127,10 @@ function App() {
       }
     }
     fetchJuegos();
+    // eslint-disable-next-line
   }, []);
 
-  // Utilidad: convertir nombre a key (solo si backend no tiene el campo archivo/key)
+  // Utilidad para transformar nombre a key válido si no hay campo archivo
   function toKey(nombre) {
     return nombre
       .toLowerCase()
@@ -144,6 +147,7 @@ function App() {
     document.body.className = claseTema;
   }, [configuracion]);
 
+  // --- LOGIN
   const handleLogin = (user) => {
     setUsuario(user);
     localStorage.setItem("userId", user.id);
@@ -152,12 +156,16 @@ function App() {
     });
   };
 
+  // --- LOGOUT robusto: primero navega a landing y luego limpia estado
   const handleLogout = () => {
-    setUsuario(null);
-    setConfiguracion(null);
-    localStorage.removeItem("userId");
-    localStorage.removeItem("token");
-    document.body.className = "theme-default";
+    window.location.href = "/"; // FULL reload, asegura caída en landing y evita router loops
+    setTimeout(() => {
+      setUsuario(null);
+      setConfiguracion(null);
+      localStorage.removeItem("userId");
+      localStorage.removeItem("token");
+      document.body.className = "theme-default";
+    }, 100);
   };
 
   if (loading || !juegosCargados)
@@ -180,7 +188,6 @@ function App() {
   return (
     <Router>
       <NavBar usuario={usuario} onLogout={handleLogout} configuracion={configuracion} />
-
       <Routes>
         <Route path="/" element={<LandingPage />} />
         <Route
@@ -200,13 +207,13 @@ function App() {
           }
         />
         <Route
-  path="/mis-juegos"
-  element={
-    <RutaPrivada usuario={usuario}>
-      <MisJuegos usuario={usuario} />
-    </RutaPrivada>
-  }
-/>
+          path="/mis-juegos"
+          element={
+            <RutaPrivada usuario={usuario}>
+              <MisJuegos usuario={usuario} />
+            </RutaPrivada>
+          }
+        />
         <Route
           path="/categoria/:id"
           element={
@@ -260,13 +267,13 @@ function App() {
           }
         />
         <Route
-  path="/admin/juegos"
-  element={
-    <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
-      <JuegosAdmin usuario={usuario} />
-    </RutaPrivada>
-  }
-/>
+          path="/admin/juegos"
+          element={
+            <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+              <JuegosAdmin usuario={usuario} />
+            </RutaPrivada>
+          }
+        />
         <Route path="/logs-juego" element={
           <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
             <LogsJuegoPage />
