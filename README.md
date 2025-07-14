@@ -1,70 +1,183 @@
-# Getting Started with Create React App 26
+¡Por supuesto! Aquí tienes el **README.md** listo para copiar, con un formato profesional, instrucciones claras y adaptado a tu proyecto **my-ia-game**:
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+---
 
-## Available Scripts
+```markdown
+# My IA Game
 
-In the project directory, you can run:
+Plataforma educativa de juegos interactivos para aprender sobre Inteligencia Artificial.  
+Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, mensajería interna y seguimiento de progreso gamificado.
 
-### `npm start`
+---
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+## 🗂️ Estructura del Repositorio
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
 
-### `npm test`
+my-ia-game/
+│
+├── backend/      # API Node.js + Express + Prisma + PostgreSQL
+├── frontend/     # React + Bootstrap + Phaser.js
+├── .gitignore
+├── .gitattributes
+└── README.md
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+````
 
-### `npm run build`
+---
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+## 🚦 Requisitos Previos
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+- **Node.js** 18 o superior
+- **npm** (gestor de paquetes de Node)
+- **PostgreSQL** 14+
+- **Git** (para clonar y gestionar versiones)
+- **Prisma CLI** (instalado como dependencia en backend)
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## 🚀 Instalación Rápida
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 1. Clonar el repositorio
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```bash
+git clone https://github.com/matryx-root/my-ia-game.git
+cd my-ia-game
+````
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+### 2. Configuración de la base de datos PostgreSQL
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+* Crea una base de datos vacía llamada, por ejemplo, `myiagame`
+* Guarda usuario, contraseña, host y puerto (default: 5432)
 
-## Learn More
+### 3. Variables de entorno
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+#### Backend
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Crea el archivo `.env` en `/backend`, con contenido similar a:
 
-### Code Splitting
+```ini
+DATABASE_URL="postgresql://TU_USUARIO:TU_PASSWORD@localhost:5432/myiagame"
+JWT_SECRET="pon_un_secreto_fuerte_aqui"
+PORT=4000
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+#### Frontend
 
-### Analyzing the Bundle Size
+Normalmente no requiere configuración especial, a menos que cambies el endpoint del backend.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+### 4. Instalar dependencias
 
-### Making a Progressive Web App
+```bash
+cd backend
+npm install
+cd ../frontend
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 5. Migraciones y Seeds (Prisma)
 
-### Advanced Configuration
+Ejecuta en `/backend`:
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+```bash
+npx prisma migrate dev --name init
+npx prisma db seed
+```
 
-### Deployment
+* Esto crea las tablas y carga datos de prueba definidos en `prisma/seed.js`.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+### 6. Ejecución
 
-### `npm run build` fails to minify
+#### Backend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+```bash
+cd backend
+npm run dev
+```
+
+El backend estará en: [http://localhost:4000](http://localhost:4000)
+
+#### Frontend
+
+```bash
+cd frontend
+npm start
+```
+
+El frontend estará en: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 👤 Usuarios de prueba
+
+* Puedes crear usuarios desde la interfaz o mediante seeds.
+* Los usuarios, roles y contraseñas de ejemplo están definidos en `prisma/seed.js`.
+* Roles: **admin**, **docente**, **alumno**.
+
+---
+
+## 📦 Comandos útiles
+
+```bash
+# Migraciones Prisma
+npx prisma migrate dev
+
+# Regenerar cliente Prisma
+npx prisma generate
+
+# Ejecutar seeds
+npx prisma db seed
+```
+
+---
+
+## 🧩 Estructura básica de carpetas
+
+* **backend/**: API REST, lógica de negocio, conexión a PostgreSQL, autenticación y administración de datos.
+* **frontend/**: Interfaz visual (React, Bootstrap, Phaser para juegos educativos).
+* **prisma/**: Definición del modelo de datos, migraciones y seeds automáticos.
+
+---
+
+## ⚠️ Notas y consejos
+
+* Verifica que PostgreSQL esté corriendo antes de migrar o seedear.
+* Si editas el esquema de datos, recuerda:
+
+  ```bash
+  npx prisma migrate dev
+  npx prisma generate
+  ```
+* Revisa bien `.env` y permisos de usuario en PostgreSQL.
+* El frontend y backend pueden correr simultáneamente.
+* Si necesitas testear en remoto, puedes usar [ngrok](https://ngrok.com/).
+
+---
+
+## 👨‍💻 Autor
+
+Simón Velasquez Carcamo
+GitHub: [matryx-root](https://github.com/matryx-root)
+
+---
+
+## 📝 Licencia
+
+MIT
+
+````
+
+---
+
+**¿Quieres agregar ejemplos visuales, tips de deploy, troubleshooting o documentación avanzada?**  
+Solo pídelo y te ayudo a ampliarlo con ejemplos o imágenes.
+
+Cuando termines de editar, guarda el archivo y actualiza el repositorio con:
+
+```bash
+git add README.md
+git commit -m "Actualiza y profesionaliza README"
+git push
+````
+
+¡Listo para impresionar a cualquier equipo de desarrollo! 🚀
