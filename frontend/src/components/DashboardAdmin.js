@@ -1,11 +1,10 @@
-
 // src/components/DashboardAdmin.js
 
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
-// Íconos para las tarjetas (puedes ajustar según tus preferencias)
+// Íconos para las tarjetas
 const CARD_ICONS = {
   Usuarios: "bi-people-fill",
   Colegios: "bi-building",
@@ -19,8 +18,18 @@ const CARD_ICONS = {
 
 export default function DashboardAdmin({ usuario }) {
   const [resumen, setResumen] = useState({});
-  const [ultimos, setUltimos] = useState({});
+  const [ultimos, setUltimos] = useState({
+    usuarios: [],
+    colegios: [],
+    configuraciones: [],
+    mensajes: [],
+    errores: [],
+    logsJuego: [],
+    logsIngreso: [],
+    logros: []
+  });
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -30,6 +39,8 @@ export default function DashboardAdmin({ usuario }) {
       return;
     }
     setLoading(true);
+    setError(null);
+
     Promise.all([
       api.get("/dashboard/resumen"),
       api.get("/dashboard/usuarios"),
@@ -40,26 +51,48 @@ export default function DashboardAdmin({ usuario }) {
       api.get("/dashboard/logsJuego"),
       api.get("/dashboard/logsIngreso"),
       api.get("/dashboard/logros"),
-    ]).then(([
-      resumen, usuarios, colegios, configuraciones,
-      mensajes, errores, logsJuego, logsIngreso, logros
-    ]) => {
-      setResumen(resumen);
-      setUltimos({
-        usuarios, colegios, configuraciones,
+    ])
+      .then(([
+        resumen, usuarios, colegios, configuraciones,
         mensajes, errores, logsJuego, logsIngreso, logros
-      });
-      setLoading(false);
-    });
+      ]) => {
+        setResumen(resumen || {});
+        setUltimos({
+          usuarios: usuarios || [],
+          colegios: colegios || [],
+          configuraciones: configuraciones || [],
+          mensajes: mensajes || [],
+          errores: errores || [],
+          logsJuego: logsJuego || [],
+          logsIngreso: logsIngreso || [],
+          logros: logros || []
+        });
+      })
+      .catch(err => {
+        setError("No se pudo cargar el dashboard. " + (err?.message || ""));
+      })
+      .finally(() => setLoading(false));
     // eslint-disable-next-line
   }, [usuario]);
 
-  if (loading)
+  if (loading) {
     return (
       <div className="container py-5 text-center">
         <span className="spinner-border"></span>
       </div>
     );
+  }
+
+  if (error) {
+    return (
+      <div className="container py-5">
+        <div className="alert alert-danger text-center">
+          <i className="bi bi-exclamation-triangle-fill me-2"></i>
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container py-5">
@@ -138,7 +171,7 @@ function DashboardTable({ title, rows, columns, icon, badge }) {
                   {columns.map(c => (
                     <td key={c}>
                       {/* Fechas con formato */}
-                      {c.includes("fecha") || c.toLowerCase().includes("hora")
+                      {c.toLowerCase().includes("fecha") || c.toLowerCase().includes("hora")
                         ? (row[c] ? new Date(row[c]).toLocaleString() : "-")
                         : // Estados y badges
                         c === "estado"

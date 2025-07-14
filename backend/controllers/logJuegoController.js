@@ -12,3 +12,14 @@ exports.registrarLogJuego = async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 };
+
+exports.listarLogsJuego = async (req, res) => {
+  try {
+    const logs = await prisma.logJuego.findMany({
+      include: { usuario: true, juego: true }
+    });
+    res.json(logs);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

@@ -12,6 +12,8 @@ import CategoriaDetallePage from "./components/CategoriaDetallePage";
 import JuegoPage from "./components/JuegoPage";
 import MensajeSoportePage from "./components/MensajeSoporte";
 import ConfiguracionUsuarioPage from "./components/ConfiguracionUsuarioPage";
+import LogsJuegoPage from "./components/LogsJuegoPage";
+import LogsErrorPage from "./components/LogsErrorPage"; // ¡No olvides crear este componente!
 
 import api from "./utils/api";
 
@@ -35,28 +37,30 @@ import SelfSupervisedGame from "./games/selfSupervisedGame";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-// Juegos por clave para uso dinámico
+// --- Mapa de componentes y mapa de IDs (se debe llenar después del fetch) ---
 export const juegosComponentes = {
-  iaGame: <IAGame />,
-  mlGame: <MLGame />,
-  dlGame: <DLGame />,
-  rlGame: <RLGame />,
-  generativeGame: <GenerativeGame />,
-  supervisedGame: <SupervisedGame />,
-  unsupervisedGame: <UnsupervisedGame />,
-  semiSupervisedGame: <SemiSupervisedGame />,
-  transferLearningGame: <TransferLearningGame />,
-  federatedLearningGame: <FederatedLearningGame />,
-  nlpGame: <NLPGame />,
-  computerVisionGame: <ComputerVisionGame />,
-  ganGame: <GANGame />,
-  vaeGame: <VAEGame />,
-  diffusionGame: <DiffusionGame />,
-  selfSupervisedGame: <SelfSupervisedGame />,
-  // ...agrega más aquí si creas otros archivos de juegos
+  iaGame: IAGame,
+  mlGame: MLGame,
+  dlGame: DLGame,
+  rlGame: RLGame,
+  generativeGame: GenerativeGame,
+  supervisedGame: SupervisedGame,
+  unsupervisedGame: UnsupervisedGame,
+  semiSupervisedGame: SemiSupervisedGame,
+  transferLearningGame: TransferLearningGame,
+  federatedLearningGame: FederatedLearningGame,
+  nlpGame: NLPGame,
+  computerVisionGame: ComputerVisionGame,
+  ganGame: GANGame,
+  vaeGame: VAEGame,
+  diffusionGame: DiffusionGame,
+  selfSupervisedGame: SelfSupervisedGame,
+  // ...agrega más aquí si creas otros juegos
 };
 
-// Rutas protegidas
+// Mapa global de archivo (key) a ID (esto se rellenará dinámicamente)
+export const juegosMap = {};
+
 function RutaPrivada({ usuario, children }) {
   if (!usuario) return <Navigate to="/login" />;
   return children;
@@ -66,8 +70,9 @@ function App() {
   const [usuario, setUsuario] = useState(null);
   const [configuracion, setConfiguracion] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [juegosCargados, setJuegosCargados] = useState(false);
 
-  // Cargar perfil y configuración al montar
+  // Al montar: carga usuario, config, y lista de juegos
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -75,7 +80,6 @@ function App() {
         .then(res => {
           if (res && !res.error) {
             setUsuario(res);
-            // Cargar configuración de usuario (ajusta si tu ruta es diferente)
             return api.get(`/configuracion/${res.id}`);
           } else {
             localStorage.removeItem("token");
@@ -99,23 +103,49 @@ function App() {
     }
   }, []);
 
-  // Aplicar tema visual al <body>
+  // Cargar IDs de juegos desde backend y armar el juegosMap
+  useEffect(() => {
+    async function fetchJuegos() {
+      try {
+        // Backend debe devolver [{id, nombre, ...archivo}]
+        const juegos = await api.get("/juegos");
+        // Relacionar archivo/key con id
+        for (let juego of juegos) {
+          // Considera que backend devuelva el campo "archivo" (ej: "mlGame", "vaeGame", etc)
+          if (juego.archivo) juegosMap[juego.archivo] = juego.id;
+          // Si solo tienes nombre, mapea manual: (ejemplo para "Machine Learning" => "mlGame")
+          if (!juego.archivo && juego.nombre && juegosComponentes[toKey(juego.nombre)])
+            juegosMap[toKey(juego.nombre)] = juego.id;
+        }
+        setJuegosCargados(true);
+      } catch (err) {
+        console.error("Error cargando juegos:", err);
+        setJuegosCargados(true);
+      }
+    }
+    fetchJuegos();
+  }, []);
 
-useEffect(() => {
-  let claseTema = "theme-default";
-  if (configuracion) {
-    if (configuracion.tema === "Oscuro") claseTema = "theme-dark";
-    else if (configuracion.tema === "Claro") claseTema = "theme-light";
-    else claseTema = "theme-default";
+  // Utilidad: convertir nombre a key (solo si backend no tiene el campo archivo/key)
+  function toKey(nombre) {
+    return nombre
+      .toLowerCase()
+      .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u')
+      .replace(/ñ/g, 'n').replace(/[^a-z0-9]/g, '');
   }
-  document.body.className = claseTema;
-}, [configuracion]);
 
-  // Cuando haces login, actualiza estado y guarda id (el token ya está guardado)
+  useEffect(() => {
+    let claseTema = "theme-default";
+    if (configuracion) {
+      if (configuracion.tema === "Oscuro") claseTema = "theme-dark";
+      else if (configuracion.tema === "Claro") claseTema = "theme-light";
+    }
+    document.body.className = claseTema;
+  }, [configuracion]);
+
   const handleLogin = (user) => {
     setUsuario(user);
     localStorage.setItem("userId", user.id);
-    // Cargar configuración al iniciar sesión
     api.get(`/configuracion/${user.id}`).then(cfg => {
       if (cfg) setConfiguracion(cfg);
     });
@@ -129,7 +159,7 @@ useEffect(() => {
     document.body.className = "theme-default";
   };
 
-  if (loading)
+  if (loading || !juegosCargados)
     return (
       <div
         style={{
@@ -148,30 +178,18 @@ useEffect(() => {
 
   return (
     <Router>
-      {/* NavBar siempre visible */}
       <NavBar usuario={usuario} onLogout={handleLogout} configuracion={configuracion} />
 
       <Routes>
-        {/* LANDING: siempre accesible */}
         <Route path="/" element={<LandingPage />} />
-
-        {/* LOGIN */}
         <Route
           path="/login"
-          element={
-            usuario ? <Navigate to="/categorias" /> : <Login onLogin={handleLogin} />
-          }
+          element={usuario ? <Navigate to="/categorias" /> : <Login onLogin={handleLogin} />}
         />
-
-        {/* REGISTRO */}
         <Route
           path="/register"
-          element={
-            usuario ? <Navigate to="/categorias" /> : <Registro onRegister={() => {}} />
-          }
+          element={usuario ? <Navigate to="/categorias" /> : <Registro onRegister={() => {}} />}
         />
-
-        {/* CATEGORÍAS */}
         <Route
           path="/categorias"
           element={
@@ -180,8 +198,6 @@ useEffect(() => {
             </RutaPrivada>
           }
         />
-
-        {/* DETALLE CATEGORÍA */}
         <Route
           path="/categoria/:id"
           element={
@@ -190,8 +206,6 @@ useEffect(() => {
             </RutaPrivada>
           }
         />
-
-        {/* JUEGO DINÁMICO */}
         <Route
           path="/juego/:juego"
           element={
@@ -200,8 +214,6 @@ useEffect(() => {
             </RutaPrivada>
           }
         />
-
-        {/* PANEL ADMIN - solo admin */}
         <Route
           path="/admin"
           element={
@@ -210,8 +222,6 @@ useEffect(() => {
             </RutaPrivada>
           }
         />
-
-        {/* CONFIGURACIÓN USUARIO */}
         <Route
           path="/configuracion"
           element={
@@ -224,8 +234,6 @@ useEffect(() => {
             </RutaPrivada>
           }
         />
-
-        {/* PANEL JUEGOS POR USUARIO - solo admin o docente */}
         <Route
           path="/panel-game"
           element={
@@ -234,8 +242,6 @@ useEffect(() => {
             </RutaPrivada>
           }
         />
-
-        {/* DASHBOARD ADMIN - solo admin */}
         <Route
           path="/dashboard-admin"
           element={
@@ -244,8 +250,16 @@ useEffect(() => {
             </RutaPrivada>
           }
         />
-
-        {/* MENSAJE SOPORTE - alumnos, docentes, admin */}
+        <Route path="/logs-juego" element={
+          <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+            <LogsJuegoPage />
+          </RutaPrivada>
+        } />
+        <Route path="/logs-error" element={
+          <RutaPrivada usuario={usuario && usuario.rol === "admin"}>
+            <LogsErrorPage />
+          </RutaPrivada>
+        } />
         <Route
           path="/mensajes-soporte"
           element={
@@ -254,8 +268,6 @@ useEffect(() => {
             </RutaPrivada>
           }
         />
-
-        {/* Cualquier otra ruta -> vuelve a landing */}
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </Router>

@@ -1,34 +1,54 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Registrar un error
-exports.registrarError = async (req, res) => {
+// Crear un nuevo log de error
+exports.crearLogError = async (req, res) => {
   try {
     const { usuarioId, juegoId, mensaje, detalle } = req.body;
-    const error = await prisma.logError.create({
+    const log = await prisma.logError.create({
       data: { usuarioId, juegoId, mensaje, detalle }
     });
-    res.status(201).json(error);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
+    res.status(201).json(log);
+  } catch (e) {
+    res.status(400).json({ error: e.message });
   }
 };
 
-// Listar logs de errores (opcional: por usuario, por juego)
-exports.listarErrores = async (req, res) => {
-  const usuarioId = req.query.usuarioId ? Number(req.query.usuarioId) : undefined;
-  const juegoId = req.query.juegoId ? Number(req.query.juegoId) : undefined;
+// Listar todos los logs de error
+exports.listarLogErrores = async (req, res) => {
   try {
-    const where = {};
-    if (usuarioId) where.usuarioId = usuarioId;
-    if (juegoId) where.juegoId = juegoId;
-
-    const errores = await prisma.logError.findMany({
-      where,
-      orderBy: { fechaHora: 'desc' }
+    const logs = await prisma.logError.findMany({
+      orderBy: { fecha: 'desc' },
+      include: { usuario: true, juego: true }
     });
-    res.json(errores);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.json(logs);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+// Obtener log de error por ID
+exports.obtenerLogErrorPorId = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    const log = await prisma.logError.findUnique({
+      where: { id },
+      include: { usuario: true, juego: true }
+    });
+    if (!log) return res.status(404).json({ error: 'Log de error no encontrado' });
+    res.json(log);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+};
+
+// Eliminar un log de error
+exports.eliminarLogError = async (req, res) => {
+  try {
+    const id = Number(req.params.id);
+    await prisma.logError.delete({ where: { id } });
+    res.json({ mensaje: 'Log de error eliminado' });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
   }
 };
