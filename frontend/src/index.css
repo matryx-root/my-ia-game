@@ -1,9 +1,25 @@
-body, #root {
-  height: 100%;
+/* En tu CSS global (App.css o index.css) */
+body {
+  background: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
+  min-height: 100vh;
   margin: 0;
   padding: 0;
-  min-height: 100vh;
-  background: linear-gradient(135deg, #6ee7b7 0%, #a7c7e7 100%) !important;
+}
+
+.navbar {
+  background: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.navbar .btn,
+.navbar .navbar-brand,
+.navbar .text-light {
+  color: #033 !important; /* verde oscuro, o el color que prefieras */
+}
+.container {
+  margin-top: 0 !important;
+  padding-top: 32px; /* Solo si necesitas separar el contenido */
 }
 
 /* Si tienes otros estilos globales, agrégalos aquí o en App.css */

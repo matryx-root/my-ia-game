@@ -2,6 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 
+// Regex
+const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
+const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
+const CELULAR_REGEX = /^[0-9]{9}$/;
+const NOMBRE_REGEX = /^[A-ZÁÉÍÓÚÑ ]{1,40}$/;
+
 export default function Registro({ onRegister }) {
   const [data, setData] = useState({
     nombre: "",
@@ -16,64 +22,120 @@ export default function Registro({ onRegister }) {
   const [errors, setErrors] = useState({});
   const [colegios, setColegios] = useState([]);
   const [cargandoColegios, setCargandoColegios] = useState(true);
+  const [usuariosExistentes, setUsuariosExistentes] = useState([]);
   const navigate = useNavigate();
 
-  // Cargar colegios desde endpoint público al montar el componente
+  // Cargar colegios y usuarios (para duplicidad email)
   useEffect(() => {
-    // Ruta pública, asegúrate que backend la sirva como /api/colegios
     api.get("/colegios")
-      .then(res => {
-        setColegios(Array.isArray(res) ? res : []);
-      })
+      .then(res => setColegios(Array.isArray(res) ? res : []))
       .catch(() => setColegios([]))
       .finally(() => setCargandoColegios(false));
+
+    api.get("/usuarios")
+      .then(res => setUsuariosExistentes(res.map(u => u.email.toUpperCase())))
+      .catch(() => setUsuariosExistentes([]));
   }, []);
 
-  // Validación básica de campos
-  const validate = () => {
+  // Validación profunda
+  const validate = (values) => {
     const newErrors = {};
-    if (!data.nombre) newErrors.nombre = "Nombre es requerido";
-    if (!data.email) newErrors.email = "Email es requerido";
-    else if (!/\S+@\S+\.\S+/.test(data.email)) newErrors.email = "Email no válido";
-    if (!data.password) newErrors.password = "Contraseña es requerida";
-    else if (data.password.length < 6) newErrors.password = "Mínimo 6 caracteres";
-    if (!data.rol) newErrors.rol = "Debes seleccionar tu rol";
-    if (!data.colegioId) newErrors.colegioId = "Debes seleccionar un colegio";
-    if (data.edad && (Number(data.edad) < 5 || Number(data.edad) > 120)) newErrors.edad = "Edad no válida";
+
+    // Nombre
+    if (!values.nombre) newErrors.nombre = "El nombre es requerido";
+    else if (!NOMBRE_REGEX.test(values.nombre)) newErrors.nombre = "Solo letras, espacios, máx 40, en MAYÚSCULAS";
+
+    // Email
+    if (!values.email) newErrors.email = "Correo es requerido";
+    else if (!EMAIL_REGEX.test(values.email)) newErrors.email = "Formato inválido. Ej: DOCENTE@GMAIL.COM";
+    else if (usuariosExistentes.includes(values.email.toUpperCase())) newErrors.email = "Este correo ya está registrado. Usa otro.";
+
+    // Contraseña
+    if (!values.password) newErrors.password = "Contraseña es requerida";
+    else if (!PASSWORD_REGEX.test(values.password)) newErrors.password = "8+ caracteres, mínimo 1 letra y 1 número. Ej: ABCD1234";
+
+    // Rol
+    if (!values.rol) newErrors.rol = "Selecciona tu rol";
+
+    // Colegio
+    if (!values.colegioId) newErrors.colegioId = "Selecciona un colegio";
+
+    // Edad
+    if (values.rol === "alumno") {
+      if (!values.edad || isNaN(Number(values.edad))) newErrors.edad = "Edad obligatoria para alumno";
+      else if (Number(values.edad) < 8 || Number(values.edad) > 18) newErrors.edad = "Alumno: edad entre 8 y 18";
+    } else if (values.rol === "docente") {
+      if (!values.edad || isNaN(Number(values.edad))) newErrors.edad = "Edad obligatoria para docente";
+      else if (Number(values.edad) < 19 || Number(values.edad) > 60) newErrors.edad = "Docente: edad entre 19 y 60";
+    }
+
+    // Celular
+    if (values.celular && !CELULAR_REGEX.test(values.celular)) newErrors.celular = "Solo 9 dígitos, ej: 912345678";
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Manejar cambios en los campos
+  // Cambios en campos: fuerza mayúsculas y quita errores
   const handleChange = (e) => {
-    setData({ ...data, [e.target.name]: e.target.value });
-    if (errors[e.target.name]) setErrors({ ...errors, [e.target.name]: null });
+    let { name, value } = e.target;
+    if (["nombre", "email"].includes(name)) value = value.toUpperCase();
+    setData({ ...data, [name]: value });
+    if (errors[name]) setErrors({ ...errors, [name]: null });
   };
 
-  // Manejar envío de registro
+  // Limpieza de campos antes de enviar
+  const cleanData = (obj) => {
+    let cleaned = { ...obj };
+    // Limpia solo los campos de texto
+    for (let k of ["nombre", "email", "password", "celular"]) {
+      if (typeof cleaned[k] === "string") cleaned[k] = cleaned[k].trim();
+    }
+    return cleaned;
+  };
+
+  // Registro
   const handleRegister = async (e) => {
     e.preventDefault();
-    if (!validate()) return;
+    const cleaned = cleanData(data);
+    if (!validate(cleaned)) return;
     setLoading(true);
     try {
       const res = await api.post("/usuarios/register", {
-        ...data,
-        colegioId: data.colegioId ? Number(data.colegioId) : null,
-        edad: data.edad ? Number(data.edad) : null
+        ...cleaned,
+        colegioId: cleaned.colegioId ? Number(cleaned.colegioId) : null,
+        edad: cleaned.edad ? Number(cleaned.edad) : null,
       });
       if (res.mensaje) {
         alert("¡Registro exitoso!");
         if (onRegister) onRegister();
         navigate("/login");
+      } else if (res.error && res.error.toLowerCase().includes("correo")) {
+        setErrors(prev => ({ ...prev, email: res.error }));
       } else {
         alert(res.error || "Error en el registro");
       }
     } catch (error) {
-      alert("Error en la conexión");
+      // Mejor mensaje para duplicidad
+      setErrors(prev => ({
+        ...prev,
+        email: "No se pudo registrar. Revisa si el correo ya está en uso o verifica tu conexión."
+      }));
     } finally {
       setLoading(false);
     }
   };
+
+  // Placeholders
+  const placeholderEdad = data.rol === "alumno"
+    ? "EJ: 12 (8 a 18 AÑOS)"
+    : data.rol === "docente"
+    ? "EJ: 25 (19 a 60 AÑOS)"
+    : "EDAD";
+  const placeholderNombre = "EJ: JUAN PÉREZ";
+  const placeholderEmail = "EJ: DOCENTE@GMAIL.COM";
+  const placeholderPassword = "EJ: ABCD1234";
+  const placeholderCelular = "EJ: 912345678";
 
   return (
     <div className="container mt-5">
@@ -90,12 +152,14 @@ export default function Registro({ onRegister }) {
                   <label htmlFor="nombre" className="form-label">Nombre Completo</label>
                   <input
                     id="nombre"
-                    className={`form-control ${errors.nombre ? "is-invalid" : ""}`}
                     name="nombre"
-                    placeholder="Ej: Juan Pérez"
-                    onChange={handleChange}
+                    className={`form-control ${errors.nombre ? "is-invalid" : ""}`}
+                    maxLength={40}
+                    placeholder={placeholderNombre}
                     value={data.nombre}
+                    onChange={handleChange}
                     required
+                    style={{ textTransform: "uppercase", color: "#495057" }}
                   />
                   {errors.nombre && <div className="invalid-feedback">{errors.nombre}</div>}
                 </div>
@@ -104,13 +168,14 @@ export default function Registro({ onRegister }) {
                   <label htmlFor="email" className="form-label">Correo Electrónico</label>
                   <input
                     id="email"
-                    className={`form-control ${errors.email ? "is-invalid" : ""}`}
                     name="email"
+                    className={`form-control ${errors.email ? "is-invalid" : ""}`}
                     type="email"
-                    placeholder="Ej: usuario@dominio.com"
-                    onChange={handleChange}
+                    placeholder={placeholderEmail}
                     value={data.email}
+                    onChange={handleChange}
                     required
+                    style={{ textTransform: "uppercase", color: "#495057" }}
                   />
                   {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                 </div>
@@ -119,12 +184,12 @@ export default function Registro({ onRegister }) {
                   <label htmlFor="password" className="form-label">Contraseña</label>
                   <input
                     id="password"
-                    className={`form-control ${errors.password ? "is-invalid" : ""}`}
                     name="password"
+                    className={`form-control ${errors.password ? "is-invalid" : ""}`}
                     type="password"
-                    placeholder="Mínimo 6 caracteres"
-                    onChange={handleChange}
+                    placeholder={placeholderPassword}
                     value={data.password}
+                    onChange={handleChange}
                     required
                   />
                   {errors.password && <div className="invalid-feedback">{errors.password}</div>}
@@ -140,9 +205,9 @@ export default function Registro({ onRegister }) {
                     onChange={handleChange}
                     required
                   >
-                    <option value="">Selecciona tu rol</option>
-                    <option value="alumno">Alumno</option>
-                    <option value="docente">Docente</option>
+                    <option value="">SELECCIONA TU ROL</option>
+                    <option value="alumno">ALUMNO</option>
+                    <option value="docente">DOCENTE</option>
                   </select>
                   {errors.rol && <div className="invalid-feedback">{errors.rol}</div>}
                 </div>
@@ -160,8 +225,8 @@ export default function Registro({ onRegister }) {
                   >
                     <option value="">
                       {cargandoColegios
-                        ? "Cargando colegios..."
-                        : (colegios.length === 0 ? "No hay colegios disponibles" : "Selecciona tu colegio")
+                        ? "CARGANDO COLEGIOS..."
+                        : (colegios.length === 0 ? "NO HAY COLEGIOS DISPONIBLES" : "SELECCIONA TU COLEGIO")
                       }
                     </option>
                     {colegios.map(c => (
@@ -172,20 +237,21 @@ export default function Registro({ onRegister }) {
                   </select>
                   {errors.colegioId && <div className="invalid-feedback">{errors.colegioId}</div>}
                 </div>
-                {/* Edad y Celular en row */}
+                {/* Edad y Celular */}
                 <div className="row">
                   <div className="col-md-6 mb-3">
-                    <label htmlFor="edad" className="form-label">Edad (opcional)</label>
+                    <label htmlFor="edad" className="form-label">Edad</label>
                     <input
                       id="edad"
-                      className={`form-control ${errors.edad ? "is-invalid" : ""}`}
                       name="edad"
+                      className={`form-control ${errors.edad ? "is-invalid" : ""}`}
                       type="number"
-                      min="5"
-                      max="120"
-                      placeholder="Ej: 25"
-                      onChange={handleChange}
+                      min={data.rol === "alumno" ? 8 : data.rol === "docente" ? 19 : 8}
+                      max={data.rol === "alumno" ? 18 : data.rol === "docente" ? 60 : 99}
+                      placeholder={placeholderEdad}
                       value={data.edad}
+                      onChange={handleChange}
+                      required
                     />
                     {errors.edad && <div className="invalid-feedback">{errors.edad}</div>}
                   </div>
@@ -193,16 +259,18 @@ export default function Registro({ onRegister }) {
                     <label htmlFor="celular" className="form-label">Celular (opcional)</label>
                     <input
                       id="celular"
-                      className="form-control"
                       name="celular"
+                      className={`form-control ${errors.celular ? "is-invalid" : ""}`}
                       type="tel"
-                      placeholder="Ej: 3001234567"
-                      onChange={handleChange}
+                      placeholder={placeholderCelular}
+                      maxLength={9}
                       value={data.celular}
+                      onChange={handleChange}
                     />
+                    {errors.celular && <div className="invalid-feedback">{errors.celular}</div>}
                   </div>
                 </div>
-                {/* Botón de registro */}
+                {/* Botón */}
                 <div className="d-grid gap-2 mt-4">
                   <button
                     type="submit"
@@ -217,7 +285,7 @@ export default function Registro({ onRegister }) {
                     ) : "Registrarse"}
                   </button>
                 </div>
-                {/* Enlace para login */}
+                {/* Enlace login */}
                 <div className="text-center mt-3">
                   ¿Ya tienes cuenta?{" "}
                   <button

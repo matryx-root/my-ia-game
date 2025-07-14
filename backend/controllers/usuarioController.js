@@ -7,54 +7,79 @@ const jwt = require('jsonwebtoken');
 exports.registrar = async (req, res) => {
   const { nombre, email, password, edad, celular, rol, colegioId } = req.body;
   try {
+    const emailNorm = email.trim().toLowerCase();
+    // 1. Control de email duplicado ANTES de crear usuario
+    const existe = await prisma.usuario.findUnique({ where: { email: emailNorm } });
+    if (existe) {
+      return res.status(400).json({ error: "El correo ya está registrado. Usa otro correo." });
+    }
+
     const hashed = await bcrypt.hash(password, 10);
     const usuario = await prisma.usuario.create({
       data: {
         nombre,
-        email,
+        email: emailNorm,
         password: hashed,
         rol, // "alumno" o "docente"
         colegioId: colegioId ? Number(colegioId) : null,
         edad: edad ? Number(edad) : null,
         celular
       },
-      include: { colegio: true } // Para enviar el colegio de inmediato
+      include: { colegio: true }
     });
     res.status(201).json({ mensaje: "Usuario registrado", usuario });
   } catch (err) {
+    // Control extra para el error único de Prisma
+    if (err.code === "P2002" && err.meta?.target?.includes("email")) {
+      return res.status(400).json({ error: "El correo ya está registrado. Usa otro correo." });
+    }
     res.status(400).json({ error: err.message });
   }
 };
 
 // LOGIN (devuelve token y usuario con colegio)
+// LOGIN (devuelve token y usuario con colegio)
 exports.login = async (req, res) => {
-  const { email, password } = req.body;
+  // Normaliza el email SIEMPRE en minúsculas y sin espacios
+  const emailNorm = req.body.email?.trim().toLowerCase();
+  const { password } = req.body;
+
   try {
-    // Incluye el colegio en la búsqueda
+    // Busca el usuario usando email normalizado
     const user = await prisma.usuario.findUnique({
-      where: { email },
+      where: { email: emailNorm },
       include: { colegio: true }
     });
-    if (!user) return res.status(401).json({ error: 'correo_no_existe' });
 
+    if (!user) {
+      return res.status(401).json({ error: 'correo_no_existe' });
+    }
+
+    // Compara el password hasheado
     const match = await bcrypt.compare(password, user.password);
-    if (!match) return res.status(401).json({ error: 'password_incorrecta' });
+    if (!match) {
+      return res.status(401).json({ error: 'password_incorrecta' });
+    }
 
-    // Registro de LogIngreso (opcional)
+    // (Opcional) Log de ingreso
     await prisma.logIngreso.create({
       data: { usuarioId: user.id, ip: req.ip, userAgent: req.headers['user-agent'] }
     });
 
+    // Genera el token
     const token = jwt.sign(
       { id: user.id, rol: user.rol, colegioId: user.colegioId },
       process.env.JWT_SECRET,
       { expiresIn: '2h' }
     );
     res.json({ token, usuario: user });
+
   } catch (err) {
+    // Error genérico
     res.status(400).json({ error: err.message });
   }
 };
+
 
 // ENDPOINT PERFIL (autenticado, siempre incluye colegio)
 exports.perfilMe = async (req, res) => {
@@ -71,12 +96,11 @@ exports.perfilMe = async (req, res) => {
   }
 };
 
-// LISTAR USUARIOS (con filtro de rol/colegio para docentes)
+// LISTAR USUARIOS (admin ve todos, docente ve solo alumnos de su colegio)
 exports.listarUsuarios = async (req, res) => {
-  const { rol, colegioId } = req.user;
   let where = {};
-  if (rol === "docente") {
-    where = { rol: "alumno", colegioId };
+  if (req.user?.rol === "docente") {
+    where = { rol: "alumno", colegioId: req.user.colegioId };
   }
   try {
     const usuarios = await prisma.usuario.findMany({
@@ -105,12 +129,22 @@ exports.verPerfil = async (req, res) => {
   }
 };
 
-
 // EDITAR USUARIO
 exports.editarUsuario = async (req, res) => {
   const id = Number(req.params.id);
-  const { nombre, email, rol, edad, celular, colegioId } = req.body;
+  let { nombre, email, rol, edad, celular, colegioId } = req.body;
   try {
+    // Si cambia el email, verifica que el nuevo no exista en otro usuario
+    if (email) {
+      email = email.trim().toLowerCase();
+      const existe = await prisma.usuario.findFirst({
+        where: { email, NOT: { id } }
+      });
+      if (existe) {
+        return res.status(400).json({ error: "El correo ya está registrado por otro usuario." });
+      }
+    }
+
     const usuario = await prisma.usuario.update({
       where: { id },
       data: { nombre, email, rol, edad: edad ? Number(edad) : null, celular, colegioId },
@@ -118,6 +152,9 @@ exports.editarUsuario = async (req, res) => {
     });
     res.json({ mensaje: "Usuario actualizado", usuario });
   } catch (err) {
+    if (err.code === "P2002" && err.meta?.target?.includes("email")) {
+      return res.status(400).json({ error: "El correo ya está registrado por otro usuario." });
+    }
     res.status(400).json({ error: err.message });
   }
 };

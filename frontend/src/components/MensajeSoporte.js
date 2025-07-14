@@ -1,6 +1,13 @@
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 
+const SOLO_VALIDOS_REGEX = /^[A-ZÁÉÍÓÚÑ0-9 ]*$/;
+const LIMPIAR_REGEX = /[^A-ZÁÉÍÓÚÑ0-9 ]/gi;
+
+const MIN_MSG_LEN = 10;
+const MAX_MSG_LEN = 100;
+const MAX_RESPUESTA_LEN = 100;
+
 export default function MensajeSoportePage({ usuario }) {
   const [mensajes, setMensajes] = useState([]);
   const [nuevoMensaje, setNuevoMensaje] = useState("");
@@ -9,8 +16,13 @@ export default function MensajeSoportePage({ usuario }) {
   const [respuesta, setRespuesta] = useState({});
   const [error, setError] = useState(null);
   const [cargando, setCargando] = useState(false);
+  const [enviando, setEnviando] = useState(false);
 
-  // Traer todos los usuarios (admin)
+  // --- CRUD NUEVO ---
+  const [editandoId, setEditandoId] = useState(null); // ID mensaje que se edita
+  const [mensajeEditado, setMensajeEditado] = useState(""); // Valor editado
+
+  // Traer todos los usuarios (solo admin)
   useEffect(() => {
     if (usuario?.rol === "admin") {
       api.get("/admin/usuarios")
@@ -35,30 +47,63 @@ export default function MensajeSoportePage({ usuario }) {
     // eslint-disable-next-line
   }, [usuario]);
 
-  // Enviar mensaje (admin a cualquiera, usuarios solo a sí mismos)
+  const normalizaTexto = (texto, toMayus = true) =>
+    (toMayus ? texto.toUpperCase() : texto)
+      .replace(LIMPIAR_REGEX, "")
+      .replace(/\s{2,}/g, " ");
+
+  // Input mensaje
+  const handleMensajeChange = (e) => {
+    let valor = e.target.value;
+    valor = normalizaTexto(valor);
+    setNuevoMensaje(valor.slice(0, MAX_MSG_LEN));
+  };
+
+  // Input respuesta
+  const handleRespuestaChange = (id, texto) => {
+    let valor = normalizaTexto(texto);
+    setRespuesta((prev) => ({ ...prev, [id]: valor.slice(0, MAX_RESPUESTA_LEN) }));
+  };
+
+  // NUEVO: Input editar mensaje
+  const handleEditarChange = (texto) => {
+    let valor = normalizaTexto(texto);
+    setMensajeEditado(valor.slice(0, MAX_MSG_LEN));
+  };
+
+  // Enviar mensaje
   const enviarMensaje = async (e) => {
     e.preventDefault();
     setError(null);
 
+    const texto = nuevoMensaje.trim();
     if (usuario.rol === "admin" && !destinatarioId) {
       setError("Selecciona el destinatario");
       return;
     }
-    if (!nuevoMensaje.trim()) {
-      setError("El mensaje no puede estar vacío");
+    if (!texto || texto.length < MIN_MSG_LEN) {
+      setError(`El mensaje debe tener al menos ${MIN_MSG_LEN} caracteres útiles.`);
       return;
     }
-    setCargando(true);
+    if (texto.length > MAX_MSG_LEN) {
+      setError(`El mensaje no puede superar ${MAX_MSG_LEN} caracteres.`);
+      return;
+    }
+    if (!SOLO_VALIDOS_REGEX.test(texto)) {
+      setError("Solo se permiten letras, números y espacios (sin símbolos, tildes raras ni signos).");
+      return;
+    }
+    setEnviando(true);
     try {
       if (usuario.rol === "admin") {
         await api.post("/mensajes", {
           usuarioId: Number(destinatarioId),
-          mensaje: nuevoMensaje.trim()
+          mensaje: texto
         });
       } else {
         await api.post("/mensajes", {
           usuarioId: usuario.id,
-          mensaje: nuevoMensaje.trim()
+          mensaje: texto
         });
       }
       setNuevoMensaje("");
@@ -71,21 +116,33 @@ export default function MensajeSoportePage({ usuario }) {
         "No se pudo enviar el mensaje"
       );
     } finally {
-      setCargando(false);
+      setEnviando(false);
     }
   };
 
   // Responder mensaje (admin)
   const responder = async (id) => {
-    if (!respuesta[id] || !respuesta[id].trim()) return;
+    const texto = (respuesta[id] || "").trim();
+    if (!texto || texto.length < MIN_MSG_LEN) {
+      setError(`La respuesta debe tener al menos ${MIN_MSG_LEN} caracteres.`);
+      return;
+    }
+    if (texto.length > MAX_RESPUESTA_LEN) {
+      setError(`La respuesta no puede superar ${MAX_RESPUESTA_LEN} caracteres.`);
+      return;
+    }
+    if (!SOLO_VALIDOS_REGEX.test(texto)) {
+      setError("Solo se permiten letras, números y espacios en la respuesta.");
+      return;
+    }
     setCargando(true);
     setError(null);
     try {
       await api.put(`/mensajes/${id}/responder`, {
-        respuesta: respuesta[id],
+        respuesta: texto,
         estado: "respondido"
       });
-      setRespuesta({ ...respuesta, [id]: "" });
+      setRespuesta((prev) => ({ ...prev, [id]: "" }));
       cargarMensajes();
     } catch {
       setError("No se pudo responder el mensaje");
@@ -94,7 +151,53 @@ export default function MensajeSoportePage({ usuario }) {
     }
   };
 
-  // Marcar como leído (solo alumno/docente)
+  // NUEVO: Editar mensaje
+  const editarMensaje = async (id) => {
+    const texto = (mensajeEditado || "").trim();
+    if (!texto || texto.length < MIN_MSG_LEN) {
+      setError(`El mensaje editado debe tener al menos ${MIN_MSG_LEN} caracteres.`);
+      return;
+    }
+    if (texto.length > MAX_MSG_LEN) {
+      setError(`El mensaje no puede superar ${MAX_MSG_LEN} caracteres.`);
+      return;
+    }
+    if (!SOLO_VALIDOS_REGEX.test(texto)) {
+      setError("Solo se permiten letras, números y espacios.");
+      return;
+    }
+    setCargando(true);
+    setError(null);
+    try {
+      await api.put(`/mensajes/${id}/editar`, {
+        mensaje: texto
+      });
+      setEditandoId(null);
+      setMensajeEditado("");
+      cargarMensajes();
+    } catch {
+      setError("No se pudo editar el mensaje");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // NUEVO: Eliminar mensaje
+  const eliminarMensaje = async (id) => {
+    if (!window.confirm("¿Estás seguro que quieres eliminar este mensaje?")) return;
+    setCargando(true);
+    setError(null);
+    try {
+      await api.delete(`/mensajes/${id}`);
+      cargarMensajes();
+    } catch {
+      setError("No se pudo eliminar el mensaje");
+    } finally {
+      setCargando(false);
+    }
+  };
+
+  // Marcar como leído (alumno/docente)
   const marcarLeido = async (id) => {
     setCargando(true);
     setError(null);
@@ -107,6 +210,14 @@ export default function MensajeSoportePage({ usuario }) {
       setCargando(false);
     }
   };
+
+  // UX: solo permite enviar si cumple requisitos
+  const puedeEnviar =
+    !enviando &&
+    nuevoMensaje.trim().length >= MIN_MSG_LEN &&
+    nuevoMensaje.trim().length <= MAX_MSG_LEN &&
+    (usuario.rol !== "admin" || destinatarioId) &&
+    SOLO_VALIDOS_REGEX.test(nuevoMensaje.trim());
 
   return (
     <div className="container py-4">
@@ -122,13 +233,12 @@ export default function MensajeSoportePage({ usuario }) {
       {/* Formulario para enviar mensaje */}
       <form className="mb-3" onSubmit={enviarMensaje}>
         <div className="input-group">
-          {/* Si es admin, elige destinatario */}
           {usuario.rol === "admin" && (
             <select
               className="form-select"
               value={destinatarioId}
               onChange={e => setDestinatarioId(e.target.value)}
-              disabled={cargando}
+              disabled={enviando}
               style={{ maxWidth: 250 }}
               required
             >
@@ -145,17 +255,27 @@ export default function MensajeSoportePage({ usuario }) {
             value={nuevoMensaje}
             placeholder={
               usuario.rol === "admin"
-                ? "Mensaje informativo o aviso a usuario seleccionado..."
-                : "Escribe tu mensaje de soporte..."
+                ? "MENSAJE INFORMATIVO O AVISO A USUARIO SELECCIONADO..."
+                : "ESCRIBE TU MENSAJE DE SOPORTE..."
             }
-            onChange={e => setNuevoMensaje(e.target.value)}
-            disabled={cargando}
-            maxLength={500}
+            onChange={handleMensajeChange}
+            disabled={enviando}
+            maxLength={MAX_MSG_LEN}
+            minLength={MIN_MSG_LEN}
+            style={{ textTransform: "uppercase", letterSpacing: 1 }}
             required
           />
-          <button className="btn btn-primary" type="submit" disabled={cargando}>
-            Enviar
+          <button
+            className="btn btn-primary"
+            type="submit"
+            disabled={!puedeEnviar}
+            title={!puedeEnviar ? `El mensaje debe tener entre ${MIN_MSG_LEN} y ${MAX_MSG_LEN} caracteres, solo letras, números y espacios.` : ""}
+          >
+            {enviando ? "Enviando..." : "Enviar"}
           </button>
+        </div>
+        <div className="form-text">
+          Solo MAYÚSCULAS. Sin símbolos ni signos. Mínimo {MIN_MSG_LEN}, máximo {MAX_MSG_LEN} caracteres.
         </div>
       </form>
 
@@ -173,13 +293,15 @@ export default function MensajeSoportePage({ usuario }) {
                 <th>Estado</th>
                 <th>Respuesta</th>
                 {usuario.rol === "admin" && <th>Responder</th>}
+                {usuario.rol === "admin" && <th>Editar</th>}
+                {usuario.rol === "admin" && <th>Eliminar</th>}
                 {usuario.rol !== "admin" && <th>Acción</th>}
               </tr>
             </thead>
             <tbody>
               {mensajes.length === 0 && (
                 <tr>
-                  <td colSpan={usuario.rol === "admin" ? 6 : 6}>
+                  <td colSpan={usuario.rol === "admin" ? 8 : 6}>
                     No hay mensajes registrados.
                   </td>
                 </tr>
@@ -191,7 +313,22 @@ export default function MensajeSoportePage({ usuario }) {
                       {m.usuario?.nombre || m.usuarioId}
                     </td>
                   )}
-                  <td>{m.mensaje}</td>
+                  {/* --- COLUMNA MENSAJE, modo edición o vista --- */}
+                  <td>
+                    {usuario.rol === "admin" && editandoId === m.id ? (
+                      <input
+                        className="form-control"
+                        value={mensajeEditado}
+                        onChange={e => handleEditarChange(e.target.value)}
+                        maxLength={MAX_MSG_LEN}
+                        minLength={MIN_MSG_LEN}
+                        style={{ textTransform: "uppercase", letterSpacing: 1 }}
+                        placeholder={`MÍN. ${MIN_MSG_LEN} CARACTERES`}
+                      />
+                    ) : (
+                      m.mensaje
+                    )}
+                  </td>
                   <td>{new Date(m.fechaHora).toLocaleString()}</td>
                   <td>
                     {m.estado === "respondido" ? (
@@ -209,7 +346,7 @@ export default function MensajeSoportePage({ usuario }) {
                       <span className="text-muted">-</span>
                     )}
                   </td>
-                  {/* Acciones */}
+                  {/* RESPONDER */}
                   {usuario.rol === "admin" && (
                     <td>
                       {m.estado === "respondido" ? (
@@ -219,13 +356,19 @@ export default function MensajeSoportePage({ usuario }) {
                           <input
                             className="form-control"
                             value={respuesta[m.id] || ""}
-                            onChange={e => setRespuesta({ ...respuesta, [m.id]: e.target.value })}
-                            maxLength={300}
+                            onChange={e => handleRespuestaChange(m.id, e.target.value)}
+                            maxLength={MAX_RESPUESTA_LEN}
+                            minLength={MIN_MSG_LEN}
+                            style={{ textTransform: "uppercase", letterSpacing: 1 }}
+                            placeholder={`MÍN. ${MIN_MSG_LEN} CARACTERES`}
                           />
                           <button
                             className="btn btn-success"
                             onClick={() => responder(m.id)}
-                            disabled={cargando || !respuesta[m.id] || !respuesta[m.id].trim()}
+                            disabled={
+                              cargando ||
+                              !(respuesta[m.id] && respuesta[m.id].trim().length >= MIN_MSG_LEN && SOLO_VALIDOS_REGEX.test(respuesta[m.id].trim()))
+                            }
                           >
                             Responder
                           </button>
@@ -233,9 +376,60 @@ export default function MensajeSoportePage({ usuario }) {
                       )}
                     </td>
                   )}
+                  {/* EDITAR SOLO ADMIN */}
+                  {usuario.rol === "admin" && (
+                    <td>
+                      {editandoId === m.id ? (
+                        <>
+                          <button
+                            className="btn btn-warning btn-sm me-1"
+                            onClick={() => editarMensaje(m.id)}
+                            disabled={
+                              cargando ||
+                              !(mensajeEditado && mensajeEditado.trim().length >= MIN_MSG_LEN && SOLO_VALIDOS_REGEX.test(mensajeEditado.trim()))
+                            }
+                          >
+                            Guardar
+                          </button>
+                          <button
+                            className="btn btn-secondary btn-sm"
+                            onClick={() => {
+                              setEditandoId(null);
+                              setMensajeEditado("");
+                            }}
+                          >
+                            Cancelar
+                          </button>
+                        </>
+                      ) : (
+                        <button
+                          className="btn btn-outline-warning btn-sm"
+                          onClick={() => {
+                            setEditandoId(m.id);
+                            setMensajeEditado(m.mensaje);
+                          }}
+                          disabled={cargando}
+                        >
+                          Editar
+                        </button>
+                      )}
+                    </td>
+                  )}
+                  {/* ELIMINAR SOLO ADMIN */}
+                  {usuario.rol === "admin" && (
+                    <td>
+                      <button
+                        className="btn btn-outline-danger btn-sm"
+                        onClick={() => eliminarMensaje(m.id)}
+                        disabled={cargando}
+                      >
+                        Eliminar
+                      </button>
+                    </td>
+                  )}
+                  {/* MARCAR LEÍDO para no-admin */}
                   {usuario.rol !== "admin" && (
                     <td>
-                      {/* Botón marcar como leído (solo para mensajes pendientes que no son propios) */}
                       {!m.leido && m.estado === "pendiente" && (
                         <button
                           className="btn btn-outline-secondary btn-sm"
