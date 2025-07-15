@@ -89,13 +89,13 @@ npm install --legacy-peer-deps
 
 ### 5. Migraciones y Seeds (Prisma)
 
-Ejecuta en `/backend` una sola vez:
+Ejecuta en `/backend` una sola vez cada linea:
 
 ```bash
 npx prisma migrate dev --name "creacion_tablas"
 
 ```
-
+De manera individual
 ```bash
 node prisma/seedColegios.js
 node prisma/seedJuegos.js
@@ -104,6 +104,7 @@ node prisma/seedLogIngreso.js
 node prisma/seedLogJuego.js
 
 ```
+O de manera grupal
 ```bash
 npx prisma db seed
 
@@ -117,7 +118,7 @@ npx prisma db seed
 
 
 #### Backend
-Ambos servidores deben estar corriendo en este orden : 
+Ambos servidores deben estar corriendo en las consolas de Visual estudio Code en este orden : 
 
 ```bash
 cd backend
@@ -150,12 +151,19 @@ El frontend estará en: [http://localhost:3000](http://localhost:3000)
 
 ```bash
 # Migraciones Prisma
+¿Cuándo se usa?
+Cada vez que cambias el modelo de datos en prisma/schema.prisma (agregas/quitas campos, relaciones o tablas).
+
 npx prisma migrate dev
 
 # Regenerar cliente Prisma
+¿Cuándo se usa?
+Después de ejecutar una migración, modificar el archivo schema.prisma, o instalar un nuevo paquete relacionado con Prisma.
 npx prisma generate
 
 # Ejecutar seeds
+¿Cuándo se usa?
+Cuando necesitas cargar datos de prueba o iniciales (por ejemplo, colegios, juegos, usuarios demo, etc.) en la base de datos.
 npx prisma db seed
 ```
 
