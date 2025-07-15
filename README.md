@@ -89,24 +89,35 @@ npm install --legacy-peer-deps
 
 ### 5. Migraciones y Seeds (Prisma)
 
-Ejecuta en `/backend`:
+Ejecuta en `/backend` una sola vez:
 
 ```bash
-npx prisma migrate dev --name Creacion de tablas en BD
+npx prisma migrate dev --name "creacion_tablas"
 
-Ejecuta en `/backend/prisma`:
-npx prisma db seedColegios.js
-npx prisma db seedJuegos.js
-npx prisma db seedLogError.js
-npx prisma db seedLogIngreso.js
-npx prisma db prisma/seedLogJuego.js
 ```
+
+```bash
+node prisma/seedColegios.js
+node prisma/seedJuegos.js
+node prisma/seedLogError.js
+node prisma/seedLogIngreso.js
+node prisma/seedLogJuego.js
+
+```
+```bash
+npx prisma db seed
+
+```
+
 
 * Esto crea las tablas y carga datos de prueba definidos en `prisma/seed.js`.
 
+
 ### 6. Ejecución
 
+
 #### Backend
+Ambos servidores deben estar corriendo en este orden : 
 
 ```bash
 cd backend
@@ -116,6 +127,7 @@ node server.js
 El backend estará en: [http://localhost:5000](http://localhost:5000)
 
 #### Frontend
+Luego, se abre otra consola de PS de visual estudio code o del IDE que este usando y corre lo siguiente:  
 
 ```bash
 cd frontend
