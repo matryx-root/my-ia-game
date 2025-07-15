@@ -82,7 +82,18 @@
   4. (Como usuario) visualizar la respuesta.
 - **Resultado esperado:** Mensaje enviado y respondido correctamente; usuario visualiza la respuesta.
 - **Evidencia:**  
-  ![Soporte OK](./test/evidencias/soporte_ok.png)
+  ![Soporte OK](./evidencias/soporte_PASO1.png)
+  ![Soporte OK](./evidencias/soporte_PASO2.png)
+  ![Soporte OK](./evidencias/soporte_PASO3.png)
+  ![Soporte OK](./evidencias/soporte_PASO4.png)
+  ![Soporte OK](./evidencias/soporte_PASO5.png)
+  ![Soporte OK](./evidencias/soporte_PASO6.png)
+  ![Soporte OK](./evidencias/soporte_PASO7.png)
+  ![Soporte OK](./evidencias/soporte_PASO8.png)
+  ![Soporte OK](./evidencias/soporte_PASO9.png)
+  ![Soporte OK](./evidencias/soporte_PASO10.png)
+  ![Soporte OK](./evidencias/soporte_PASO11.png)
+  ![Soporte OK](./evidencias/soporte_PASO12.png)
 
 ---
 
