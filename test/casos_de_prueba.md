@@ -26,7 +26,7 @@
   3. Login con email no registrado.
 - **Resultado esperado:** Acceso exitoso con credenciales válidas. Mensaje de error si inválidas.
 - **Evidencia:**  
-  ![Login OK](../evidencias/login_ok.png)  
+  ![Login OK](./evidencias/login_ok.png)  
   ![Login Fallido](./evidencias/login_fail.png)
 
 ---
