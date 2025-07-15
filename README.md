@@ -149,21 +149,25 @@ El frontend estará en: [http://localhost:3000](http://localhost:3000)
 
 ## 📦 Comandos útiles
 
-```bash
 # Migraciones Prisma
 ¿Cuándo se usa?
 Cada vez que cambias el modelo de datos en prisma/schema.prisma (agregas/quitas campos, relaciones o tablas).
 
+```bash
 npx prisma migrate dev
-
+```
 # Regenerar cliente Prisma
 ¿Cuándo se usa?
 Después de ejecutar una migración, modificar el archivo schema.prisma, o instalar un nuevo paquete relacionado con Prisma.
+
+```bash
 npx prisma generate
+```
 
 # Ejecutar seeds
 ¿Cuándo se usa?
 Cuando necesitas cargar datos de prueba o iniciales (por ejemplo, colegios, juegos, usuarios demo, etc.) en la base de datos.
+```bash
 npx prisma db seed
 ```
 
