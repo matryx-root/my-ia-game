@@ -215,7 +215,7 @@ cd backend
 node server.js
 ```
 
-El backend estará en: [http://localhost:4000](http://localhost:4000)
+El backend estará en: [http://localhost:5000](http://localhost:5000)
 
 #### Frontend
 
@@ -270,7 +270,6 @@ npx prisma db seed
   ```
 * Revisa bien `.env` y permisos de usuario en PostgreSQL.
 * El frontend y backend pueden correr simultáneamente.
-* Si necesitas testear en remoto, puedes usar [ngrok](https://ngrok.com/).
 
 ---
 
@@ -287,17 +286,3 @@ MIT
 
 ````
 
----
-
-**¿Quieres agregar ejemplos visuales, tips de deploy, troubleshooting o documentación avanzada?**  
-Solo pídelo y te ayudo a ampliarlo con ejemplos o imágenes.
-
-Cuando termines de editar, guarda el archivo y actualiza el repositorio con:
-
-```bash
-git add README.md
-git commit -m "Actualiza y profesionaliza README"
-git push
-````
-
-¡Listo para impresionar a cualquier equipo de desarrollo! 🚀
