@@ -75,9 +75,14 @@ Normalmente no requiere configuración especial, a menos que cambies el endpoint
 
 ### 4. Instalar dependencias
 
+Tanto en el Backend como en Frontend las dependencias y sus versiones se pueden encontrar en package.json de cada carpeta.
+
+
+
 ```bash
 cd backend
 npm install --legacy-peer-deps
+
 cd ../frontend
 npm install --legacy-peer-deps
 ```
