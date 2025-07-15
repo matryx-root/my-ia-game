@@ -56,7 +56,7 @@
 - **Resultado esperado:** Se guarda correctamente el puntaje/avance.
 - **Evidencia:**  
   ![Puntaje Registrado](./evidencias/puntaje_registradoA.png)
-  ![Puntaje Registrado](./evidencias/puntaje_registradoB.png)
+  ![Puntaje Registrado](./evidencias/puntaje_registradoC.png)
 
 ---
 
