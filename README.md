@@ -52,13 +52,16 @@ cd my-ia-game
 * Mas informacion en 
 
 - [Script de creación de base de datos](./postgreSQL/db_create.sql)
-- [Ver carpeta completa de SQL](./postgreSQL/)
+- [Ver carpeta completa de SQL + ER](./postgreSQL/)
 
 ### 3. Variables de entorno
 
 #### Backend
 
-Crea el archivo `.env` en `/backend`, con contenido similar a:
+Revisa el archivo `.env` en (./backend/.env), con contenido similar a:
+
+
+
 
 ```ini
 DATABASE_URL="postgresql://TU_USUARIO:TU_PASSWORD@localhost:5432/myiagame"
