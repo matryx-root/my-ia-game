@@ -194,7 +194,7 @@ npm install --legacy-peer-deps
 Ejecuta en `/backend`:
 
 ```bash
-npx prisma migrate dev --name init
+npx prisma migrate dev --name Creacion de tablas en BD
 
 Ejecuta en `/backend/prisma`:
 npx prisma db seedColegios.js
