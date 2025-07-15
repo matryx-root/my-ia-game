@@ -10,18 +10,17 @@ Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, m
 
 ---
 
-## 🗂️ Estructura del Repositorio
-
-
+## 📁 Estructura del Repositorio
 
 my-ia-game/
-│
-├── backend/      # API Node.js + Express + Prisma + PostgreSQL
-├── frontend/     # React + Bootstrap + Phaser.js
-├── .gitignore
-├── .gitattributes
-└── README.md
-
+ ├─ backend/      # API Node.js + Express + Prisma + PostgreSQL
+ ├─ frontend/     # React + Bootstrap + Phaser.js
+ ├─ prisma/       # Esquema, migraciones, seeds
+ ├─ postgreSQL/   # Scripts SQL y ERD
+ ├─ test/         # Evidencias QA, pruebas
+ ├─ .gitignore
+ ├─ .gitattributes
+ └─ README.md
 
 
 ---
@@ -175,9 +174,13 @@ npx prisma db seed
 
 ## 🧩 Estructura básica de carpetas
 
-* **backend/**: API REST, lógica de negocio, conexión a PostgreSQL, autenticación y administración de datos.
-* **frontend/**: Interfaz visual (React, Bootstrap, Phaser para juegos educativos).
-* **prisma/**: Definición del modelo de datos, migraciones y seeds automáticos.
+- **backend/**: API REST, lógica de negocio, conexión a PostgreSQL, autenticación y administración de datos.
+- **frontend/**: Interfaz visual (React, Bootstrap, Phaser para juegos educativos).
+- **prisma/**: Definición del modelo de datos, migraciones y seeds automáticos (Prisma ORM).
+- **postgreSQL/**: Scripts SQL para creación de base de datos, diagramas entidad-relación (ERD) y documentación técnica de la BD.
+- **test/**: Evidencias de pruebas manuales, capturas de pantalla y casos de QA para evaluación.
+
+---
 
 ---
 
