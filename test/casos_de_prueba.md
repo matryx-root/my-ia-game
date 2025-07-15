@@ -143,7 +143,7 @@
 - **Resultado esperado:** El sistema muestra errores claros y no pierde datos críticos.
 - **Evidencia:**  
   ![OFFline Red Error](./evidencias/red_error1.png)
-  ![3G](./evidencias/red_error2.png)
+  ![3G Lento](./evidencias/red_error2.png)
 
 ---
 
@@ -155,12 +155,8 @@
   2. Consultar logs de la BD o panel.
 - **Resultado esperado:** Las acciones relevantes quedan registradas.
 - **Evidencia:**  
-  ![Logs Auditoría](./test/evidencias/logs_auditoria.png)
+  ![Logs Auditoría](./evidencias/logs_auditoria.png)
+  ![Logs Auditoría](./evidencias/logs_auditoria2.png)
 
 ---
 
-## Notas
-
-- Guarda tus evidencias en la carpeta `/test/evidencias/` (o cambia el path si es necesario).
-- Si quieres usar checklist para cada prueba, reemplaza los bullets `-` por `- [ ]` en los pasos.
-- Puedes personalizar los nombres de los screenshots o agregar subcarpetas si tu repositorio crece.
