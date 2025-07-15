@@ -142,7 +142,8 @@
   3. Reconectar y validar recuperación.
 - **Resultado esperado:** El sistema muestra errores claros y no pierde datos críticos.
 - **Evidencia:**  
-  ![Red Error](./test/evidencias/red_error.png)
+  ![OFFline Red Error](./evidencias/red_error1.png)
+  ![3G](./evidencias/red_error2.png)
 
 ---
 
