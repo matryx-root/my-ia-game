@@ -22,7 +22,7 @@ my-ia-game/
 ├── .gitattributes
 └── README.md
 
-````
+
 
 ---
 
@@ -44,6 +44,7 @@ my-ia-game/
 git clone https://github.com/matryx-root/my-ia-game.git
 cd my-ia-game
 ````
+
 
 ### 2. Configuración de la base de datos PostgreSQL
 
