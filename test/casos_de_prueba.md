@@ -40,7 +40,9 @@
   3. Ingresar y jugar.
 - **Resultado esperado:** El juego carga y es jugable.
 - **Evidencia:**  
-  ![Juego por Categoría](./test/evidencias/juego_categoria.png)
+  ![Juego por Categoría](./evidencias/juego_paso1.png)
+  ![Juego por Categoría](./evidencias/juego_paso2.png)
+  ![Juego por Categoría](./evidencias/juego_paso3.png)
 
 ---
 
