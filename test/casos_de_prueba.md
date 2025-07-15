@@ -106,7 +106,9 @@
   3. Confirmar cambios reflejados en la BD y la interfaz.
 - **Resultado esperado:** Todas las operaciones CRUD funcionan correctamente.
 - **Evidencia:**  
-  ![Admin CRUD OK](./test/evidencias/admin_crud_ok.png)
+  ![Admin CRUD OK](./evidencias/admin_crud_ok1.png)
+  ![Admin CRUD OK](./evidencias/admin_crud_ok2.png)
+  ![Admin CRUD OK](./evidencias/admin_crud_ok3.png)
 
 ---
 
