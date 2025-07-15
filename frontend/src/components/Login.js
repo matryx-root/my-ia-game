@@ -31,6 +31,9 @@ export default function Login({ onLogin }) {
 
         if (typeof onLogin === "function") onLogin(res.usuario);
 
+        // Mostrar mensaje tipo alert (igual que en registro)
+        window.alert("¡Login exitoso!");
+
         // Redirección según el rol
         if (res.usuario.rol === "admin") {
           navigate("/admin");
