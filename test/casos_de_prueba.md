@@ -121,8 +121,14 @@
   3. Navegar por todas las vistas.
 - **Resultado esperado:** La UI es responsiva y usable en todas las resoluciones.
 - **Evidencia:**  
-  ![Responsive OK](./test/evidencias/responsive_ok.png)  
-  ![Mobile OK](./test/evidencias/mobile_ok.png)
+![Mobile OK](./evidencias/mobile_ok1.png)
+![Mobile OK](./evidencias/mobile_ok2.png)
+![Mobile OK](./evidencias/mobile_ok3.png)
+![Mobile OK](./evidencias/mobile_ok4.png)
+  ![Responsive OK](./evidencias/Tableta_ok1.png)  
+  ![Responsive OK](./evidencias/Tableta_ok2.png)  
+  ![Responsive OK](./evidencias/Tableta_ok3.png)  
+  
 
 ---
 
