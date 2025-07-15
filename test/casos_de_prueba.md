@@ -56,7 +56,7 @@
 - **Resultado esperado:** Se guarda correctamente el puntaje/avance.
 - **Evidencia:**  
   ![Puntaje Registrado](./evidencias/puntaje_registradoA.png)
-
+![Puntaje Registrado](./evidencias/puntaje_registradoB.png)
 
 ---
 
@@ -68,7 +68,7 @@
   2. Visualizar sección de logros y estadísticas.
 - **Resultado esperado:** Se muestran logros y estadísticas del usuario.
 - **Evidencia:**  
-  ![Panel de Logros](./evidencias/puntaje_registradoB.png)
+  ![Panel de Logros](./evidencias/puntaje_registrado.png)
 
 ---
 
@@ -97,20 +97,7 @@
 
 ---
 
-### 7. Modificación de configuraciones de usuario (tema, idioma)
-
-- **Precondición:** Usuario logueado.
-- **Pasos:**
-  1. Acceder a “Configuración”.
-  2. Cambiar tema visual y/o idioma.
-  3. Guardar y verificar cambios.
-- **Resultado esperado:** Se aplican y guardan los cambios de configuración.
-- **Evidencia:**  
-  ![Configuración OK](./test/evidencias/configuracion_ok.png)
-
----
-
-### 8. Gestión de usuarios y juegos desde el panel de administración
+### 7. Gestión de usuarios y juegos desde el panel de administración
 
 - **Precondición:** Usuario admin logueado.
 - **Pasos:**
@@ -123,7 +110,7 @@
 
 ---
 
-### 9. Pruebas de interfaz en dispositivos móviles y escritorio (responsive)
+### 8. Pruebas de interfaz en dispositivos móviles y escritorio (responsive)
 
 - **Precondición:** Sistema desplegado y accesible.
 - **Pasos:**
@@ -137,7 +124,7 @@
 
 ---
 
-### 10. Simulación de caídas de red y validación de manejo de errores
+### 9. Simulación de caídas de red y validación de manejo de errores
 
 - **Precondición:** Usuario logueado, sistema activo.
 - **Pasos:**
@@ -150,7 +137,7 @@
 
 ---
 
-### 11. Validación de logs de auditoría (ingreso, errores, acciones relevantes)
+### 10. Validación de logs de auditoría (ingreso, errores, acciones relevantes)
 
 - **Precondición:** Acceso a dashboard admin o BD/logs.
 - **Pasos:**
