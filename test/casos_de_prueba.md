@@ -55,7 +55,8 @@
   3. Verificar que el avance y puntaje quedan guardados en la BD.
 - **Resultado esperado:** Se guarda correctamente el puntaje/avance.
 - **Evidencia:**  
-  ![Puntaje Registrado](./test/evidencias/puntaje_registrado.png)
+  ![Puntaje Registrado](./evidencias/puntaje_registradoA.png)
+  ![Puntaje Registrado](./evidencias/puntaje_registradoB.png)
 
 ---
 
