@@ -212,7 +212,7 @@ npx prisma db prisma/seedLogJuego.js
 
 ```bash
 cd backend
-npm run dev
+node server.js
 ```
 
 El backend estará en: [http://localhost:4000](http://localhost:4000)
