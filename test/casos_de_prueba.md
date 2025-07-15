@@ -56,7 +56,7 @@
 - **Resultado esperado:** Se guarda correctamente el puntaje/avance.
 - **Evidencia:**  
   ![Puntaje Registrado](./evidencias/puntaje_registradoA.png)
-  ![Puntaje Registrado](./evidencias/puntaje_registradoB.png)
+
 
 ---
 
@@ -68,7 +68,7 @@
   2. Visualizar sección de logros y estadísticas.
 - **Resultado esperado:** Se muestran logros y estadísticas del usuario.
 - **Evidencia:**  
-  ![Panel de Logros](./test/evidencias/panel_logros.png)
+  ![Panel de Logros](./evidencias/puntaje_registradoB.png)
 
 ---
 
