@@ -2,8 +2,8 @@
 
 ---
 
-```markdown
-# My IA Game
+
+## My IA Game
 
 Plataforma educativa de juegos interactivos para aprender sobre Inteligencia Artificial.  
 Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, mensajería interna y seguimiento de progreso gamificado.
@@ -12,7 +12,7 @@ Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, m
 
 ## 🗂️ Estructura del Repositorio
 
-```
+
 
 my-ia-game/
 │
@@ -60,14 +60,13 @@ cd my-ia-game
 
 Revisa el archivo [.env](./backend/.env), con contenido similar a:
 
-
-
-
 ```ini
 DATABASE_URL="postgresql://TU_USUARIO:TU_PASSWORD@localhost:5432/myiagame"
 JWT_SECRET="pon_un_secreto_fuerte_aqui"
 PORT=4000
 ```
+
+Este archivo no se sube o comparte publicamente en entorno de produccion, pero como es labortatorio, se hace disponible.
 
 #### Frontend
 
