@@ -13,7 +13,7 @@
   3. Enviar el formulario.
 - **Resultado esperado:** El usuario es creado correctamente y se muestra mensaje de éxito.
 - **Evidencia:**  
-  ![Registro OK](./test/evidencias/registro_ok.png)
+  ![Registro OK](./evidencias/registro_ok.png)
 
 ---
 
