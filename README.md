@@ -58,7 +58,7 @@ cd my-ia-game
 
 #### Backend
 
-Revisa el archivo `.env` en (./backend/.env), con contenido similar a:
+Revisa el archivo `.env` [en](./backend/.env), con contenido similar a:
 
 
 
