@@ -12,17 +12,7 @@ Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, m
 
 ## 📁 Estructura del Repositorio
 
-my-ia-game/
-│
-├── backend/        # API Node.js + Express + Prisma + PostgreSQL
-├── frontend/       # React + Bootstrap + Phaser.js
-├── prisma/         # Esquema, migraciones y seeds (Prisma)
-├── postgreSQL/     # Scripts SQL y diagramas ERD
-├── test/           # Evidencias QA, casos de prueba
-│
-├── .gitignore
-├── .gitattributes
-└── README.md
+![Directorio Proyecto](./Directorio.png)
 
 
 ---
