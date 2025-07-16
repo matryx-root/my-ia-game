@@ -10,7 +10,7 @@ export default function SemiSupervisedGame() {
   const [ejemploActual, setEjemploActual] = useState(0);
   const [juegoKey, setJuegoKey] = useState(0);
 
-  // Ejemplos: solo uno sin etiqueta
+  
   const ejemplos = [
     [
       { icon: '🐱', label: 'Gato' },
@@ -39,10 +39,10 @@ export default function SemiSupervisedGame() {
     ]
   ];
 
-  // Respuestas correctas para cada ejemplo
+  
   const respuestas = ['Perro', 'Oso', 'Rana', 'Tortuga', 'Elefante'];
 
-  // Opciones posibles (puedes extender según tus ejemplos)
+  
   const opciones = [
     ['Gato', 'Perro', 'Ratón'],
     ['Oso', 'Zorro', 'Koala'],
@@ -58,7 +58,7 @@ export default function SemiSupervisedGame() {
     setJuegoKey(k => k + 1);
   };
 
-  // Phaser logic
+  
   useEffect(() => {
     if (!instruccion && !gameRef.current) {
       let idx = ejemploActual;
@@ -72,14 +72,14 @@ export default function SemiSupervisedGame() {
         backgroundColor: '#ffe0e0',
         scene: {
           create: function () {
-            // Texto principal centrado
+            
             this.add.text(60, 30, "🧩 Semi-Supervised: ¿Quién es el animal sin pista?", {
               fontFamily: 'Courier New',
               fontSize: '22px',
               color: '#b71c1c'
             });
 
-            // Dibuja los animales centrados
+            
             let yBase = 120;
             let xBase = 140;
             ejemplos[idx].forEach((em, i) => {
@@ -88,17 +88,17 @@ export default function SemiSupervisedGame() {
                 this.add.text(xBase + i * 130, yBase + 60, em.label, { fontSize: '18px', color: '#333' }).setOrigin(0.5);
             });
 
-            // Pregunta en rojo, centrada
+            
             this.add.text(325, 210, '¿Quién es el animal sin etiqueta?', {
               fontFamily: 'Arial',
               fontSize: '19px',
               color: '#ad1457'
             }).setOrigin(0.5);
 
-            // Feedback
+            
             let feedback = this.add.text(325, 340, '', { fontSize: '21px', color: '#1976d2' }).setOrigin(0.5);
 
-            // Botones de respuesta (bien visuales)
+            
             let buttons = [];
             opciones[idx].forEach((op, i) => {
               const bx = 210 + i * 110, by = 270;
@@ -118,7 +118,7 @@ export default function SemiSupervisedGame() {
                   setResultado('¡Acertaste! Así aprende una IA semi-supervisada: algunas cosas tienen pista, otras no.');
 
                   completed = true;
-                  // Avanza al siguiente ejemplo después de 2s o termina
+                  
                   this.time.delayedCall(1800, () => {
                     if (idx + 1 < ejemplos.length) {
                       setEjemploActual(e => e + 1);
@@ -164,7 +164,7 @@ export default function SemiSupervisedGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey, ejemploActual]);
 
   const handleReset = () => {
@@ -182,7 +182,7 @@ export default function SemiSupervisedGame() {
 
   return (
     <div>
-      {/* Modal explicativo */}
+      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -211,7 +211,7 @@ export default function SemiSupervisedGame() {
         </div>
       )}
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-semisupervised" style={{
         margin: '30px auto 0 auto',
         minHeight: 400,
@@ -221,7 +221,7 @@ export default function SemiSupervisedGame() {
         boxShadow: '0 2px 8px #ef9a9a'
       }} />
 
-      {/* Feedback educativo */}
+      
       {resultado && (
         <div className="alert alert-info mt-3 text-center" style={{ maxWidth: 650, margin: "auto" }}>
           {resultado}
@@ -232,7 +232,7 @@ export default function SemiSupervisedGame() {
         </div>
       )}
 
-      {/* Botones debajo del juego */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

@@ -11,7 +11,7 @@ export default function IAGameBrainNetwork() {
 
   const iniciarJuego = () => setInstruccion(false);
 
-  // Coordenadas de 20 nodos con forma de cerebro (puedes ajustar las posiciones para mejorar)
+  
   const brainNodes = [
     { x: 210, y: 210 }, { x: 250, y: 180 }, { x: 300, y: 150 }, { x: 370, y: 140 },
     { x: 440, y: 150 }, { x: 510, y: 180 }, { x: 570, y: 230 }, { x: 600, y: 300 },
@@ -54,7 +54,7 @@ export default function IAGameBrainNetwork() {
               fill: '#333'
             });
 
-            // Barra de progreso
+            
             barraProgreso = this.add.rectangle(410, 570, 480, 22, 0xe1bee7).setOrigin(0.5);
             this.barraRelleno = this.add.rectangle(170, 570, 0, 22, 0x7e57c2).setOrigin(0, 0.5);
             textoProgreso = this.add.text(680, 565, `0/${maxConnections} conexiones`, {
@@ -63,7 +63,7 @@ export default function IAGameBrainNetwork() {
               fill: '#333'
             });
 
-            // Dibuja nodos en forma de cerebro
+            
             brainNodes.forEach((coord, i) => {
               const circuit = this.add.image(coord.x, coord.y, 'circuit')
                 .setScale(1)
@@ -72,7 +72,7 @@ export default function IAGameBrainNetwork() {
               circuit.index = i;
               circuit.connected = false;
 
-              // Hover visual
+              
               circuit.on('pointerover', function () {
                 if (!this.connected) circuit.setScale(1.28);
               });
@@ -80,7 +80,7 @@ export default function IAGameBrainNetwork() {
                 if (!this.connected) circuit.setScale(1.0);
               });
 
-              // On click: conectar con el anterior
+              
               circuit.on('pointerdown', () => {
                 if (this.completed) return;
 
@@ -91,14 +91,14 @@ export default function IAGameBrainNetwork() {
                   lastIdx !== i &&
                   !connectedPairs.find(p => (p[0] === lastIdx && p[1] === i) || (p[0] === i && p[1] === lastIdx))
                 ) {
-                  // Conecta los dos nodos (lastIdx y i)
+                  
                   connectedPairs.push([lastIdx, i]);
                   circuit.setTint(0xffe082);
                   circuits[lastIdx].setTint(0xffe082);
                   circuits[lastIdx].connected = true;
                   circuit.connected = true;
 
-                  // Dibuja línea animada
+                  
                   let progress = { t: 0 };
                   let x1 = circuits[lastIdx].x, y1 = circuits[lastIdx].y;
                   let x2 = circuits[i].x, y2 = circuits[i].y;
@@ -108,19 +108,19 @@ export default function IAGameBrainNetwork() {
                     duration: 300,
                     onUpdate: () => {
                       graphics.clear();
-                      // Redibuja todas las líneas anteriores
+                      
                       connectedPairs.forEach(([a, b], idx) => {
                         let c1 = circuits[a], c2 = circuits[b];
                         graphics.lineStyle(5, 0x7e57c2, 0.44 + idx / totalNodes);
                         graphics.strokeLineShape(new Phaser.Geom.Line(c1.x, c1.y, c2.x, c2.y));
                       });
-                      // Dibuja la animación de la línea actual
+                      
                       graphics.lineStyle(4, 0x8d5fe7, 1);
                       graphics.strokeLineShape(new Phaser.Geom.Line(x1, y1, x1 + progress.t * (x2 - x1), y1 + progress.t * (y2 - y1)));
                     },
                     onComplete: () => {
                       graphics.clear();
-                      // Redibuja todas las líneas completas
+                      
                       connectedPairs.forEach(([a, b], idx) => {
                         let c1 = circuits[a], c2 = circuits[b];
                         graphics.lineStyle(5, 0x7e57c2, 0.44 + idx / totalNodes);
@@ -129,7 +129,7 @@ export default function IAGameBrainNetwork() {
                     }
                   });
 
-                  // Progreso
+                  
                   this.barraRelleno.width = (connectedPairs.length / maxConnections) * 480;
                   textoProgreso.setText(`${connectedPairs.length}/${maxConnections} conexiones`);
 
@@ -160,10 +160,10 @@ export default function IAGameBrainNetwork() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey]);
 
-  // Reset
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -178,7 +178,7 @@ export default function IAGameBrainNetwork() {
 
   return (
     <div>
-      {/* Modal explicativo antes de jugar */}
+      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -202,9 +202,9 @@ export default function IAGameBrainNetwork() {
           </div>
         </div>
       )}
-      {/* Contenedor del juego */}
+      
       <div id="game-container-ia" style={{ margin: 'auto', minHeight: 420, maxWidth: 840 }} />
-      {/* Mensaje de aprendizaje al terminar */}
+      
       {resultado && (
         <div className="alert alert-success mt-3" style={{ maxWidth: 800, margin: "auto" }}>
           {resultado}

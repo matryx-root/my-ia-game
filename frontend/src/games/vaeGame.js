@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-// Cambia los nombres y archivos según tus imágenes en public/games-images
+
 const ANIMALES = [
   { nombre: "Gato", head: "gato-head.png", body: "gato-body.png", feet: "gato-feet.png" },
   { nombre: "Perro", head: "perro-head.png", body: "perro-body.png", feet: "perro-feet.png" },
   { nombre: "Pajaro", head: "pajaro-head.png", body: "pajaro-body.png", feet: "pajaro-feet.png" }
 ];
 
-// Para obtener un índice aleatorio
+
 function getRandomIndex() {
   return Math.floor(Math.random() * ANIMALES.length);
 }
@@ -21,7 +21,7 @@ export default function VAEGame({ usuario }) {
   const [seleccion, setSeleccion] = useState({ idxHead: 0, idxBody: 0, idxFeet: 0 });
   const [juegoKey, setJuegoKey] = useState(0);
 
-  // Al iniciar o reiniciar, partes aleatorias
+  
   useEffect(() => {
     if (!instruccion) {
       setSeleccion({
@@ -32,7 +32,7 @@ export default function VAEGame({ usuario }) {
     }
   }, [instruccion, juegoKey]);
 
-  // Imagenes de la selección actual
+  
   const headImg = `/games-images/${ANIMALES[seleccion.idxHead].head}`;
   const bodyImg = `/games-images/${ANIMALES[seleccion.idxBody].body}`;
   const feetImg = `/games-images/${ANIMALES[seleccion.idxFeet].feet}`;
@@ -42,7 +42,7 @@ export default function VAEGame({ usuario }) {
   const handleCambiar = (parte) => {
     setSeleccion(sel => {
       let next = { ...sel };
-      // Siempre pasar a una parte aleatoria, diferente a la actual
+      
       let idx;
       do {
         idx = getRandomIndex();
@@ -81,7 +81,7 @@ export default function VAEGame({ usuario }) {
 
   return (
     <div>
-      {/* Modal de instrucciones */}
+      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -107,13 +107,13 @@ export default function VAEGame({ usuario }) {
         </div>
       )}
 
-      {/* Layout visual y botones */}
+      
       {!instruccion && (
         <div style={{
           display: "flex", justifyContent: "center", alignItems: "center",
           minHeight: 390, maxWidth: 650, margin: "auto", gap: 24
         }}>
-          {/* Columna izquierda: controles */}
+          
           <div>
             <div style={{ display: "flex", alignItems: "center", marginBottom: 18 }}>
               <img src={headImg} alt="cabeza" style={{ width: 56, height: 44, marginRight: 12, borderRadius: 7, border: "1.5px solid #ffd54f" }} />
@@ -144,7 +144,7 @@ export default function VAEGame({ usuario }) {
               </button>
             </div>
           </div>
-          {/* Columna derecha: vista previa de criatura armada */}
+          
           <div style={{
             border: "2px dashed #b0bec5", borderRadius: 12, padding: 12,
             minWidth: 120, minHeight: 180, background: "#fafdff", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center"
@@ -156,7 +156,7 @@ export default function VAEGame({ usuario }) {
         </div>
       )}
 
-      {/* Feedback y combinaciones creadas */}
+      
       {feedback && (
         <div className="alert alert-info mt-3" style={{ maxWidth: 700, margin: "auto" }}>
           {feedback}
@@ -179,7 +179,7 @@ export default function VAEGame({ usuario }) {
           </div>
         </div>
       )}
-      {/* Botones debajo SIEMPRE visibles */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

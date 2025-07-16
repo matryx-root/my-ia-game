@@ -35,12 +35,12 @@ export default function GenerativeGame() {
             ejemplos.forEach(ej => this.load.image(ej.imgKey, ej.imgUrl));
           },
           create: function () {
-            // Botón Generar/Siguiente
+            
             btn = this.add.rectangle(360, 60, 180, 60, 0x90caf9)
               .setInteractive({ useHandCursor: true });
             let btnText = this.add.text(305, 45, "Generar", { font: "24px Arial", fill: "#0d47a1" });
 
-            // Frase alineada a la izquierda, centrada vertical
+            
             fraseText = this.add.text(60, 200, ejemplos[currentIdx].frase, {
               font: "32px Arial",
               fill: "#111",
@@ -48,13 +48,13 @@ export default function GenerativeGame() {
             });
             fraseText.setOrigin(0, 0.5);
 
-            // Imagen a la derecha, inicialmente invisible
+            
             imgSprite = this.add.image(540, 215, ejemplos[currentIdx].imgKey)
               .setDisplaySize(290, 200)
               .setAlpha(0)
               .setOrigin(0.5, 0.5);
 
-            let estadoActual = "frase"; // Local del juego
+            let estadoActual = "frase"; 
 
             btn.on('pointerdown', () => {
               if (generating) return;
@@ -63,7 +63,7 @@ export default function GenerativeGame() {
                 generating = true;
                 btnText.setText("Siguiente");
                 setResultado("La IA está generando una nueva imagen...");
-                // Mostrar imagen después de 2s con fade-in
+                
                 this.time.delayedCall(2000, () => {
                   this.tweens.add({
                     targets: imgSprite,
@@ -78,7 +78,7 @@ export default function GenerativeGame() {
                   });
                 });
               } else {
-                // Elegir otra frase al azar, ocultar imagen, actualizar frase
+                
                 let idx = Phaser.Math.Between(0, ejemplos.length - 1);
                 while (idx === currentIdx) idx = Phaser.Math.Between(0, ejemplos.length - 1);
                 setCurrentIdx(idx);
@@ -101,10 +101,10 @@ export default function GenerativeGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey, currentIdx]);
 
-  // Reiniciar
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -121,7 +121,7 @@ export default function GenerativeGame() {
 
   return (
     <div>
-      {/* Modal explicativo */}
+      
       {instruccion &&
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -154,10 +154,10 @@ export default function GenerativeGame() {
         </div>
       }
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-generative" style={{ margin: 'auto', minHeight: 430 }} />
 
-      {/* Feedback educativo */}
+      
       {resultado && (
         <div className="alert alert-info mt-3" style={{ maxWidth: 700, margin: "auto" }}>
           {resultado}
@@ -168,7 +168,7 @@ export default function GenerativeGame() {
         </div>
       )}
 
-      {/* Botones debajo del juego */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

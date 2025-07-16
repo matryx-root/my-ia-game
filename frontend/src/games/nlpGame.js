@@ -24,10 +24,10 @@ export default function NLPGame() {
         backgroundColor: '#fff8e1',
         scene: {
           create: function () {
-            // Centramos los textos y elementos
+            
             this.cameras.main.setBackgroundColor('#fff8e1');
 
-            // Frases ampliadas
+            
             const frases = [
               {
                 texto: "El perro está ____ en el parque.",
@@ -65,7 +65,7 @@ export default function NLPGame() {
                 fontFamily: "monospace", fontSize: '20px', fill: '#333'
               });
 
-              // Frase centrada horizontalmente
+              
               this.add.text(this.cameras.main.centerX, 110, frases[idx].texto, {
                 fontFamily: "monospace", fontSize: '24px', fill: '#222'
               }).setOrigin(0.5);
@@ -74,7 +74,7 @@ export default function NLPGame() {
                 fontSize: '20px', fill: '#1565c0', fontFamily: "monospace"
               }).setOrigin(0.5);
 
-              // Opciones tipo tarjeta, centradas
+              
               const opBaseX = this.cameras.main.centerX - 130;
               frases[idx].opciones.forEach((op, i) => {
                 const btn = this.add.rectangle(opBaseX + i * 130, 180, 110, 50, 0xffecb3, 0.96)
@@ -101,11 +101,11 @@ export default function NLPGame() {
                     btn.setFillStyle(0xa5d6a7);
                     btnText.setColor('#388e3c');
                     setResultado("¡Has usado el razonamiento del lenguaje natural! Así funcionan los traductores y asistentes de voz.");
-                    // Deshabilitar todas las opciones
+                    
                     this.children.list.filter(child => child.input && child.input.enabled).forEach(child => {
                       child.disableInteractive && child.disableInteractive();
                     });
-                    // Espera 3s y muestra nueva frase
+                    
                     timeoutRef = setTimeout(() => {
                       fraseIdx = Phaser.Math.Between(0, frases.length - 1);
                       feedback.setText('');
@@ -126,7 +126,7 @@ export default function NLPGame() {
           }
         }
       });
-      // Limpieza si se desmonta o reinicia
+      
       return () => { if (timeoutRef) clearTimeout(timeoutRef); };
     }
     return () => {
@@ -135,10 +135,10 @@ export default function NLPGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey]);
 
-  // Reset (nueva frase)
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -155,7 +155,7 @@ export default function NLPGame() {
 
   return (
     <div>
-      {/* Modal explicativo */}
+      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -194,7 +194,7 @@ export default function NLPGame() {
           </small>
         </div>
       )}
-      {/* Botones de navegación */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

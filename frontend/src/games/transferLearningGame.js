@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 export default function TransferLearningGame() {
   const gameRef = useRef(null);
   const navigate = useNavigate();
-  const [fase, setFase] = useState('intro'); // intro, entrenamiento, transferencia, resultado
+  const [fase, setFase] = useState('intro'); 
   const [aciertos, setAciertos] = useState(0);
   const [feedback, setFeedback] = useState('');
   const [resultado, setResultado] = useState(null);
@@ -15,7 +15,7 @@ export default function TransferLearningGame() {
     if (fase !== 'intro' && !gameRef.current) {
       let escena = {};
 
-      // --- FASE 1: ENTRENAMIENTO ---
+      
       if (fase === 'entrenamiento') {
         escena = {
           create: function () {
@@ -30,7 +30,7 @@ export default function TransferLearningGame() {
             let texto = this.add.text(325, 140, ejemplos[index].emoji, { fontSize: '110px' }).setOrigin(0.5);
             let msg = this.add.text(325, 210, '', { fontSize: '22px', fill: '#1b5e20' }).setOrigin(0.5);
 
-            // Botones sí/no
+            
             const btnSi = this.add.rectangle(235, 300, 120, 60, 0xa5d6a7).setInteractive({ useHandCursor: true });
             const btnNo = this.add.rectangle(415, 300, 120, 60, 0xffccbc).setInteractive({ useHandCursor: true });
             this.add.text(207, 288, "Gato", { fontSize: '24px', fill: '#222', fontFamily: 'monospace' });
@@ -64,7 +64,7 @@ export default function TransferLearningGame() {
         };
       }
 
-      // --- FASE 2: TRANSFERENCIA ---
+      
       if (fase === 'transferencia') {
         escena = {
           create: function () {
@@ -111,7 +111,7 @@ export default function TransferLearningGame() {
         };
       }
 
-      // --- FASE 3: RESULTADO ---
+      
       if (fase === 'resultado') {
         escena = {
           create: function () {
@@ -146,10 +146,10 @@ export default function TransferLearningGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [fase, juegoKey]);
 
-  // --- BOTONES ---
+  
   const volverCategoria = () => navigate(-1);
   const handleReset = () => {
     setAciertos(0);
@@ -165,7 +165,7 @@ export default function TransferLearningGame() {
 
   return (
     <div>
-      {/* Intro */}
+      
       {fase === 'intro' && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -190,7 +190,7 @@ export default function TransferLearningGame() {
         </div>
       )}
 
-      {/* Juego */}
+      
       <div
         id="game-container-transferlearning"
         style={{
@@ -204,7 +204,7 @@ export default function TransferLearningGame() {
         }}
       />
 
-      {/* Feedback y resultado */}
+      
       {feedback && fase === "transferencia" && (
         <div className="alert alert-info mt-3" style={{ maxWidth: 650, margin: "auto" }}>
           {feedback}
@@ -216,7 +216,7 @@ export default function TransferLearningGame() {
         </div>
       )}
 
-      {/* Botones SIEMPRE VISIBLES (excepto intro) */}
+      
       {fase !== "intro" && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

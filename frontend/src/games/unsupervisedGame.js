@@ -5,12 +5,12 @@ import { useNavigate } from "react-router-dom";
 export default function UnsupervisedGame() {
   const gameRef = useRef(null);
   const navigate = useNavigate();
-  const [fase, setFase] = useState("intro"); // intro, jugar, fin
+  const [fase, setFase] = useState("intro"); 
   const [colorActual, setColorActual] = useState(0);
   const [resultado, setResultado] = useState(null);
   const [juegoKey, setJuegoKey] = useState(0);
 
-  // Colores y sus nombres
+  
   const colores = [
     { color: 0xff0000, nombre: "rojo", rgb: "#ff0000" },
     { color: 0x00ff00, nombre: "verde", rgb: "#00ff00" },
@@ -92,10 +92,10 @@ export default function UnsupervisedGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [fase, colorActual, juegoKey]);
 
-  // --- BOTONES DE NAVEGACIÓN ---
+  
   const volverCategoria = () => navigate(-1);
 
   const handleReset = () => {
@@ -111,7 +111,7 @@ export default function UnsupervisedGame() {
 
   return (
     <div>
-      {/* Intro */}
+      
       {fase === "intro" && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -139,14 +139,14 @@ export default function UnsupervisedGame() {
         </div>
       )}
 
-      {/* Contenedor Phaser */}
+      
       <div id="game-container-unsupervised" style={{ margin: 'auto', minHeight: 400, maxWidth: 620 }} />
 
-      {/* Visualización final */}
+      
       {fase === "fin" && (
         <div style={{ textAlign: "center", margin: "20px 0" }}>
           <div style={{ display: "flex", justifyContent: "center", gap: 40 }}>
-            {/* Grupo de círculos rojos */}
+           
             <div>
               <div>
                 {[0, 1, 2].map(i => (
@@ -159,7 +159,7 @@ export default function UnsupervisedGame() {
               </div>
               <div style={{ fontSize: 14, color: colores[0].rgb }}>Grupo Rojo</div>
             </div>
-            {/* Grupo de círculos verdes */}
+           
             <div>
               <div>
                 {[0, 1, 2].map(i => (
@@ -172,7 +172,7 @@ export default function UnsupervisedGame() {
               </div>
               <div style={{ fontSize: 14, color: colores[1].rgb }}>Grupo Verde</div>
             </div>
-            {/* Grupo de círculos azules */}
+            
             <div>
               <div>
                 {[0, 1, 2].map(i => (
@@ -189,7 +189,7 @@ export default function UnsupervisedGame() {
         </div>
       )}
 
-      {/* Mensaje final */}
+      
       {fase === "fin" && resultado && (
         <div className="alert alert-success mt-3" style={{ maxWidth: 600, margin: "auto" }}>
           {resultado}
@@ -200,7 +200,7 @@ export default function UnsupervisedGame() {
         </div>
       )}
 
-      {/* Botones SIEMPRE VISIBLES (excepto intro) */}
+      
       {fase !== "intro" && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

@@ -22,7 +22,7 @@ export default function RLGame() {
         backgroundColor: '#ffe0b2',
         scene: {
           create: function () {
-            // Título centrado
+            
             this.add.text(450, 60, "💪 RL: ¡Encuentra el botón ganador por prueba y error!", {
               fontFamily: "Arial",
               fontSize: '28px',
@@ -39,24 +39,24 @@ export default function RLGame() {
               color: "#1976d2"
             }).setOrigin(0.5);
 
-            // 5 botones en fila
+            
             for (let i = 1; i <= 5; i++) {
-              const x = 120 + (i - 1) * 160; // separa bien los botones
+              const x = 120 + (i - 1) * 160; 
               const y = 210;
 
-              // Botón: círculo grande y color
+              
               const btn = this.add.circle(x, y, 60, 0x64b5f6).setInteractive({ useHandCursor: true });
               btn.setStrokeStyle(5, 0x1976d2);
               btn.defaultColor = 0x64b5f6;
 
-              // Número de botón
+              
               this.add.text(x, y - 15, i, {
                 fontFamily: "Arial Black",
                 fontSize: '40px',
                 color: "#fff"
               }).setOrigin(0.5);
 
-              // Icono emoji en cada botón
+              
               this.add.text(x, y + 32, "🔘", { fontSize: '28px' }).setOrigin(0.5);
 
               btn.on('pointerover', () => {
@@ -70,7 +70,7 @@ export default function RLGame() {
                 if (terminado) return;
                 intentos++;
                 if (i === correct) {
-                  btn.setFillStyle(0x43a047); // Verde
+                  btn.setFillStyle(0x43a047); 
                   btn.setStrokeStyle(6, 0x2e7d32);
                   feedback.setText(`¡Correcto! Ganaste en ${intentos} intento${intentos > 1 ? "s" : ""} 🏆`);
                   terminado = true;
@@ -78,7 +78,7 @@ export default function RLGame() {
                     "Así aprende la IA con refuerzo: prueba muchas veces, recibe premios si acierta y aprende qué opción es mejor. ¡Cuantas más veces juega, más aprende a ganar!"
                   );
 
-                  // Animación de estrellas
+                  
                   for (let s = 0; s < 10; s++) {
                     const star = this.add.star(x, y, 6, 5, 18, 0xffeb3b);
                     this.tweens.add({
@@ -92,7 +92,7 @@ export default function RLGame() {
                     stars.push(star);
                   }
                 } else {
-                  btn.setFillStyle(0xef5350); // Rojo temporal
+                  btn.setFillStyle(0xef5350); 
                   feedback.setText("No era ese. ¡Sigue probando…! 🔄");
                   setTimeout(() => btn.setFillStyle(btn.defaultColor), 600);
                 }
@@ -108,10 +108,10 @@ export default function RLGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey]);
 
-  // Reiniciar
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -126,7 +126,7 @@ export default function RLGame() {
 
   return (
     <div>
-      {/* Modal explicativo centrado */}
+      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -162,7 +162,7 @@ export default function RLGame() {
         </div>
       )}
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-rl" style={{
         margin: '30px auto 0 auto',
         minHeight: 480,
@@ -172,7 +172,7 @@ export default function RLGame() {
         boxShadow: '0 2px 8px #ccc'
       }} />
 
-      {/* Feedback final */}
+      
       {resultado && (
         <div className="alert alert-success mt-3 text-center" style={{ maxWidth: 780, margin: "auto" }}>
           <b>¡Así aprende una IA real!</b>
@@ -185,7 +185,7 @@ export default function RLGame() {
         </div>
       )}
 
-      {/* Botones interactivos siempre debajo */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary btn-lg" onClick={volverCategoria}>

@@ -1,4 +1,4 @@
-// src/games/mlGame.js
+
 import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { useNavigate } from 'react-router-dom';
@@ -23,9 +23,9 @@ export default function MLClusterGame({ usuario }) {
   const NOMBRE_LOGRO = "Puntaje Perfecto ML";
   const DESC_LOGRO = "Obtuviste 12/12 aciertos en el juego de Clustering.";
 
-  // Función para obtener tamaño responsivo
+  
   const getResponsiveSize = () => {
-    const minWidth = 340; // para móviles
+    const minWidth = 340; 
     const maxWidth = 900;
     let width = window.innerWidth;
     let height = window.innerHeight;
@@ -38,7 +38,7 @@ export default function MLClusterGame({ usuario }) {
     return { width, height };
   };
 
-  // Cargar historial de partidas
+  
   const cargarHistorial = async () => {
     if (!usuario || !usuario.id) return;
     try {
@@ -55,7 +55,7 @@ export default function MLClusterGame({ usuario }) {
 
   const iniciarJuego = () => setInstruccion(false);
 
-  // Destruye Phaser cuando cambia el tamaño, la instrucción o el usuario
+  
   useEffect(() => {
     if (gameRef.current) {
       gameRef.current.destroy(true);
@@ -66,10 +66,10 @@ export default function MLClusterGame({ usuario }) {
     setErrorGuardar(null);
     setDesaciertos(0);
     setMostroLogro(false);
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey, usuario]);
 
-  // Crea el juego cuando instrucción está cerrada
+  
   useEffect(() => {
     if (instruccion) return;
 
@@ -83,12 +83,12 @@ export default function MLClusterGame({ usuario }) {
 
     let { width, height } = getResponsiveSize();
 
-    // Calcula posiciones y radios proporcionalmente
+    
     const clusterRadius = Math.max(40, Math.floor(width / 10));
     const pointRadius = Math.max(15, Math.floor(width / 35));
     const baseY = height - clusterRadius - 30;
 
-    // Phaser game
+    
     gameRef.current = new Phaser.Game({
       type: Phaser.AUTO,
       width,
@@ -107,7 +107,7 @@ export default function MLClusterGame({ usuario }) {
           this.add.text(40, 45, 'Haz clic en cada punto y arrástralo al grupo correcto', { fontSize: `${Math.max(12, Math.floor(width/46))}px`, fill: '#444' });
 
           clusters.forEach((cl, idx) => {
-            // Los círculos y textos se distribuyen proporcionalmente
+            
             const cx = (width/(clusters.length+1)) * (idx+1);
             this.add.circle(cx, baseY, clusterRadius, cl.color, 0.18).setStrokeStyle(3, cl.color);
             this.add.text(cx - 30, baseY + clusterRadius + 7, cl.name, { fontSize: Math.max(14, Math.floor(width/46)), fill: '#555' });
@@ -135,7 +135,7 @@ export default function MLClusterGame({ usuario }) {
               punto.y = dragY;
             });
 
-            // eslint-disable-next-line no-loop-func
+            
             punto.on('dragend', (pointer) => {
               let correcto = false;
               clusters.forEach((cl, idx) => {
@@ -183,33 +183,33 @@ export default function MLClusterGame({ usuario }) {
       }
     });
 
-    // Limpieza al desmontar
+    
     return () => {
       if (gameRef.current) {
         gameRef.current.destroy(true);
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey, usuario]);
 
-  // Redimensionar canvas al cambiar el tamaño de la ventana
+  
   useEffect(() => {
     if (instruccion) return;
     function onResize() {
-      setJuegoKey(k => k + 1); // fuerza recarga del juego con nuevo tamaño
+      setJuegoKey(k => k + 1); 
     }
     window.addEventListener('resize', onResize);
     return () => window.removeEventListener('resize', onResize);
-    // eslint-disable-next-line
+    
   }, [instruccion, usuario]);
 
   useEffect(() => {
     if (usuario && usuario.id) cargarHistorial();
-    // eslint-disable-next-line
+    
   }, [usuario, juegoKey]);
 
-  // Acción del botón de guardar progreso + logro si corresponde
+  
   const guardarProgresoYLogro = async () => {
     if (!usuario || !usuario.id) {
       setErrorGuardar('No hay usuario logueado.');
@@ -218,7 +218,7 @@ export default function MLClusterGame({ usuario }) {
     setErrorGuardar(null);
 
     try {
-      // Guardar progreso normal
+      
       const progresoPayload = {
         usuarioId: usuario.id,
         juegoId: ML_GAME_ID,
@@ -229,7 +229,7 @@ export default function MLClusterGame({ usuario }) {
       };
       await api.post('/juegos/progreso', progresoPayload);
 
-      // Si puntaje perfecto, guardar logro
+      
       if (desaciertos === 0) {
         await api.post("/usuarios/achievement", {
           usuarioId: usuario.id,
@@ -252,7 +252,7 @@ export default function MLClusterGame({ usuario }) {
     }
   };
 
-  // Reset
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -270,7 +270,7 @@ export default function MLClusterGame({ usuario }) {
 
   return (
     <div ref={containerRef} style={{ width: "100%", maxWidth: 900, margin: "auto" }}>
-      {/* Modal explicativo antes de jugar */}
+      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -301,10 +301,10 @@ export default function MLClusterGame({ usuario }) {
         </div>
       )}
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-ml-cluster" style={{ margin: 'auto', minHeight: 350 }} />
 
-      {/* Mensaje de aprendizaje al terminar */}
+      
       {resultado && (
         <div className="alert alert-success mt-3" style={{ maxWidth: 800, margin: "auto" }}>
           {resultado}
@@ -315,7 +315,7 @@ export default function MLClusterGame({ usuario }) {
         </div>
       )}
 
-      {/* Badge de logro por puntaje perfecto */}
+      
       {mostroLogro && (
         <div className="alert alert-info text-center mt-3 fw-bold" style={{ maxWidth: 500, margin: "auto" }}>
           <i className="bi bi-trophy-fill text-warning me-2"></i>
@@ -323,7 +323,7 @@ export default function MLClusterGame({ usuario }) {
         </div>
       )}
 
-      {/* Botón para guardar progreso */}
+      
       {puedeGuardar && !guardado && (
         <div className="d-flex justify-content-center mt-4">
           <button className="btn btn-success" onClick={guardarProgresoYLogro}>
@@ -332,7 +332,7 @@ export default function MLClusterGame({ usuario }) {
         </div>
       )}
 
-      {/* Historial de partidas */}
+      
       {historialProgreso.length > 0 && (
         <div className="my-4" style={{ maxWidth: 800, margin: "auto" }}>
           <h5>Historial de partidas</h5>
@@ -369,7 +369,7 @@ export default function MLClusterGame({ usuario }) {
         </div>
       )}
 
-      {/* Botones debajo del juego */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={() => navigate(-1)}>

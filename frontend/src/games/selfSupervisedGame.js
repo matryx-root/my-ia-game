@@ -10,7 +10,7 @@ export default function SelfSupervisedGame() {
   const [juegoKey, setJuegoKey] = useState(0);
   const [fraseActual, setFraseActual] = useState(0);
 
-  // Ejemplos ampliados
+  
   const frases = [
     {
       texto: "El gato está _____ en el tejado.",
@@ -71,7 +71,7 @@ export default function SelfSupervisedGame() {
     setJuegoKey(k => k + 1);
   };
 
-  // Guardamos referencia al objeto Phaser.Scene para reiniciar la escena al cambiar la frase
+  
   const sceneRef = useRef(null);
 
   useEffect(() => {
@@ -96,7 +96,7 @@ export default function SelfSupervisedGame() {
               color: "#333"
             });
 
-            // Frase principal, centrada y grande
+            
             this.frase = this.add.text(375, 120, frases[idx].texto, {
               fontFamily: "Arial",
               fontSize: '30px',
@@ -132,7 +132,7 @@ export default function SelfSupervisedGame() {
               btn.on('pointerout', () => { btn.setFillStyle(btn.defaultColor); });
 
               btn.on('pointerdown', () => {
-                if (completando) return; // evitar doble click
+                if (completando) return; 
                 if (op === frases[idx].respuesta) {
                   completando = true;
                   btn.setFillStyle(0xa5d6a7);
@@ -142,7 +142,7 @@ export default function SelfSupervisedGame() {
 
                   setResultado("¡Así aprende una IA a predecir lo que falta! Este tipo de IA se usa para autocompletar, traducir y restaurar información.");
 
-                  // Efecto de completado: la frase cambia de color y fade
+                  
                   this.tweens.add({
                     targets: [this.frase, ...this.botones.map((b, k) => k === i ? b : null).filter(Boolean)],
                     alpha: 0.5,
@@ -151,7 +151,7 @@ export default function SelfSupervisedGame() {
 
                   this.time.delayedCall(1700, () => {
                     completando = false;
-                    // Siguiente frase (si hay)
+                    
                     if (idx + 1 < frases.length) {
                       setFraseActual(f => f + 1);
                       setResultado(null);
@@ -160,7 +160,7 @@ export default function SelfSupervisedGame() {
                         gameRef.current = null;
                       }
                     } else {
-                      // Juego completado
+                      
                       setResultado("¡Completaste todas las frases! Eres un experto en predicción como una IA. 🎉");
                     }
                   });
@@ -189,10 +189,10 @@ export default function SelfSupervisedGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey, fraseActual]);
 
-  // Reset: reinicia desde la primera frase
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -208,7 +208,7 @@ export default function SelfSupervisedGame() {
 
   return (
     <div>
-      {/* Modal explicativo */}
+      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -239,7 +239,7 @@ export default function SelfSupervisedGame() {
         </div>
       )}
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-selfsupervised" style={{
         margin: '30px auto 0 auto',
         minHeight: 420,
@@ -249,7 +249,7 @@ export default function SelfSupervisedGame() {
         boxShadow: '0 2px 8px #ddd'
       }} />
 
-      {/* Feedback educativo */}
+      
       {resultado && (
         <div className="alert alert-info mt-3 text-center" style={{ maxWidth: 800, margin: "auto" }}>
           {resultado}
@@ -260,7 +260,7 @@ export default function SelfSupervisedGame() {
         </div>
       )}
 
-      {/* Botones debajo del juego */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>
