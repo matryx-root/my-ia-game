@@ -16,7 +16,7 @@ export default function NavBar({ usuario, onLogout }) {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm" style={{ minHeight: 64 }}>
       <div className="container-fluid">
-        {/* LOGO */}
+        
         <span
           className="navbar-brand fw-bold"
           style={{ cursor: "pointer", fontSize: 22 }}
@@ -25,7 +25,7 @@ export default function NavBar({ usuario, onLogout }) {
           My IA Game
         </span>
 
-        {/* Botón hamburguesa (visible solo en mobile) */}
+        
         <button
           className="navbar-toggler"
           type="button"
@@ -38,7 +38,7 @@ export default function NavBar({ usuario, onLogout }) {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        {/* Menú colapsable */}
+        
         <div className="collapse navbar-collapse" id="mainNav">
           {usuario && (
             <div className="w-100">
@@ -90,7 +90,7 @@ export default function NavBar({ usuario, onLogout }) {
                 >
                   <i className="bi bi-gear me-1"></i>Configuración
                 </button>
-                {/* Botón Salir SIEMPRE al final */}
+                
                 <button
                   onClick={handleLogout}
                   className="btn btn-outline-light ms-lg-2"
@@ -99,7 +99,7 @@ export default function NavBar({ usuario, onLogout }) {
                   Salir
                 </button>
               </div>
-              {/* Saludo, badges y rol: debajo de los botones en mobile, a la derecha en desktop */}
+              
               <div className="mt-2 mt-lg-0 d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-end">
                 <span className="text-light fw-bold" style={{ fontSize: 16 }}>
                   Bienvenido, {usuario.nombre}{" "}

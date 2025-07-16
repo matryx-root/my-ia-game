@@ -33,7 +33,7 @@ async function handleResponse(response) {
   return data;
 }
 
-// --- API centralizado ---
+
 const api = {
   get: (url) =>
     fetch(API_URL + url, { headers: headers() }).then(handleResponse),
@@ -58,13 +58,13 @@ const api = {
       headers: headers(),
     }).then(handleResponse),
 
-  // Subir archivos con FormData (sin Content-Type manual)
+  
   postFile: (url, formData) =>
     fetch(API_URL + url, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + getToken(),
-        // No Content-Type para FormData
+        
       },
       body: formData,
     }).then(handleResponse),
@@ -72,38 +72,38 @@ const api = {
 
 export default api;
 
-// ========== JUEGOS ADMIN ==========
 
-// GET /admin/juegos
+
+
 export function getJuegos() {
   return api.get("/admin/juegos");
 }
 
-// POST /admin/juegos
+
 export function crearJuego(data) {
   return api.post("/admin/juegos", data);
 }
 
-// PUT /admin/juegos/:id
+
 export function actualizarJuego(id, data) {
   return api.put(`/admin/juegos/${id}`, data);
 }
 
-// DELETE /admin/juegos/:id
+
 export function borrarJuego(id) {
   return api.delete(`/admin/juegos/${id}`);
 }
 
-// POST /admin/juegos/upload (archivo)
+
 export function uploadArchivoJuego(file) {
   const formData = new FormData();
   formData.append("archivo", file);
   return api.postFile("/admin/juegos/upload", formData);
 }
 
-// GET /admin/juegos/download/:archivo
+
 export function downloadArchivoJuego(nombreArchivo) {
-  // Forzar descarga automática usando blob y crear un enlace oculto
+  
   fetch(`${API_URL}/admin/juegos/download/${nombreArchivo}`, {
     method: "GET",
     headers: { Authorization: "Bearer " + getToken() },
@@ -111,7 +111,7 @@ export function downloadArchivoJuego(nombreArchivo) {
     .then(async (res) => {
       if (!res.ok) throw new Error("No se pudo descargar archivo");
       const blob = await res.blob();
-      // Descarga directa
+      
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

@@ -1,4 +1,4 @@
-// backend/prisma/seed.js
+
 
 const seedColegios = require("./seedColegios");
 const seedJuegos = require("./seedJuegos");

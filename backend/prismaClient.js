@@ -1,5 +1,5 @@
-// backend/prismaClient.js
-const { PrismaClient } = require('./generated/prisma'); // <- RUTA PERSONALIZADA
+
+const { PrismaClient } = require('./generated/prisma'); 
 const prisma = new PrismaClient();
 
 module.exports = prisma;

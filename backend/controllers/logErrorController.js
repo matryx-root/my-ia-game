@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Crear un nuevo log de error
+
 exports.crearLogError = async (req, res) => {
   try {
     const { usuarioId, juegoId, mensaje, detalle } = req.body;
@@ -14,7 +14,7 @@ exports.crearLogError = async (req, res) => {
   }
 };
 
-// Listar todos los logs de error
+
 exports.listarLogErrores = async (req, res) => {
   try {
     const logs = await prisma.logError.findMany({
@@ -27,7 +27,7 @@ exports.listarLogErrores = async (req, res) => {
   }
 };
 
-// Obtener log de error por ID
+
 exports.obtenerLogErrorPorId = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -42,7 +42,7 @@ exports.obtenerLogErrorPorId = async (req, res) => {
   }
 };
 
-// Eliminar un log de error
+
 exports.eliminarLogError = async (req, res) => {
   try {
     const id = Number(req.params.id);

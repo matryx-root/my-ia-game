@@ -1,11 +1,8 @@
-// controllers/juegoController.js
 
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-/**
- * Obtener todos los juegos registrados
- */
+
 exports.listarJuegos = async (req, res) => {
   try {
     const juegos = await prisma.juego.findMany({ orderBy: { id: 'asc' } });
@@ -15,9 +12,7 @@ exports.listarJuegos = async (req, res) => {
   }
 };
 
-/**
- * Crear un nuevo juego
- */
+
 exports.crearJuego = async (req, res) => {
   try {
     const { nombre, descripcion } = req.body;
@@ -31,9 +26,7 @@ exports.crearJuego = async (req, res) => {
   }
 };
 
-/**
- * Editar juego por ID
- */
+
 exports.editarJuego = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -55,9 +48,7 @@ exports.editarJuego = async (req, res) => {
   }
 };
 
-/**
- * Eliminar un juego por ID
- */
+
 exports.eliminarJuego = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -68,11 +59,7 @@ exports.eliminarJuego = async (req, res) => {
   }
 };
 
-/**
- * Guardar o actualizar el progreso de usuario en un juego.
- * Guarda puntaje, porcentaje, aciertos/desaciertos si se envían.
- * Previene duplicados y actualiza si ya existe.
- */
+
 exports.guardarProgreso = async (req, res) => {
   const { usuarioId, juegoId, avance, completado, aciertos, desaciertos } = req.body;
   try {
@@ -90,7 +77,7 @@ exports.guardarProgreso = async (req, res) => {
     if (typeof aciertos !== "undefined") data.aciertos = aciertos;
     if (typeof desaciertos !== "undefined") data.desaciertos = desaciertos;
 
-    // SIEMPRE crear un nuevo registro, nunca actualizar
+    
     const progreso = await prisma.progresoUsuario.create({
       data
     });
@@ -101,21 +88,14 @@ exports.guardarProgreso = async (req, res) => {
 };
 
 
-/**
- * Guardar un logro alcanzado por el usuario en un juego.
- * Previene duplicados para el mismo usuario, juego y nombre de logro.
- */
+
 exports.guardarLogro = async (req, res) => {
   const { usuarioId, juegoId, nombre, descripcion } = req.body;
   try {
     if (!usuarioId || !nombre) {
       return res.status(400).json({ error: "usuarioId y nombre son obligatorios" });
     }
-    // Opcional: evitar duplicados
-    // const existe = await prisma.achievement.findFirst({ where: { usuarioId, juegoId, nombre } });
-    // if (existe) {
-    //  return res.status(409).json({ error: "El logro ya existe para este usuario/juego." });
-    // }
+  
     const logro = await prisma.achievement.create({
       data: { usuarioId, juegoId, nombre, descripcion }
     });
@@ -125,9 +105,7 @@ exports.guardarLogro = async (req, res) => {
   }
 };
 
-/**
- * Listar progreso de juegos para un usuario
- */
+
 exports.progresoUsuario = async (req, res) => {
   try {
     const usuarioId = Number(req.params.id);
@@ -141,9 +119,7 @@ exports.progresoUsuario = async (req, res) => {
   }
 };
 
-/**
- * Listar logros de usuario
- */
+
 exports.logrosUsuario = async (req, res) => {
   try {
     const usuarioId = Number(req.params.id);

@@ -1,19 +1,19 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// CONFIGURACIÓN DE VALIDACIÓN
+
 const MIN_MSG_LEN = 10;
 const MAX_MSG_LEN = 100;
 const MAX_RESPUESTA_LEN = 100;
-const SOLO_TEXTO_VALIDO = /^[A-ZÁÉÍÓÚÑ0-9 ]+$/; // Solo mayúsculas, números, espacios
+const SOLO_TEXTO_VALIDO = /^[A-ZÁÉÍÓÚÑ0-9 ]+$/; 
 
-// Crear un mensaje de soporte
+
 exports.crearMensaje = async (req, res) => {
   try {
     const { usuarioId, mensaje } = req.body;
     let texto = (mensaje || "").trim().toUpperCase();
 
-    // Valida usuario destino
+    
     const usuario = await prisma.usuario.findUnique({ where: { id: Number(usuarioId) } });
     if (!usuario) {
       return res.status(400).json({ error: "Usuario destino no existe" });
@@ -28,7 +28,7 @@ exports.crearMensaje = async (req, res) => {
       return res.status(400).json({ error: "Solo MAYÚSCULAS, números y espacios. No se permiten símbolos, tildes ni signos." });
     }
 
-    // Crea mensaje
+   
     const nuevoMensaje = await prisma.mensajeSoporte.create({
       data: { usuarioId: Number(usuarioId), mensaje: texto }
     });
@@ -38,7 +38,7 @@ exports.crearMensaje = async (req, res) => {
   }
 };
 
-// Listar mensajes de soporte (puede filtrar por usuarioId)
+
 exports.listarMensajes = async (req, res) => {
   const usuarioId = req.query.usuarioId ? Number(req.query.usuarioId) : undefined;
   try {
@@ -61,14 +61,14 @@ exports.listarMensajes = async (req, res) => {
   }
 };
 
-// Responder mensaje de soporte (solo docente o admin)
+
 exports.responderMensaje = async (req, res) => {
   try {
     const id = Number(req.params.id);
     const { respuesta, estado = "respondido" } = req.body;
     let texto = (respuesta || "").trim().toUpperCase();
 
-    // Validar contenido
+   
     if (!texto || texto.length < MIN_MSG_LEN) {
       return res.status(400).json({ error: `La respuesta debe tener al menos ${MIN_MSG_LEN} caracteres.` });
     }
@@ -79,7 +79,7 @@ exports.responderMensaje = async (req, res) => {
       return res.status(400).json({ error: "Solo MAYÚSCULAS, números y espacios. No se permiten símbolos, tildes ni signos." });
     }
 
-    // Evita doble respuesta
+   
     const mensaje = await prisma.mensajeSoporte.findUnique({ where: { id } });
     if (!mensaje) return res.status(404).json({ error: "Mensaje no encontrado" });
     if (mensaje.estado === "respondido") {
@@ -96,7 +96,7 @@ exports.responderMensaje = async (req, res) => {
   }
 };
 
-// EDITAR mensaje (solo admin, por id)
+
 exports.editarMensaje = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -122,7 +122,7 @@ exports.editarMensaje = async (req, res) => {
   }
 };
 
-// ELIMINAR mensaje (solo admin, por id)
+
 exports.eliminarMensaje = async (req, res) => {
   try {
     const id = Number(req.params.id);
@@ -133,19 +133,16 @@ exports.eliminarMensaje = async (req, res) => {
   }
 };
 
-// Marcar mensaje como leído (solo usuario destinatario)
+
 exports.marcarLeido = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    // Valida existencia del mensaje
+   
     const mensaje = await prisma.mensajeSoporte.findUnique({ where: { id } });
     if (!mensaje) return res.status(404).json({ error: "Mensaje no encontrado" });
 
-    // Opcional: valida si req.user.id === mensaje.usuarioId para mayor seguridad
-    // if (req.user && req.user.id !== mensaje.usuarioId) {
-    //   return res.status(403).json({ error: "No autorizado para marcar como leído." });
-    // }
+  
 
     const actualizado = await prisma.mensajeSoporte.update({
       where: { id },

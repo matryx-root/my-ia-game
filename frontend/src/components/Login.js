@@ -19,11 +19,11 @@ export default function Login({ onLogin }) {
       setLoading(false);
 
       if (res.token && res.usuario) {
-        // Guarda el usuario COMPLETO (objeto), el token, y otros campos si necesitas
+        
         localStorage.setItem("usuario", JSON.stringify(res.usuario));
         localStorage.setItem("token", res.token);
 
-        // Extras opcionales por compatibilidad:
+        
         localStorage.setItem("userId", res.usuario.id);
         localStorage.setItem("rol", res.usuario.rol || "");
         if (res.usuario.colegioId)
@@ -31,10 +31,10 @@ export default function Login({ onLogin }) {
 
         if (typeof onLogin === "function") onLogin(res.usuario);
 
-        // Mostrar mensaje tipo alert (igual que en registro)
+        
         window.alert("¡Login exitoso!");
 
-        // Redirección según el rol
+        
         if (res.usuario.rol === "admin") {
           navigate("/admin");
         } else if (res.usuario.rol === "docente") {

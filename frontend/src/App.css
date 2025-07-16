@@ -42,7 +42,7 @@ form, nav, .card, .panel, .app-box, .main-content {
   transition: background 0.3s, color 0.3s;
 }
 
-/* Aumenta max-width para paneles grandes */
+
 @media (min-width: 650px) {
   form, nav, .card, .panel, .app-box, .main-content {
     max-width: 900px;

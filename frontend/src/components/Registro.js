@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../utils/api";
 
-// Regex
+
 const EMAIL_REGEX = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/;
 const CELULAR_REGEX = /^[0-9]{9}$/;
@@ -25,7 +25,7 @@ export default function Registro({ onRegister }) {
   const [usuariosExistentes, setUsuariosExistentes] = useState([]);
   const navigate = useNavigate();
 
-  // Cargar colegios y usuarios (para duplicidad email)
+  
   useEffect(() => {
     api.get("/colegios")
       .then(res => setColegios(Array.isArray(res) ? res : []))
@@ -37,30 +37,30 @@ export default function Registro({ onRegister }) {
       .catch(() => setUsuariosExistentes([]));
   }, []);
 
-  // Validación profunda
+  
   const validate = (values) => {
     const newErrors = {};
 
-    // Nombre
+    
     if (!values.nombre) newErrors.nombre = "El nombre es requerido";
     else if (!NOMBRE_REGEX.test(values.nombre)) newErrors.nombre = "Solo letras, espacios, máx 40, en MAYÚSCULAS";
 
-    // Email
+    
     if (!values.email) newErrors.email = "Correo es requerido";
     else if (!EMAIL_REGEX.test(values.email)) newErrors.email = "Formato inválido. Ej: DOCENTE@GMAIL.COM";
     else if (usuariosExistentes.includes(values.email.toUpperCase())) newErrors.email = "Este correo ya está registrado. Usa otro.";
 
-    // Contraseña
+    
     if (!values.password) newErrors.password = "Contraseña es requerida";
     else if (!PASSWORD_REGEX.test(values.password)) newErrors.password = "8+ caracteres, mínimo 1 letra y 1 número. Ej: ABCD1234";
 
-    // Rol
+    
     if (!values.rol) newErrors.rol = "Selecciona tu rol";
 
-    // Colegio
+    
     if (!values.colegioId) newErrors.colegioId = "Selecciona un colegio";
 
-    // Edad
+    
     if (values.rol === "alumno") {
       if (!values.edad || isNaN(Number(values.edad))) newErrors.edad = "Edad obligatoria para alumno";
       else if (Number(values.edad) < 8 || Number(values.edad) > 18) newErrors.edad = "Alumno: edad entre 8 y 18";
@@ -69,14 +69,14 @@ export default function Registro({ onRegister }) {
       else if (Number(values.edad) < 19 || Number(values.edad) > 60) newErrors.edad = "Docente: edad entre 19 y 60";
     }
 
-    // Celular
+    
     if (values.celular && !CELULAR_REGEX.test(values.celular)) newErrors.celular = "Solo 9 dígitos, ej: 912345678";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  // Cambios en campos: fuerza mayúsculas y quita errores
+  
   const handleChange = (e) => {
     let { name, value } = e.target;
     if (["nombre", "email"].includes(name)) value = value.toUpperCase();
@@ -84,17 +84,17 @@ export default function Registro({ onRegister }) {
     if (errors[name]) setErrors({ ...errors, [name]: null });
   };
 
-  // Limpieza de campos antes de enviar
+  
   const cleanData = (obj) => {
     let cleaned = { ...obj };
-    // Limpia solo los campos de texto
+    
     for (let k of ["nombre", "email", "password", "celular"]) {
       if (typeof cleaned[k] === "string") cleaned[k] = cleaned[k].trim();
     }
     return cleaned;
   };
 
-  // Registro
+  
   const handleRegister = async (e) => {
     e.preventDefault();
     const cleaned = cleanData(data);
@@ -116,7 +116,7 @@ export default function Registro({ onRegister }) {
         alert(res.error || "Error en el registro");
       }
     } catch (error) {
-      // Mejor mensaje para duplicidad
+      
       setErrors(prev => ({
         ...prev,
         email: "No se pudo registrar. Revisa si el correo ya está en uso o verifica tu conexión."
@@ -126,7 +126,7 @@ export default function Registro({ onRegister }) {
     }
   };
 
-  // Placeholders
+  
   const placeholderEdad = data.rol === "alumno"
     ? "EJ: 12 (8 a 18 AÑOS)"
     : data.rol === "docente"
@@ -147,7 +147,7 @@ export default function Registro({ onRegister }) {
             </div>
             <div className="card-body p-4">
               <form onSubmit={handleRegister} autoComplete="off">
-                {/* Nombre */}
+                
                 <div className="mb-3">
                   <label htmlFor="nombre" className="form-label">Nombre Completo</label>
                   <input
@@ -163,7 +163,7 @@ export default function Registro({ onRegister }) {
                   />
                   {errors.nombre && <div className="invalid-feedback">{errors.nombre}</div>}
                 </div>
-                {/* Email */}
+                
                 <div className="mb-3">
                   <label htmlFor="email" className="form-label">Correo Electrónico</label>
                   <input
@@ -179,7 +179,7 @@ export default function Registro({ onRegister }) {
                   />
                   {errors.email && <div className="invalid-feedback">{errors.email}</div>}
                 </div>
-                {/* Contraseña */}
+                
                 <div className="mb-3">
                   <label htmlFor="password" className="form-label">Contraseña</label>
                   <input
@@ -194,7 +194,7 @@ export default function Registro({ onRegister }) {
                   />
                   {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                 </div>
-                {/* Rol */}
+                
                 <div className="mb-3">
                   <label htmlFor="rol" className="form-label">Rol</label>
                   <select
@@ -211,7 +211,7 @@ export default function Registro({ onRegister }) {
                   </select>
                   {errors.rol && <div className="invalid-feedback">{errors.rol}</div>}
                 </div>
-                {/* Colegio */}
+                
                 <div className="mb-3">
                   <label htmlFor="colegioId" className="form-label">Colegio</label>
                   <select
@@ -237,7 +237,7 @@ export default function Registro({ onRegister }) {
                   </select>
                   {errors.colegioId && <div className="invalid-feedback">{errors.colegioId}</div>}
                 </div>
-                {/* Edad y Celular */}
+                
                 <div className="row">
                   <div className="col-md-6 mb-3">
                     <label htmlFor="edad" className="form-label">Edad</label>
@@ -270,7 +270,7 @@ export default function Registro({ onRegister }) {
                     {errors.celular && <div className="invalid-feedback">{errors.celular}</div>}
                   </div>
                 </div>
-                {/* Botón */}
+                
                 <div className="d-grid gap-2 mt-4">
                   <button
                     type="submit"
@@ -285,7 +285,7 @@ export default function Registro({ onRegister }) {
                     ) : "Registrarse"}
                   </button>
                 </div>
-                {/* Enlace login */}
+                
                 <div className="text-center mt-3">
                   ¿Ya tienes cuenta?{" "}
                   <button

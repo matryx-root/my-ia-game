@@ -1,4 +1,4 @@
-// src/components/LogsErrorPage.js
+
 import React from "react";
 export default function LogsErrorPage() {
   return (

@@ -25,7 +25,7 @@ export default function MisJuegos({ usuario }) {
       .finally(() => setLoading(false));
   }, [usuario]);
 
-  // Agrupar progreso por juego
+  
   const progresoPorJuego = {};
   progreso.forEach(p => {
     if (!progresoPorJuego[p.juegoId]) {
@@ -58,7 +58,7 @@ export default function MisJuegos({ usuario }) {
       </div>
       <hr />
 
-      {/* PROGRESO */}
+      
       <h5 className="fw-bold mt-4">Progreso en Juegos</h5>
       {Object.keys(progresoPorJuego).length === 0 ? (
         <span className="text-muted">No hay progresos registrados aún.</span>
@@ -113,7 +113,7 @@ export default function MisJuegos({ usuario }) {
         ))
       )}
 
-      {/* LOGROS */}
+      
       <h5 className="fw-bold mt-4">Logros</h5>
       {logros.length === 0 ? (
         <span className="text-muted">No tienes logros aún.</span>

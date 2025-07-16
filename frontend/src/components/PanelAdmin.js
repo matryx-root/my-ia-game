@@ -1,4 +1,4 @@
-// src/components/PanelAdmin.js
+
 
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
@@ -14,28 +14,28 @@ export default function PanelAdmin({ usuario }) {
 
   const navigate = useNavigate();
 
-  // Solo admin puede acceder
+  
   useEffect(() => {
     if (!usuario || usuario.rol !== "admin") {
       alert("No tienes permiso para acceder a este panel.");
       navigate("/");
     }
-    // eslint-disable-next-line
+    
   }, [usuario]);
 
-  // Cargar usuarios y colegios
+  
   const cargarDatos = () => {
     api.get("/admin/usuarios")
       .then(res => setUsuarios(res))
       .catch(() => setError("No se pudo conectar a usuarios"));
-    // Cargar colegios con endpoint público si existe
+    
     api.get("/colegios")
       .then(res => setColegios(Array.isArray(res) ? res : []))
       .catch(() => setError("No se pudo conectar a colegios"));
   };
   useEffect(cargarDatos, []);
 
-  // Eliminar usuario
+  
   const eliminarUsuario = id => {
     if (!window.confirm("¿Eliminar este usuario?")) return;
     api.delete(`/admin/usuarios/${id}`).then(() => {
@@ -44,7 +44,7 @@ export default function PanelAdmin({ usuario }) {
     }).catch(() => setError("No se pudo eliminar."));
   };
 
-  // Agregar usuario
+  
   const handleAgregar = e => {
     e.preventDefault();
     if (
@@ -71,7 +71,7 @@ export default function PanelAdmin({ usuario }) {
       .catch(() => setError("No se pudo crear el usuario."));
   };
 
-  // Guardar edición
+  
   const handleEditar = e => {
     e.preventDefault();
     const data = {
@@ -104,7 +104,7 @@ export default function PanelAdmin({ usuario }) {
             </div>
           )}
 
-          {/* Botón para crear usuario */}
+          
           {!nuevo && (
             <div className="mb-3">
               <button className="btn btn-success" onClick={() => setNuevo({
@@ -115,7 +115,7 @@ export default function PanelAdmin({ usuario }) {
             </div>
           )}
 
-          {/* Formulario para crear usuario */}
+          
           {nuevo && (
             <form className="row g-2 mb-3" onSubmit={handleAgregar}>
               <div className="col-md">

@@ -4,10 +4,10 @@ const prisma = new PrismaClient();
 async function main() {
   await prisma.juego.createMany({
     data: [
-      // IA Reactiva
+      
       { nombre: "IA Simbólica y Sistemas Expertos", descripcion: "Toma decisiones usando reglas fijas, sin aprendizaje ni memoria." },
 
-      // IA con Memoria Limitada
+      
       { nombre: "Machine Learning", descripcion: "Aprende patrones a partir de datos históricos." },
       { nombre: "Supervised Learning", descripcion: "Aprendizaje supervisado con datos etiquetados." },
       { nombre: "Unsupervised Learning", descripcion: "Aprendizaje no supervisado, encuentra patrones en datos no etiquetados." },
@@ -20,13 +20,13 @@ async function main() {
       { nombre: "Computer Vision", descripcion: "Interpretación y análisis automático de imágenes o videos." },
       { nombre: "Natural Language Processing", descripcion: "Procesamiento y análisis de lenguaje humano." },
 
-      // ANI (IA Estrecha)
+      
       { nombre: "GANs (Generative Adversarial Networks)", descripcion: "Genera imágenes, audio o datos simulando creatividad." },
       { nombre: "VAEs (Variational Autoencoders)", descripcion: "Compresión y generación eficiente de datos." },
       { nombre: "Diffusion Models", descripcion: "Generación de contenido mediante procesos de difusión." },
       { nombre: "Generative AI", descripcion: "Modelos que crean nuevo contenido (texto, imágenes, audio, etc)." },
 
-      // IA con Teoría de la Mente
+      
       { nombre: "Teoría de la Mente (Demo)", descripcion: "Simulación de empatía, emociones o intenciones (en desarrollo)." }
     ],
     skipDuplicates: true

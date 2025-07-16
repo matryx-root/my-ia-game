@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Registrar progreso de usuario en un juego
+
 exports.registrarProgreso = async (req, res) => {
   try {
     const { usuarioId, juegoId, avance, completado } = req.body;
@@ -14,7 +14,7 @@ exports.registrarProgreso = async (req, res) => {
   }
 };
 
-// Listar progreso de todos los alumnos del colegio (docente)
+
 exports.progresoAlumnosDocente = async (req, res) => {
   const { rol, colegioId } = req.user;
   if (rol !== "docente") return res.status(403).json({ error: "No autorizado" });

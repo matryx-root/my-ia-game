@@ -7,8 +7,8 @@ export default function ComputerVisionGame() {
   const gameRef = useRef(null);
   const navigate = useNavigate();
   const { id } = useParams();
-  const [nivel, setNivel] = useState(0); // 0 = rojo, 1 = amarillo, 2 = verde
-  const [fase, setFase] = useState("intro"); // intro, jugar, fin
+  const [nivel, setNivel] = useState(0); 
+  const [fase, setFase] = useState("intro"); 
   const [resultado, setResultado] = useState(null);
 
   const colores = [
@@ -85,7 +85,7 @@ export default function ComputerVisionGame() {
                     });
                     setTimeout(() => {
                       circ.setStrokeStyle();
-                      // Limpia el error
+                     
                       this.children.list
                         .filter(t => t.text && t.text.startsWith("¡No es el color"))
                         .forEach(t => t.destroy());
@@ -104,10 +104,10 @@ export default function ComputerVisionGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [fase, nivel]);
 
-  // Volver a jugar
+  
   function reiniciar() {
     setNivel(0);
     setFase("jugar");
@@ -118,14 +118,14 @@ export default function ComputerVisionGame() {
     }
   }
 
-  // Vuelve a la categoría anterior
+  
   function volverCategoria() {
-    navigate(-1); // Puedes cambiarlo por navigate("/categorias") si prefieres ruta fija
+    navigate(-1); 
   }
 
   return (
     <div>
-      {/* Modal de bienvenida */}
+      
       {fase === "intro" && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -157,7 +157,7 @@ export default function ComputerVisionGame() {
         </div>
       )}
 
-      {/* Phaser game container */}
+      
       <div
         id="game-container-computervision"
         style={{
@@ -170,7 +170,7 @@ export default function ComputerVisionGame() {
         }}
       />
 
-      {/* Mensaje final */}
+      
       {fase === "fin" && resultado && (
         <div className="alert alert-success mt-3" style={{ maxWidth: 600, margin: "40px auto", textAlign: "center" }}>
           <div style={{ fontSize: 28, marginBottom: 10 }}>🚦</div>
@@ -184,7 +184,7 @@ export default function ComputerVisionGame() {
         </div>
       )}
 
-      {/* Botones de navegación SIEMPRE visibles cuando no es intro */}
+      
       {fase !== "intro" && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

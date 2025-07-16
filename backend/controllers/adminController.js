@@ -2,12 +2,9 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 
-// controllers/adminController.js
 exports.listarUsuarios = async (req, res) => {
   try {
-    // Puedes usar Prisma o tu ORM aquí
-    // Ejemplo: const usuarios = await prisma.usuario.findMany();
-    // Si tienes colegios, puedes incluirlos: include: { colegio: true }
+
     const usuarios = await prisma.usuario.findMany({
       include: { colegio: true }
     });
@@ -17,7 +14,7 @@ exports.listarUsuarios = async (req, res) => {
   }
 };
 
-// controllers/adminController.js
+
 exports.listarColegios = async (req, res) => {
   try {
     const colegios = await prisma.colegio.findMany();
@@ -73,12 +70,12 @@ exports.eliminarUsuario = async (req, res) => {
   try {
     const id = Number(req.params.id);
 
-    // Primero elimina los logs relacionados (cambia el nombre si tu modelo es diferente)
+    
     await prisma.logIngreso.deleteMany({
       where: { usuarioId: id }
     });
 
-    // Ahora elimina el usuario
+  
     await prisma.usuario.delete({
       where: { id }
     });
@@ -89,7 +86,7 @@ exports.eliminarUsuario = async (req, res) => {
   }
 };
 
-// Juegos
+
 exports.listarJuegos = async (req, res) => {
   try {
     const juegos = await prisma.juego.findMany();
@@ -130,11 +127,11 @@ exports.eliminarJuego = async (req, res) => {
   }
 };
 
-// Listar progreso de juegos para un usuario
+
 exports.progresoUsuario = async (req, res) => {
   try {
     const usuarioId = Number(req.params.id);
-    // Incluye los datos del juego relacionado
+   
     const progresos = await prisma.progresoUsuario.findMany({
       where: { usuarioId },
       include: { juego: true }

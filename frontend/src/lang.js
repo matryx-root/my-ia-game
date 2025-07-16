@@ -1,4 +1,4 @@
-// src/lang.js
+
 export const textos = {
   "Español": {
     bienvenida: "Bienvenido",
@@ -9,7 +9,7 @@ export const textos = {
     dashboard: "Dashboard",
     soporte: "Soporte",
     juegosPorUsuario: "Juegos por Usuario",
-    // ...agrega aquí TODOS los textos usados en la interfaz
+    
   },
   "Inglés": {
     bienvenida: "Welcome",
@@ -20,6 +20,6 @@ export const textos = {
     dashboard: "Dashboard",
     soporte: "Support",
     juegosPorUsuario: "Games per User",
-    // ...agrega todos los textos en inglés
+    
   }
 };

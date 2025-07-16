@@ -18,11 +18,11 @@ export default function MensajeSoportePage({ usuario }) {
   const [cargando, setCargando] = useState(false);
   const [enviando, setEnviando] = useState(false);
 
-  // --- CRUD NUEVO ---
-  const [editandoId, setEditandoId] = useState(null); // ID mensaje que se edita
-  const [mensajeEditado, setMensajeEditado] = useState(""); // Valor editado
+ 
+  const [editandoId, setEditandoId] = useState(null); 
+  const [mensajeEditado, setMensajeEditado] = useState(""); 
 
-  // Traer todos los usuarios (solo admin)
+  
   useEffect(() => {
     if (usuario?.rol === "admin") {
       api.get("/admin/usuarios")
@@ -31,7 +31,7 @@ export default function MensajeSoportePage({ usuario }) {
     }
   }, [usuario]);
 
-  // Cargar mensajes
+  
   const cargarMensajes = () => {
     setCargando(true);
     let url = "/mensajes";
@@ -44,7 +44,7 @@ export default function MensajeSoportePage({ usuario }) {
 
   useEffect(() => {
     if (usuario) cargarMensajes();
-    // eslint-disable-next-line
+    
   }, [usuario]);
 
   const normalizaTexto = (texto, toMayus = true) =>
@@ -52,26 +52,26 @@ export default function MensajeSoportePage({ usuario }) {
       .replace(LIMPIAR_REGEX, "")
       .replace(/\s{2,}/g, " ");
 
-  // Input mensaje
+  
   const handleMensajeChange = (e) => {
     let valor = e.target.value;
     valor = normalizaTexto(valor);
     setNuevoMensaje(valor.slice(0, MAX_MSG_LEN));
   };
 
-  // Input respuesta
+  
   const handleRespuestaChange = (id, texto) => {
     let valor = normalizaTexto(texto);
     setRespuesta((prev) => ({ ...prev, [id]: valor.slice(0, MAX_RESPUESTA_LEN) }));
   };
 
-  // NUEVO: Input editar mensaje
+  
   const handleEditarChange = (texto) => {
     let valor = normalizaTexto(texto);
     setMensajeEditado(valor.slice(0, MAX_MSG_LEN));
   };
 
-  // Enviar mensaje
+  
   const enviarMensaje = async (e) => {
     e.preventDefault();
     setError(null);
@@ -120,7 +120,7 @@ export default function MensajeSoportePage({ usuario }) {
     }
   };
 
-  // Responder mensaje (admin)
+  
   const responder = async (id) => {
     const texto = (respuesta[id] || "").trim();
     if (!texto || texto.length < MIN_MSG_LEN) {
@@ -151,7 +151,7 @@ export default function MensajeSoportePage({ usuario }) {
     }
   };
 
-  // NUEVO: Editar mensaje
+  
   const editarMensaje = async (id) => {
     const texto = (mensajeEditado || "").trim();
     if (!texto || texto.length < MIN_MSG_LEN) {
@@ -182,7 +182,7 @@ export default function MensajeSoportePage({ usuario }) {
     }
   };
 
-  // NUEVO: Eliminar mensaje
+  
   const eliminarMensaje = async (id) => {
     if (!window.confirm("¿Estás seguro que quieres eliminar este mensaje?")) return;
     setCargando(true);
@@ -197,7 +197,7 @@ export default function MensajeSoportePage({ usuario }) {
     }
   };
 
-  // Marcar como leído (alumno/docente)
+  
   const marcarLeido = async (id) => {
     setCargando(true);
     setError(null);
@@ -211,7 +211,7 @@ export default function MensajeSoportePage({ usuario }) {
     }
   };
 
-  // UX: solo permite enviar si cumple requisitos
+  
   const puedeEnviar =
     !enviando &&
     nuevoMensaje.trim().length >= MIN_MSG_LEN &&
@@ -230,7 +230,7 @@ export default function MensajeSoportePage({ usuario }) {
       </h2>
       {error && <div className="alert alert-danger">{error}</div>}
 
-      {/* Formulario para enviar mensaje */}
+      
       <form className="mb-3" onSubmit={enviarMensaje}>
         <div className="input-group">
           {usuario.rol === "admin" && (
@@ -279,7 +279,7 @@ export default function MensajeSoportePage({ usuario }) {
         </div>
       </form>
 
-      {/* Tabla de mensajes */}
+      
       {cargando ? (
         <div>Cargando...</div>
       ) : (
@@ -313,7 +313,7 @@ export default function MensajeSoportePage({ usuario }) {
                       {m.usuario?.nombre || m.usuarioId}
                     </td>
                   )}
-                  {/* --- COLUMNA MENSAJE, modo edición o vista --- */}
+                  
                   <td>
                     {usuario.rol === "admin" && editandoId === m.id ? (
                       <input
@@ -346,7 +346,7 @@ export default function MensajeSoportePage({ usuario }) {
                       <span className="text-muted">-</span>
                     )}
                   </td>
-                  {/* RESPONDER */}
+                  
                   {usuario.rol === "admin" && (
                     <td>
                       {m.estado === "respondido" ? (
@@ -376,7 +376,7 @@ export default function MensajeSoportePage({ usuario }) {
                       )}
                     </td>
                   )}
-                  {/* EDITAR SOLO ADMIN */}
+                  
                   {usuario.rol === "admin" && (
                     <td>
                       {editandoId === m.id ? (
@@ -415,7 +415,7 @@ export default function MensajeSoportePage({ usuario }) {
                       )}
                     </td>
                   )}
-                  {/* ELIMINAR SOLO ADMIN */}
+                 
                   {usuario.rol === "admin" && (
                     <td>
                       <button
@@ -427,7 +427,7 @@ export default function MensajeSoportePage({ usuario }) {
                       </button>
                     </td>
                   )}
-                  {/* MARCAR LEÍDO para no-admin */}
+                 
                   {usuario.rol !== "admin" && (
                     <td>
                       {!m.leido && m.estado === "pendiente" && (

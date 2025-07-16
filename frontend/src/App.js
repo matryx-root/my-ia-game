@@ -18,7 +18,7 @@ import MisJuegos from "./components/MisJuegos";
 import JuegosAdmin from "./components/JuegosAdmin";
 import api from "./utils/api";
 
-// Importación de juegos
+
 import IAGame from "./games/iaGame";
 import MLGame from "./games/mlGame";
 import DLGame from "./games/dlGame";
@@ -38,7 +38,7 @@ import SelfSupervisedGame from "./games/selfSupervisedGame";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-// Mapa de componentes para render dinámico de juegos
+
 export const juegosComponentes = {
   iaGame: IAGame,
   mlGame: MLGame,
@@ -56,15 +56,15 @@ export const juegosComponentes = {
   vaeGame: VAEGame,
   diffusionGame: DiffusionGame,
   selfSupervisedGame: SelfSupervisedGame,
-  // Agrega aquí nuevos juegos si los creas
+  
 };
 
-// Mapa global de archivo/key -> id de juego
+
 export const juegosMap = {};
 
 function RutaPrivada({ usuario, children }) {
   const location = useLocation();
-  // Permitir el landing incluso si no hay usuario
+  
   if (!usuario && location.pathname === "/") return children;
   if (!usuario) return <Navigate to="/login" />;
   return children;
@@ -76,7 +76,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [juegosCargados, setJuegosCargados] = useState(false);
 
-  // Carga de usuario, configuración y lista de juegos
+  
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -107,15 +107,15 @@ function App() {
     }
   }, []);
 
-  // Carga del mapa juegosMap (para asociación dinámica)
+  
   useEffect(() => {
     async function fetchJuegos() {
       try {
         const juegos = await api.get("/juegos");
         for (let juego of juegos) {
-          // Si tu backend ya guarda el nombre de archivo JS (sin extensión)
+          
           if (juego.archivo) juegosMap[juego.archivo.replace(/\.js$/, "")] = juego.id;
-          // Alternativamente, usa el nombre con limpieza básica
+          
           else if (juego.nombre && juegosComponentes[toKey(juego.nombre)]) {
             juegosMap[toKey(juego.nombre)] = juego.id;
           }
@@ -127,10 +127,10 @@ function App() {
       }
     }
     fetchJuegos();
-    // eslint-disable-next-line
+    
   }, []);
 
-  // Utilidad para transformar nombre a key válido si no hay campo archivo
+  
   function toKey(nombre) {
     return nombre
       .toLowerCase()
@@ -147,7 +147,7 @@ function App() {
     document.body.className = claseTema;
   }, [configuracion]);
 
-  // --- LOGIN
+  
   const handleLogin = (user) => {
     setUsuario(user);
     localStorage.setItem("userId", user.id);
@@ -156,9 +156,9 @@ function App() {
     });
   };
 
-  // --- LOGOUT robusto: primero navega a landing y luego limpia estado
+  
   const handleLogout = () => {
-    window.location.href = "/"; // FULL reload, asegura caída en landing y evita router loops
+    window.location.href = "/"; 
     setTimeout(() => {
       setUsuario(null);
       setConfiguracion(null);

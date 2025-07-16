@@ -1,10 +1,10 @@
-// src/components/DashboardAdmin.js
+
 
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 import { useNavigate } from "react-router-dom";
 
-// Íconos para las tarjetas
+
 const CARD_ICONS = {
   Usuarios: "bi-people-fill",
   Colegios: "bi-building",
@@ -72,7 +72,7 @@ export default function DashboardAdmin({ usuario }) {
         setError("No se pudo cargar el dashboard. " + (err?.message || ""));
       })
       .finally(() => setLoading(false));
-    // eslint-disable-next-line
+   
   }, [usuario]);
 
   if (loading) {
@@ -100,7 +100,7 @@ export default function DashboardAdmin({ usuario }) {
         <i className="bi bi-bar-chart-fill me-2"></i>
         Dashboard Administración
       </h2>
-      {/* Tarjetas resumen */}
+     
       <div className="row g-4 mb-4">
         {[
           ["Usuarios", resumen.totalUsuarios, "Total de usuarios registrados"],
@@ -116,7 +116,7 @@ export default function DashboardAdmin({ usuario }) {
         ))}
       </div>
 
-      {/* Tablas de últimos elementos */}
+      
       <div className="row g-4">
         <DashboardTable title="Últimos Usuarios" rows={ultimos.usuarios} columns={["nombre", "email", "rol"]} icon="bi-people-fill" badge="primary" />
         <DashboardTable title="Últimos Colegios" rows={ultimos.colegios} columns={["nombre", "nivel"]} icon="bi-building" badge="secondary" />
@@ -130,7 +130,7 @@ export default function DashboardAdmin({ usuario }) {
   );
 }
 
-// Tarjeta resumen (dashboard)
+
 function DashboardCard({ label, value, help, icon }) {
   return (
     <div className="col-6 col-md-3">
@@ -147,7 +147,7 @@ function DashboardCard({ label, value, help, icon }) {
   );
 }
 
-// Tabla resumen últimos datos (usuarios, colegios, mensajes, etc.)
+
 function DashboardTable({ title, rows, columns, icon, badge }) {
   if (!rows || rows.length === 0) return null;
   return (
@@ -170,20 +170,20 @@ function DashboardTable({ title, rows, columns, icon, badge }) {
                 <tr key={row.id || idx}>
                   {columns.map(c => (
                     <td key={c}>
-                      {/* Fechas con formato */}
+                      
                       {c.toLowerCase().includes("fecha") || c.toLowerCase().includes("hora")
                         ? (row[c] ? new Date(row[c]).toLocaleString() : "-")
-                        : // Estados y badges
+                        : 
                         c === "estado"
                         ? (
                           <span className={`badge bg-${badge || "secondary"}`}>
                             {row[c]}
                           </span>
                         )
-                        : // Mensajes y descripciones
+                        : 
                         c === "mensaje" && row[c]?.length > 80
                         ? row[c].slice(0, 80) + "..."
-                        : // Usuario anidado
+                        : 
                         typeof row[c] !== "undefined"
                         ? String(row[c])
                         : row.usuario?.nombre || "-"

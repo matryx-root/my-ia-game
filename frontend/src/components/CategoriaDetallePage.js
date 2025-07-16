@@ -1,4 +1,4 @@
-// src/components/CategoriaDetallePage.js
+
 
 import React from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -8,10 +8,10 @@ export default function CategoriaDetallePage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Consigue los juegos de la categoría seleccionada
+ 
   const juegos = categoriasJuegos[id] || [];
 
-  // Si la categoría no existe (opcional)
+ 
   if (!categoriasJuegos.hasOwnProperty(id)) {
     return (
       <div className="container mt-5">

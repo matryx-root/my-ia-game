@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// Dashboard widgets: totales
+
 exports.resumenDashboard = async (req, res) => {
   try {
     const [
@@ -28,7 +28,7 @@ exports.resumenDashboard = async (req, res) => {
   }
 };
 
-// Listados recientes (últimos 6 registros de cada uno)
+
 exports.usuariosRecientes = async (req, res) => {
   const rows = await prisma.usuario.findMany({
     orderBy: { id: 'desc' }, take: 6,

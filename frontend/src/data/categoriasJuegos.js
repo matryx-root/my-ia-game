@@ -1,19 +1,4 @@
-// src/data/categoriasJuegos.js
 
-/**
- * Estructura:
- * {
- *   [nombreCategoria]: [
- *     {
- *       key: "idUnicoJuego",
- *       nombre: "Nombre del juego",
- *       archivo: "NombreDelArchivoGame", // Debe coincidir con el import del componente del juego
- *       descripcion: "Descripción breve del juego"
- *     },
- *     ...
- *   ]
- * }
- */
 const categoriasJuegos = {
   "IA Reactiva": [
     {
@@ -43,7 +28,7 @@ const categoriasJuegos = {
     { key: "generativeGame", nombre: "Generative AI", archivo: "generativeGame", descripcion: "Modelos que crean nuevo contenido (texto, imágenes, audio, etc)." }
   ],
   "IA con Teoría de la Mente": [
-    // Puedes agregar aquí juegos sobre emociones, empatía, social, etc.
+    
     {
       key: "theoryOfMindGame",
       nombre: "Teoría de la Mente (Demo)",
@@ -53,8 +38,8 @@ const categoriasJuegos = {
   ]
 };
 
-// Exportación principal para uso en componentes
+
 export default categoriasJuegos;
 
-// Exportar los nombres de las categorías por si lo necesitas en algún otro componente
+
 export const nombresCategorias = Object.keys(categoriasJuegos);

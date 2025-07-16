@@ -2,7 +2,7 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
 async function main() {
-  // Municipales
+ 
   await prisma.colegio.createMany({
     data: [
       { nombre: "Escuela México", nivel: "Básica" },
@@ -14,7 +14,7 @@ async function main() {
       { nombre: "Liceo Armando Robles Rivera", nivel: "Científico-Humanista y Artístico" },
       { nombre: "Escuela Teniente Merino", nivel: "Básica" },
       { nombre: "Escuela Fedor Dostoievski", nivel: "Básica" },
-      // Particulares Subvencionados
+     
       { nombre: "Colegio San Luis de Alba", nivel: "Básica y Media" },
       { nombre: "Colegio Alonso de Ercilla", nivel: "Básica y Media" },
       { nombre: "Colegio María Auxiliadora", nivel: "Básica y Media, femenino" },
@@ -25,13 +25,13 @@ async function main() {
       { nombre: "Colegio Masters College", nivel: "Básica y Media" },
       { nombre: "Colegio Helvecia", nivel: "Básica y Media" },
       { nombre: "Colegio Honorio Ojeda Valderas", nivel: "Básica y Media" },
-      // Particulares Pagados
+      
       { nombre: "Colegio Alemán Rudolf Deckwerth", nivel: "Básica y Media, alemán" },
       { nombre: "Colegio Austral de Valdivia", nivel: "Básica y Media" },
       { nombre: "Colegio Montesorri", nivel: "Básica" },
       { nombre: "Colegio Núcleo Educativo", nivel: "Básica y Media" },
       { nombre: "Colegio Deportivo Municipal de Valdivia", nivel: "Básica y Media, enfoque deportivo" },
-      // Técnico-Profesionales
+      
       { nombre: "Liceo Técnico Valdivia", nivel: "TP" },
       { nombre: "Centro Educativo Fernando Santiván", nivel: "TP" }
     ],

@@ -16,7 +16,7 @@ export default function JuegosAdmin({ usuario }) {
 
   useEffect(() => { cargar(); }, []);
 
-  // CREAR
+  
   const handleCrear = async e => {
     e.preventDefault();
     try {
@@ -35,7 +35,7 @@ export default function JuegosAdmin({ usuario }) {
     }
   };
 
-  // EDITAR
+
   const handleEditar = async e => {
     e.preventDefault();
     try {
@@ -54,7 +54,7 @@ export default function JuegosAdmin({ usuario }) {
     }
   };
 
-  // ELIMINAR
+ 
   const handleBorrar = async (id) => {
     if (!window.confirm("¿Eliminar este juego?")) return;
     try {
@@ -72,7 +72,7 @@ export default function JuegosAdmin({ usuario }) {
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success" onClick={() => setSuccess(null)}>{success}</div>}
       
-      {/* CREAR JUEGO */}
+      
       <form className="row g-2 mb-4" onSubmit={handleCrear}>
         <div className="col-md-3">
           <input className="form-control" required placeholder="Nombre" value={nuevo.nombre}
@@ -91,7 +91,7 @@ export default function JuegosAdmin({ usuario }) {
         </div>
       </form>
 
-      {/* TABLA */}
+      
       <div className="table-responsive">
         <table className="table table-bordered table-striped align-middle">
           <thead>

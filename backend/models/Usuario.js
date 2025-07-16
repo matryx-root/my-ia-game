@@ -9,11 +9,11 @@ class Usuario {
     this.nombre = nombre;
     this.email = email;
     this.password = password;
-    this.rol = rol; // "alumno" o "docente"
+    this.rol = rol; 
     this.edad = edad;
     this.celular = celular;
     this.colegioId = colegioId;
-    this.colegio = colegio; // objeto Colegio (opcional)
+    this.colegio = colegio; 
     this.progreso = progreso;
     this.logsIngreso = logsIngreso;
     this.logsJuego = logsJuego;

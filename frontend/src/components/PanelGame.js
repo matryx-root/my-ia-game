@@ -20,7 +20,7 @@ export default function PanelGame({ usuario }) {
       alert("No tienes permiso para acceder a este panel.");
       navigate("/");
     }
-    // eslint-disable-next-line
+    
   }, [usuario]);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ export default function PanelGame({ usuario }) {
     }
   }, [selectedId, usuarios]);
 
-  // Agrupar por juego
+  
   const progresoPorJuego = {};
   progreso.forEach(p => {
     if (!progresoPorJuego[p.juegoId]) {
@@ -126,7 +126,7 @@ export default function PanelGame({ usuario }) {
             </select>
           </div>
 
-          {/* Detalle alumno y progreso */}
+          
           {selectedUser && (
             <div className="card shadow mt-4">
               <div className="card-body">
@@ -140,7 +140,7 @@ export default function PanelGame({ usuario }) {
                 </div>
                 <hr />
 
-                {/* PROGRESO */}
+               
                 {Object.keys(progresoPorJuego).length === 0 ? (
                   <span className="text-muted">No hay progresos registrados.</span>
                 ) : (
@@ -194,7 +194,7 @@ export default function PanelGame({ usuario }) {
                   ))
                 )}
 
-                {/* LOGROS */}
+                
                 <h5 className="fw-bold mt-4 mb-2">Logros</h5>
                 {logros.length === 0 ? (
                   <span className="text-muted">No hay logros registrados.</span>

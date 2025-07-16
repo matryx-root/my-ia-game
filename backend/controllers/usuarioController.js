@@ -3,12 +3,12 @@ const prisma = new PrismaClient();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-// REGISTRO de usuario (alumno o docente)
+
 exports.registrar = async (req, res) => {
   const { nombre, email, password, edad, celular, rol, colegioId } = req.body;
   try {
     const emailNorm = email.trim().toLowerCase();
-    // 1. Control de email duplicado ANTES de crear usuario
+    
     const existe = await prisma.usuario.findUnique({ where: { email: emailNorm } });
     if (existe) {
       return res.status(400).json({ error: "El correo ya está registrado. Usa otro correo." });
@@ -20,7 +20,7 @@ exports.registrar = async (req, res) => {
         nombre,
         email: emailNorm,
         password: hashed,
-        rol, // "alumno" o "docente"
+        rol, 
         colegioId: colegioId ? Number(colegioId) : null,
         edad: edad ? Number(edad) : null,
         celular
@@ -29,7 +29,7 @@ exports.registrar = async (req, res) => {
     });
     res.status(201).json({ mensaje: "Usuario registrado", usuario });
   } catch (err) {
-    // Control extra para el error único de Prisma
+    
     if (err.code === "P2002" && err.meta?.target?.includes("email")) {
       return res.status(400).json({ error: "El correo ya está registrado. Usa otro correo." });
     }
@@ -37,15 +37,14 @@ exports.registrar = async (req, res) => {
   }
 };
 
-// LOGIN (devuelve token y usuario con colegio)
-// LOGIN (devuelve token y usuario con colegio)
+
 exports.login = async (req, res) => {
-  // Normaliza el email SIEMPRE en minúsculas y sin espacios
+  
   const emailNorm = req.body.email?.trim().toLowerCase();
   const { password } = req.body;
 
   try {
-    // Busca el usuario usando email normalizado
+   
     const user = await prisma.usuario.findUnique({
       where: { email: emailNorm },
       include: { colegio: true }
@@ -55,18 +54,18 @@ exports.login = async (req, res) => {
       return res.status(401).json({ error: 'correo_no_existe' });
     }
 
-    // Compara el password hasheado
+    
     const match = await bcrypt.compare(password, user.password);
     if (!match) {
       return res.status(401).json({ error: 'password_incorrecta' });
     }
 
-    // (Opcional) Log de ingreso
+    
     await prisma.logIngreso.create({
       data: { usuarioId: user.id, ip: req.ip, userAgent: req.headers['user-agent'] }
     });
 
-    // Genera el token
+    
     const token = jwt.sign(
       { id: user.id, rol: user.rol, colegioId: user.colegioId },
       process.env.JWT_SECRET,
@@ -75,13 +74,13 @@ exports.login = async (req, res) => {
     res.json({ token, usuario: user });
 
   } catch (err) {
-    // Error genérico
+    
     res.status(400).json({ error: err.message });
   }
 };
 
 
-// ENDPOINT PERFIL (autenticado, siempre incluye colegio)
+
 exports.perfilMe = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -96,7 +95,7 @@ exports.perfilMe = async (req, res) => {
   }
 };
 
-// LISTAR USUARIOS (admin ve todos, docente ve solo alumnos de su colegio)
+
 exports.listarUsuarios = async (req, res) => {
   let where = {};
   if (req.user?.rol === "docente") {
@@ -113,7 +112,7 @@ exports.listarUsuarios = async (req, res) => {
   }
 };
 
-// VER PERFIL (por id)
+
 exports.verPerfil = async (req, res) => {
   const id = Number(req.params.id);
   if (!id) return res.status(400).json({ error: "Falta id de usuario" });
@@ -129,12 +128,12 @@ exports.verPerfil = async (req, res) => {
   }
 };
 
-// EDITAR USUARIO
+
 exports.editarUsuario = async (req, res) => {
   const id = Number(req.params.id);
   let { nombre, email, rol, edad, celular, colegioId } = req.body;
   try {
-    // Si cambia el email, verifica que el nuevo no exista en otro usuario
+    
     if (email) {
       email = email.trim().toLowerCase();
       const existe = await prisma.usuario.findFirst({
@@ -159,7 +158,7 @@ exports.editarUsuario = async (req, res) => {
   }
 };
 
-// ELIMINAR USUARIO
+
 exports.eliminarUsuario = async (req, res) => {
   try {
     const id = Number(req.params.id);
