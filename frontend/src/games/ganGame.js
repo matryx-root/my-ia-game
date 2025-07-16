@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { useNavigate, useParams } from 'react-router-dom';
 
-// Figuras geométricas posibles
+
 const figurasReales = [
   { tipo: "circle", color: 0x00bfae, label: "Círculo", texto: "Real" },
   { tipo: "square", color: 0xffb300, label: "Cuadrado", texto: "Real" },
@@ -21,17 +21,17 @@ export default function GANGame() {
   const [instruccion, setInstruccion] = useState(true);
   const [resultado, setResultado] = useState(null);
 
-  // Nuevo: fuerza refresco para cada ronda random
+  
   const [juegoKey, setJuegoKey] = useState(0);
 
   const iniciarJuego = () => setInstruccion(false);
 
   useEffect(() => {
     if (!instruccion && !gameRef.current) {
-      // Escoge aleatoriamente las figuras y la posición
+      
       const figuraReal = figurasReales[Math.floor(Math.random() * figurasReales.length)];
       const figuraFalsa = figurasFalsas[Math.floor(Math.random() * figurasFalsas.length)];
-      // Izquierda/derecha random
+      
       const realFirst = Math.random() < 0.5;
 
       gameRef.current = new Phaser.Game({
@@ -46,10 +46,10 @@ export default function GANGame() {
               fontSize: '20px', fill: '#333'
             });
 
-            // Posiciones horizontales
+            
             const posX = [200, 420];
 
-            // Dibuja las figuras según el orden
+            
             let figuras = [];
             let labels = [];
             let interactiveObjs = [];
@@ -61,7 +61,7 @@ export default function GANGame() {
               } else if (fig.tipo === "square") {
                 objeto = this.add.rectangle(x, y, 100, 100, fig.color).setInteractive({ useHandCursor: true });
               } else if (fig.tipo === "triangle") {
-                // Triángulo: dibuja usando gráficos
+                
                 const graphics = this.add.graphics();
                 graphics.fillStyle(fig.color, 1);
                 graphics.beginPath();
@@ -83,7 +83,7 @@ export default function GANGame() {
                 objeto = this.add.text(x - 44, y - 50, fig.emoji, { fontSize: "95px" })
                   .setInteractive({ useHandCursor: true });
               }
-              // Etiqueta bajo figura
+              
               const etiqueta = this.add.text(x - 30, y + 60, fig.texto, {
                 fontSize: '16px',
                 fill: fig.texto === "Real" ? '#00897b' : '#c2185b'
@@ -91,7 +91,7 @@ export default function GANGame() {
               return { objeto, etiqueta };
             }
 
-            // Dibuja ambas figuras, randomizando el orden
+            
             let real, fake;
             if (realFirst) {
               real = drawFigura.call(this, figuraReal, posX[0], 200);
@@ -105,7 +105,7 @@ export default function GANGame() {
 
             let mensaje = null;
 
-            // Efecto hover visual (solo para figuras básicas)
+            
             figuras.forEach((fig, idx) => {
               fig.on('pointerover', function () {
                 if (idx === 0 && realFirst) {
@@ -125,9 +125,9 @@ export default function GANGame() {
               });
             });
 
-            // Clicks: feedback según cuál es la falsa
+            
             figuras[realFirst ? 0 : 1].on('pointerdown', () => {
-              // Real click
+              
               if (!mensaje) {
                 mensaje = this.add.text(120, 320, "¡Esa es real! Intenta descubrir la imagen generada...", {
                   fontSize: '18px',
@@ -138,7 +138,7 @@ export default function GANGame() {
               }
             });
             figuras[realFirst ? 1 : 0].on('pointerdown', () => {
-              // Falsa click
+              
               if (!mensaje) {
                 mensaje = this.add.text(90, 320, "¡Correcto! La imagen de la derecha fue creada por una IA (GAN)", {
                   fontSize: '20px',
@@ -158,14 +158,14 @@ export default function GANGame() {
         gameRef.current = null;
       }
     };
-    // eslint-disable-next-line
+    
   }, [instruccion, juegoKey]);
 
-  // Reset: vuelve a mostrar instrucciones y reinicia juego
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
-    setJuegoKey((k) => k + 1); // Cambia la key para forzar nuevo random
+    setJuegoKey((k) => k + 1); 
     if (gameRef.current) {
       gameRef.current.destroy(true);
       gameRef.current = null;
@@ -178,7 +178,7 @@ export default function GANGame() {
 
   return (
     <div>
-      {/* Modal explicativo */}
+      
       {instruccion &&
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -212,10 +212,10 @@ export default function GANGame() {
         </div>
       }
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-gan" style={{ margin: 'auto', minHeight: 400 }} />
 
-      {/* Feedback después de jugar */}
+      
       {resultado && (
         <div className="alert alert-success mt-3" style={{ maxWidth: 650, margin: "auto" }}>
           {resultado}
@@ -226,7 +226,7 @@ export default function GANGame() {
         </div>
       )}
 
-      {/* Botones debajo del juego, solo si NO está en la instrucción */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

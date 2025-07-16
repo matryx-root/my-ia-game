@@ -46,15 +46,15 @@ export default function DiffusionGame() {
             this.add.text(90, 35, "🌫️ Diffusion Model: Difumina la imagen paso a paso", { fontSize: '19px', fill: '#333' });
             img = this.add.image(325, 200, 'apple').setScale(2);
 
-            // Botón profesional y didáctico
+            
             const boton = this.add.container(325, 330);
 
-            // Fondo del botón (azul, grande y redondeado)
+            
             const bg = this.add.rectangle(0, 0, 240, 54, 0x1976d2, 0.95)
               .setStrokeStyle(3, 0x1565c0)
               .setInteractive({ useHandCursor: true });
 
-            // Emoji y texto
+            
             const icono = this.add.text(-105, -15, "✨", { fontSize: "28px" });
             const txt = this.add.text(-75, -15, "Difuminar manzana", {
               fontFamily: 'monospace',
@@ -65,7 +65,7 @@ export default function DiffusionGame() {
 
             boton.add([bg, icono, txt]);
 
-            // Animación hover
+            
             bg.on("pointerover", () => {
               bg.setFillStyle(0x2196f3, 1);
               bg.setScale(1.08);
@@ -79,7 +79,7 @@ export default function DiffusionGame() {
               icono.setFontSize("28px");
             });
 
-            // Clic difuminar
+            
             bg.on("pointerdown", () => onBlur(this));
           }
         }
@@ -93,7 +93,7 @@ export default function DiffusionGame() {
     };
   }, [instruccion]);
 
-  // Reset: vuelve a mostrar instrucciones y reinicia juego
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -109,7 +109,7 @@ export default function DiffusionGame() {
 
   return (
     <div>
-      {/* Modal de instrucción */}
+      
       {instruccion &&
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -141,9 +141,9 @@ export default function DiffusionGame() {
         </div>
       }
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-diffusion" style={{ margin: 'auto', minHeight: 440 }} />
-      {/* Feedback final después de jugar */}
+      
       {resultado && (
         <div className="alert alert-info mt-3" style={{ maxWidth: 650, margin: "auto" }}>
           {resultado}
@@ -154,7 +154,7 @@ export default function DiffusionGame() {
         </div>
       )}
 
-      {/* Botones debajo del juego, solo si NO está en la instrucción */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

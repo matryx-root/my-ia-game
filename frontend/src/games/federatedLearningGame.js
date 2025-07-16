@@ -31,37 +31,37 @@ export default function FederatedLearningGame() {
             let faces = [];
             let mensaje = null;
 
-            // Crear clientes con candado
+            
             for (let i = 0; i < 5; i++) {
               const x = 100 + i * 120;
               const y = 170;
-              // Cliente
+              
               const c = this.add.circle(x, y, 35, 0x8bc34a).setInteractive();
-              // Candado 🔒 arriba del cliente
+              
               const lock = this.add.text(x - 11, y - 55, "🔒", { fontSize: '28px' });
-              // Carita feliz oculta al principio
+              
               const face = this.add.text(x - 13, y - 18, "", { fontSize: '29px' });
-              // Nombre del cliente
+              
               this.add.text(x - 15, y + 47, `Cliente ${i + 1}`, { fontSize: '13px', fill: '#333' });
               clients.push(c);
               locks.push(lock);
               faces.push(face);
             }
 
-            // Servidor central
+            
             const server = this.add.rectangle(360, 330, 100, 54, 0x1976d2, 0.97)
               .setStrokeStyle(3, 0x115293);
             this.add.text(336, 318, 'Servidor', { fontSize: '16px', fill: '#fff' });
 
-            // Click en cada cliente
+            
             clients.forEach((c, i) => {
               c.on('pointerdown', () => {
                 if (!c.sent) {
                   c.sent = true;
-                  c.setFillStyle(0x388e3c); // Verde más fuerte
-                  locks[i].setText("");      // Quita candado (puedes dejarlo si prefieres)
-                  faces[i].setText("😊");    // Aparece carita feliz
-                  // Línea animada de cliente a servidor
+                  c.setFillStyle(0x388e3c); 
+                  locks[i].setText("");      
+                  faces[i].setText("😊");    
+                  
                   this.tweens.addCounter({
                     from: 0,
                     to: 1,
@@ -87,7 +87,7 @@ export default function FederatedLearningGame() {
               });
             });
 
-            // Mensaje de instrucciones
+            
             this.add.text(154, 372, "Haz clic en los clientes para 'enviar' aprendizaje (tu secreto está protegido)", {
               fontSize: '16px', fill: '#555'
             });
@@ -103,7 +103,7 @@ export default function FederatedLearningGame() {
     };
   }, [instruccion]);
 
-  // Reset y volver
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -116,7 +116,7 @@ export default function FederatedLearningGame() {
 
   return (
     <div>
-      {/* Modal de explicación didáctica */}
+      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)', position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh', zIndex: 1000
@@ -145,9 +145,9 @@ export default function FederatedLearningGame() {
         </div>
       )}
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-federated" style={{ margin: 'auto', minHeight: 430 }} />
-      {/* Feedback final */}
+      
       {resultado && (
         <div className="alert alert-success mt-3" style={{ maxWidth: 720, margin: "auto" }}>
           {resultado}
@@ -155,7 +155,7 @@ export default function FederatedLearningGame() {
           <small>¿Dónde más podríamos usar esto en la vida real? 🚗📱🏥</small>
         </div>
       )}
-      {/* Botones */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>

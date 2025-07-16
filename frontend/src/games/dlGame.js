@@ -11,7 +11,7 @@ export default function DLGame() {
 
   const iniciarJuego = () => setInstruccion(false);
 
-  // Limpia y crea el juego
+  
   useEffect(() => {
     if (!instruccion && !gameRef.current) {
       let completed = false;
@@ -67,7 +67,7 @@ export default function DLGame() {
     };
   }, [instruccion]);
 
-  // Botón reset: recarga solo este juego
+  
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -79,7 +79,7 @@ export default function DLGame() {
 
   return (
     <div>
-      {/* Modal de instrucción */}
+      
       {instruccion &&
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -110,10 +110,10 @@ export default function DLGame() {
         </div>
       }
 
-      {/* Contenedor del juego */}
+      
       <div id="game-container-dl" style={{ margin: 'auto', minHeight: 600 }} />
 
-      {/* Feedback final después de jugar */}
+      
       {resultado && (
         <div className="alert alert-info mt-3" style={{ maxWidth: 800, margin: "auto" }}>
           {resultado}
@@ -124,7 +124,7 @@ export default function DLGame() {
         </div>
       )}
 
-      {/* Botones SIEMPRE visibles bajo el juego */}
+      
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={() => navigate(-1)}>
