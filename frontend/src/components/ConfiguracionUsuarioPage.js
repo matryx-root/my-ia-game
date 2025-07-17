@@ -3,8 +3,8 @@ import api from "../utils/api";
 
 export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
   const [config, setConfig] = useState({
-    tema: "",
-    idioma: "",
+    tema: "Predeterminado",
+    idioma: "Español",
     sonido: true,
     notificaciones: true
   });

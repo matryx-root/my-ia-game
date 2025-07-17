@@ -13,6 +13,26 @@ enum RolUsuario {
   docente
   admin
 }
+enum Tema {
+  Predeterminado
+  Oscuro
+  Claro
+}
+enum Idioma {
+  Español
+  Inglés
+}
+
+model ConfiguracionUsuario {
+  id              Int      @id @default(autoincrement())
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  usuarioId       Int      @unique
+  tema            Tema?      // Enum en vez de String
+  idioma          Idioma?    // Enum en vez de String
+  sonido          Boolean?
+  notificaciones  Boolean?
+}
+
 
 
 model Colegio {
@@ -121,12 +141,3 @@ model Achievement {
   fechaHora   DateTime @default(now())
 }
 
-model ConfiguracionUsuario {
-  id              Int      @id @default(autoincrement())
-  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
-  usuarioId       Int      @unique
-  tema            String?
-  idioma          String?
-  sonido          Boolean?
-  notificaciones  Boolean?
-}

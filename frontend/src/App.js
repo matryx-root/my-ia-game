@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import './App.css'; 
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Registro from "./components/Registro";
@@ -18,7 +19,7 @@ import MisJuegos from "./components/MisJuegos";
 import JuegosAdmin from "./components/JuegosAdmin";
 import api from "./utils/api";
 
-
+// Importar todos los juegos aquí
 import IAGame from "./games/iaGame";
 import MLGame from "./games/mlGame";
 import DLGame from "./games/dlGame";
@@ -38,7 +39,7 @@ import SelfSupervisedGame from "./games/selfSupervisedGame";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
 
-
+// Mapeo de componentes de juegos
 export const juegosComponentes = {
   iaGame: IAGame,
   mlGame: MLGame,
@@ -56,15 +57,11 @@ export const juegosComponentes = {
   vaeGame: VAEGame,
   diffusionGame: DiffusionGame,
   selfSupervisedGame: SelfSupervisedGame,
-  
 };
-
-
 export const juegosMap = {};
 
 function RutaPrivada({ usuario, children }) {
   const location = useLocation();
-  
   if (!usuario && location.pathname === "/") return children;
   if (!usuario) return <Navigate to="/login" />;
   return children;
@@ -76,7 +73,15 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [juegosCargados, setJuegosCargados] = useState(false);
 
-  
+  // Utilidad para normalizar el nombre del juego
+  function toKey(nombre) {
+    return nombre
+      .toLowerCase()
+      .replace(/á/g, "a").replace(/é/g, "e").replace(/í/g, "i").replace(/ó/g, "o").replace(/ú/g, "u")
+      .replace(/ñ/g, "n").replace(/[^a-z0-9]/g, "");
+  }
+
+  // Carga usuario y configuración al iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -107,15 +112,13 @@ function App() {
     }
   }, []);
 
-  
+  // Carga listado de juegos al iniciar
   useEffect(() => {
     async function fetchJuegos() {
       try {
         const juegos = await api.get("/juegos");
         for (let juego of juegos) {
-          
           if (juego.archivo) juegosMap[juego.archivo.replace(/\.js$/, "")] = juego.id;
-          
           else if (juego.nombre && juegosComponentes[toKey(juego.nombre)]) {
             juegosMap[toKey(juego.nombre)] = juego.id;
           }
@@ -127,17 +130,9 @@ function App() {
       }
     }
     fetchJuegos();
-    
   }, []);
 
-  
-  function toKey(nombre) {
-    return nombre
-      .toLowerCase()
-      .replace(/á/g, 'a').replace(/é/g, 'e').replace(/í/g, 'i').replace(/ó/g, 'o').replace(/ú/g, 'u')
-      .replace(/ñ/g, 'n').replace(/[^a-z0-9]/g, '');
-  }
-
+  // Aplica tema visual al body según config
   useEffect(() => {
     let claseTema = "theme-default";
     if (configuracion) {
@@ -147,7 +142,7 @@ function App() {
     document.body.className = claseTema;
   }, [configuracion]);
 
-  
+  // Login exitoso: guarda usuario y trae config
   const handleLogin = (user) => {
     setUsuario(user);
     localStorage.setItem("userId", user.id);
@@ -156,9 +151,9 @@ function App() {
     });
   };
 
-  
+  // Logout
   const handleLogout = () => {
-    window.location.href = "/"; 
+    window.location.href = "/";
     setTimeout(() => {
       setUsuario(null);
       setConfiguracion(null);
@@ -168,7 +163,8 @@ function App() {
     }, 100);
   };
 
-  if (loading || !juegosCargados)
+  // Cargando inicial
+  if (loading || !juegosCargados) {
     return (
       <div
         style={{
@@ -184,6 +180,7 @@ function App() {
         Cargando...
       </div>
     );
+  }
 
   return (
     <Router>
@@ -244,7 +241,6 @@ function App() {
             <RutaPrivada usuario={usuario}>
               <ConfiguracionUsuarioPage
                 usuario={usuario}
-                config={configuracion}
                 onConfigChange={setConfiguracion}
               />
             </RutaPrivada>

@@ -2,7 +2,9 @@
   --color-bg: #f8fafc;
   --color-text: #18181c;
   --color-card: #fff;
+  --color-title: #114eeb;
   --color-card-shadow: #2222;
+  --navbar-bg: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
 }
 
 .theme-default {
@@ -10,29 +12,53 @@
   --color-text: #18181c;
   --color-card: #fff;
   --color-card-shadow: #2222;
+  --navbar-bg: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
 }
 .theme-dark {
   --color-bg: #15181c;
   --color-text: #eee;
   --color-card: #24272e;
   --color-card-shadow: #111a;
+  --color-title: #5db0ff;
+  --navbar-bg: #181c24;
 }
 .theme-light {
   --color-bg: #f5f6fa;
   --color-text: #18181c;
   --color-card: #fff;
   --color-card-shadow: #2222;
+  --navbar-bg: #f8fafc;
+  --color-title: #003399;
+}
+
+/* Navbar fondo adaptativo */
+.navbar {
+  background: var(--navbar-bg) !important;
+  color: var(--color-text) !important;
+  transition: background 0.3s, color 0.3s;
+  border: none !important;
+  box-shadow: none !important;
 }
 
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Montserrat', Arial, sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
   margin: 0;
   transition: background 0.3s, color 0.3s;
 }
 
-form, nav, .card, .panel, .app-box, .main-content {
+/* Fondo del body gradiente sólo en Predeterminado */
+.theme-default body {
+  background: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
+}
+.theme-dark body,
+.theme-light body {
+  background: var(--color-bg);
+}
+
+/* Cartas, formularios y paneles */
+form, .card, .panel, .app-box, .main-content {
   margin: 1em auto;
   max-width: 350px;
   padding: 1em;
@@ -42,14 +68,13 @@ form, nav, .card, .panel, .app-box, .main-content {
   transition: background 0.3s, color 0.3s;
 }
 
-
 @media (min-width: 650px) {
-  form, nav, .card, .panel, .app-box, .main-content {
+  form, .card, .panel, .app-box, .main-content {
     max-width: 900px;
   }
 }
 
-button {
+button, .btn {
   margin-top: 1em;
   padding: 0.6em 1.5em;
   border-radius: 0.5em;
@@ -58,6 +83,7 @@ button {
   color: #fff;
   font-weight: bold;
   cursor: pointer;
+  transition: background 0.3s;
 }
 
 table { width: 100%; }

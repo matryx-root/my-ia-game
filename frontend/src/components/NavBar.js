@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import React from "react";
 
-export default function NavBar({ usuario, onLogout }) {
+export default function NavBar({ usuario, onLogout, configuracion }) {
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -13,10 +13,18 @@ export default function NavBar({ usuario, onLogout }) {
     }, 100);
   };
 
+  // Opcional: Muestra el tema actual (puedes quitar si no lo usas)
+  const themeText = configuracion?.tema
+    ? configuracion.tema === "Oscuro"
+      ? "🌙 Modo Oscuro"
+      : configuracion.tema === "Claro"
+      ? "☀️ Modo Claro"
+      : "🖥️ Predeterminado"
+    : "";
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-dark mb-4 shadow-sm" style={{ minHeight: 64 }}>
       <div className="container-fluid">
-        
         <span
           className="navbar-brand fw-bold"
           style={{ cursor: "pointer", fontSize: 22 }}
@@ -25,7 +33,6 @@ export default function NavBar({ usuario, onLogout }) {
           My IA Game
         </span>
 
-        
         <button
           className="navbar-toggler"
           type="button"
@@ -38,15 +45,11 @@ export default function NavBar({ usuario, onLogout }) {
           <span className="navbar-toggler-icon"></span>
         </button>
 
-        
         <div className="collapse navbar-collapse" id="mainNav">
-          {usuario && (
+          {usuario ? (
             <div className="w-100">
               <div className="d-flex flex-column flex-lg-row align-items-stretch align-items-lg-center gap-2 gap-lg-2 w-100">
-                <button
-                  className="btn btn-outline-info"
-                  onClick={() => navigate("/categorias")}
-                >
+                <button className="btn btn-outline-info" onClick={() => navigate("/categorias")}>
                   <i className="bi bi-grid me-1"></i>Categorías
                 </button>
                 {usuario.rol === "admin" && (
@@ -70,27 +73,17 @@ export default function NavBar({ usuario, onLogout }) {
                     <i className="bi bi-bar-chart-fill me-1"></i>Progreso Alumnos
                   </button>
                 )}
-                <button
-                  className="btn btn-outline-info"
-                  onClick={() => navigate("/mis-juegos")}
-                >
+                <button className="btn btn-outline-info" onClick={() => navigate("/mis-juegos")}>
                   <i className="bi bi-bar-chart-fill me-1"></i>Mis Juegos y Logros
                 </button>
                 {(usuario.rol === "alumno" || usuario.rol === "docente" || usuario.rol === "admin") && (
-                  <button
-                    className="btn btn-outline-secondary"
-                    onClick={() => navigate("/mensajes-soporte")}
-                  >
+                  <button className="btn btn-outline-secondary" onClick={() => navigate("/mensajes-soporte")}>
                     <i className="bi bi-chat-left-text me-1"></i>Soporte
                   </button>
                 )}
-                <button
-                  className="btn btn-outline-success"
-                  onClick={() => navigate("/configuracion")}
-                >
+                <button className="btn btn-outline-success" onClick={() => navigate("/configuracion")}>
                   <i className="bi bi-gear me-1"></i>Configuración
                 </button>
-                
                 <button
                   onClick={handleLogout}
                   className="btn btn-outline-light ms-lg-2"
@@ -99,7 +92,7 @@ export default function NavBar({ usuario, onLogout }) {
                   Salir
                 </button>
               </div>
-              
+
               <div className="mt-2 mt-lg-0 d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-end">
                 <span className="text-light fw-bold" style={{ fontSize: 16 }}>
                   Bienvenido, {usuario.nombre}{" "}
@@ -120,8 +113,28 @@ export default function NavBar({ usuario, onLogout }) {
                   {usuario.rol === "alumno" && (
                     <span className="badge bg-success ms-2">ALUMNO</span>
                   )}
+                  {themeText && (
+                    <span className="badge bg-dark ms-2 border" style={{ color: "#f9d923" }}>
+                      {themeText}
+                    </span>
+                  )}
                 </span>
               </div>
+            </div>
+          ) : (
+            <div className="w-100 text-end">
+              <button
+                className="btn btn-outline-primary ms-2"
+                onClick={() => navigate("/login")}
+              >
+                Iniciar sesión
+              </button>
+              <button
+                className="btn btn-outline-success ms-2"
+                onClick={() => navigate("/register")}
+              >
+                Registrarse
+              </button>
             </div>
           )}
         </div>

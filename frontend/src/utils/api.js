@@ -1,9 +1,11 @@
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
+// Devuelve el token JWT desde localStorage
 function getToken() {
   return localStorage.getItem("token");
 }
 
+// Genera headers para fetch, añadiendo Authorization si hay token
 function headers(custom = {}) {
   const h = { "Content-Type": "application/json", ...custom };
   const t = getToken();
@@ -11,6 +13,7 @@ function headers(custom = {}) {
   return h;
 }
 
+// Maneja la respuesta de la API, extrayendo JSON o texto y lanzando errores claros
 async function handleResponse(response) {
   const contentType = response.headers.get("content-type");
   let data;
@@ -21,8 +24,7 @@ async function handleResponse(response) {
   }
   if (!response.ok) {
     const errMsg =
-      (typeof data === "object" && data.error) ||
-      (typeof data === "object" && data.message) ||
+      (typeof data === "object" && (data.error || data.message)) ||
       data ||
       response.statusText;
     if (process.env.NODE_ENV === "development") {
@@ -32,7 +34,6 @@ async function handleResponse(response) {
   }
   return data;
 }
-
 
 const api = {
   get: (url) =>
@@ -58,13 +59,12 @@ const api = {
       headers: headers(),
     }).then(handleResponse),
 
-  
   postFile: (url, formData) =>
     fetch(API_URL + url, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + getToken(),
-        
+        // Ojo: *NO* incluyas "Content-Type" aquí, fetch la pone automáticamente en multipart/form-data
       },
       body: formData,
     }).then(handleResponse),
@@ -72,28 +72,22 @@ const api = {
 
 export default api;
 
-
-
-
+/* ---- FUNCIONES ESPECÍFICAS DE JUEGOS ---- */
 export function getJuegos() {
   return api.get("/admin/juegos");
 }
-
 
 export function crearJuego(data) {
   return api.post("/admin/juegos", data);
 }
 
-
 export function actualizarJuego(id, data) {
   return api.put(`/admin/juegos/${id}`, data);
 }
 
-
 export function borrarJuego(id) {
   return api.delete(`/admin/juegos/${id}`);
 }
-
 
 export function uploadArchivoJuego(file) {
   const formData = new FormData();
@@ -101,9 +95,7 @@ export function uploadArchivoJuego(file) {
   return api.postFile("/admin/juegos/upload", formData);
 }
 
-
 export function downloadArchivoJuego(nombreArchivo) {
-  
   fetch(`${API_URL}/admin/juegos/download/${nombreArchivo}`, {
     method: "GET",
     headers: { Authorization: "Bearer " + getToken() },
@@ -111,7 +103,6 @@ export function downloadArchivoJuego(nombreArchivo) {
     .then(async (res) => {
       if (!res.ok) throw new Error("No se pudo descargar archivo");
       const blob = await res.blob();
-      
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
