@@ -6,17 +6,19 @@
   --color-text: #18181c;
   --color-card: #fff;
   --color-card-shadow: #2222;
-  --navbar-bg: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
+  --color-categorias-bg: #e3f2fd;
+  --navbar-bg: linear-gradient(135deg, #7ef0f8 0%, #586168 100%);
 }
 
 /* Tema predeterminado */
 .theme-default {
-  --color-bg: #6baff3;
+  --color-bg: #83e0c4;
   --color-text: #18181c;
   --color-card: #fff;
   --color-title: #114eeb;
   --color-card-shadow: #2222;
-  --navbar-bg: #6baff3;
+  --color-categorias-bg: #83e0c4;
+  
 }
 
 /* Tema oscuro */
@@ -27,16 +29,18 @@
   --color-title: #fff;
   --color-card-shadow: #111a;
   --navbar-bg: #181c24;
+  --color-categorias-bg: #181a1c;
 }
 
 /* Tema claro */
 .theme-light {
-  --color-bg: #59a4f0;
+  --color-bg: #f4fafd;
   --color-text: #18181c;
   --color-card: #fff;
-  --color-title: #003399;
+  --color-title: #18181c;
   --color-card-shadow: #2222;
-  --navbar-bg: #59a4f0;
+  --navbar-bg: #f4fafd;
+  --color-categorias-bg: #f4fafd;
 }
 
 /* Navbar fondo adaptativo */
@@ -163,3 +167,247 @@ h1, h2, h3, h4, h5, h6 {
   color: #000000 !important;
 }
 
+/* Fondo base para la página de categorías según tema */
+.categorias-bg {
+  background: var(--color-categorias-bg);
+  min-height: 100vh;
+}
+
+/* Tarjeta base */
+.categoria-card {
+  border-radius: 20px;
+  width: 340px;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 24px;
+  cursor: pointer;
+  box-shadow: 0 8px 32px #0002;
+  box-sizing: border-box;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
+  font-family: 'Montserrat', Arial, sans-serif;
+}
+
+.categoria-card:hover {
+  transform: scale(1.035);
+  box-shadow: 0 12px 40px #0004;
+}
+
+/* Colores por categoría y tema */
+.theme-default .categoria-card.ia-reactiva {
+  background: #ffab91;
+  color: #222;
+}
+.theme-default .categoria-card.ia-memoria {
+  background: #f8bbd0;
+  color: #222;
+}
+.theme-default .categoria-card.ia-estrecha {
+  background: #b2dfdb;
+  color: #222;
+}
+.theme-default .categoria-card.ia-mente {
+  background: #fff176;
+  color: #222;
+}
+
+.theme-dark .categoria-card.ia-reactiva {
+  background: #c86e53;
+  color: #fff;
+}
+.theme-dark .categoria-card.ia-memoria {
+  background: #b87698;
+  color: #fff;
+}
+.theme-dark .categoria-card.ia-estrecha {
+  background: #629b97;
+  color: #fff;
+}
+.theme-dark .categoria-card.ia-mente {
+  background: #e0ce68;
+  color: #222;
+}
+
+
+/* Otros estilos */
+.categoria-card .icono-categoria {
+  font-size: 40px;
+  margin-bottom: 10px;
+}
+.categoria-card .titulo-categoria {
+  font-weight: bold;
+  font-size: 23px;
+  text-align: center;
+  margin-bottom: 10px;
+}
+.categoria-card .descripcion-categoria {
+  font-size: 16px;
+  text-align: center;
+  line-height: 1.4;
+  max-width: 280px;
+  word-break: break-word;
+  margin: 0;
+}
+
+
+
+.theme-light .navbar-brand,
+.theme-light .badge{
+  color: #140202;
+}
+
+/* Color adaptable para el texto de bienvenida */
+.usuario-bienvenida {
+  color: #111; /* Negro por defecto (modo claro) */
+  transition: color 0.2s;
+}
+.theme-dark .usuario-bienvenida {
+  color: #fff; /* Blanco en modo oscuro */
+}
+.theme-light .usuario-bienvenida {
+  color: #111; /* Negro en modo claro */
+}
+.theme-default .usuario-bienvenida {
+  color: #1565c0; /* Azul oscuro, si quieres diferenciar el tema default */
+}
+
+
+/* FONDO GENERAL DEL LANDING SEGÚN TEMA */
+.landing-bg {
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
+  background: var(--landing-bg);
+  transition: background 0.4s;
+}
+
+/* CARD DEL LANDING */
+.landing-card {
+  background: var(--landing-card-bg, #fff);
+  border-radius: 2em;
+  box-shadow: 0 6px 32px #1d35577a;
+  padding: 48px 44px 32px 44px;
+  text-align: center;
+  min-width: 370px;
+  max-width: 520px;
+  transition: background 0.4s, color 0.4s;
+}
+
+/* TITULO */
+.landing-title {
+  font-weight: 800;
+  font-size: 2.5rem;
+  margin-bottom: 12px;
+  letter-spacing: 0.5px;
+  color: var(--landing-title, #222b48);
+  text-shadow: 0 1px 3px #b0e0ef60;
+}
+
+.landing-title-highlight {
+  color: var(--landing-title-highlight, #16b973);
+  text-shadow: none;
+}
+
+/* DESCRIPCIÓN */
+.landing-desc {
+  font-size: 1.4rem;
+  color: var(--landing-desc, #1b406b);
+  font-weight: 500;
+  margin: 18px 0 32px 0;
+  text-shadow: 0 1px 2px #fff8;
+}
+
+.landing-ai {
+  color: var(--landing-ai, #1864ab);
+  font-weight: 700;
+}
+
+/* EDUCACION / ETIQUETAS */
+.landing-edu {
+  font-size: 18px;
+  color: var(--landing-edu, #383858);
+  font-weight: 500;
+  margin-bottom: 30px;
+}
+.edu-alumno {
+  color: var(--edu-alumno, #ff9900);
+}
+.edu-docente {
+  color: var(--edu-docente, #902de4);
+}
+
+/* BOTÓN */
+.landing-btn {
+  background: var(--landing-btn-bg, linear-gradient(90deg, #1864ab 80%, #16b973 100%));
+  color: #fff;
+  font-size: 25px;
+  border: none;
+  border-radius: 16px;
+  padding: 15px 46px;
+  cursor: pointer;
+  margin-bottom: 8px;
+  font-weight: bold;
+  box-shadow: 0 2px 18px #16b97360;
+  transition: background 0.3s;
+}
+.landing-btn:hover {
+  filter: brightness(1.1);
+}
+
+/* NOTA INFERIOR */
+.landing-note {
+  margin-top: 38px;
+  font-size: 15px;
+  color: var(--landing-note, #555c6e);
+}
+.landing-docente {
+  color: var(--landing-ai, #1864ab);
+  font-weight: 600;
+}
+
+/* THEMES - Variables */
+:root {
+  --landing-bg: linear-gradient(135deg, #60a3d9 0%, #65e1c8 100%);
+  --landing-card-bg: #fff;
+  --landing-title: #222b48;
+  --landing-title-highlight: #16b973;
+  --landing-desc: #1b406b;
+  --landing-ai: #1864ab;
+  --landing-edu: #383858;
+  --edu-alumno: #ff9900;
+  --edu-docente: #902de4;
+  --landing-btn-bg: linear-gradient(90deg, #1864ab 80%, #16b973 100%);
+  --landing-note: #555c6e;
+}
+.theme-dark {
+  --landing-bg: linear-gradient(135deg, #192029 0%, #232931 100%);
+  --landing-card-bg: #24272e;
+  --landing-title: #fff;
+  --landing-title-highlight: #41e196;
+  --landing-desc: #b9c5e3;
+  --landing-ai: #5db0ff;
+  --landing-edu: #eee;
+  --edu-alumno: #ffe48c;
+  --edu-docente: #f8a0ff;
+  --landing-btn-bg: linear-gradient(90deg, #5db0ff 80%, #41e196 100%);
+  --landing-note: #eee;
+}
+.theme-light {
+  --landing-bg: linear-gradient(135deg, #f8fafc 0%, #d0f0fd 100%);
+  --landing-card-bg: #fff;
+  --landing-title: #1b2344;
+  --landing-title-highlight: #189954;
+  --landing-desc: #0c2454;
+  --landing-ai: #003399;
+  --landing-edu: #18181c;
+  --edu-alumno: #ff9900;
+  --edu-docente: #902de4;
+  --landing-btn-bg: linear-gradient(90deg, #003399 80%, #16b973 100%);
+  --landing-note: #222;
+}

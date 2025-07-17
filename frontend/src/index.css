@@ -12,3 +12,24 @@ html, body {
   padding-top: 32px;
 }
 
+html, body, #root {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+   /* Elimina cualquier fondo residual */
+}
+
+body,
+#root,
+.landing-bg {
+  margin: 0 !important;
+  padding: 0 !important;
+  box-sizing: border-box;
+}
+
+.navbar {
+  margin: 0 !important;
+  padding: 0.6em 1.2em; /* Ajusta a tu diseño */
+  width: 100%;
+}

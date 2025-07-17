@@ -1,13 +1,12 @@
-
-
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+// Ahora en vez de color, usamos una clave de clase CSS
 const categorias = [
   {
     id: "IA Reactiva",
     nombre: "IA Reactiva",
-    color: "#ffab91",
+    clase: "ia-reactiva",
     icon: "⚡",
     descripcion:
       "Sistemas expertos, IA simbólica, lógica difusa. Actúan solo con reglas fijas, sin aprendizaje ni memoria."
@@ -15,7 +14,7 @@ const categorias = [
   {
     id: "IA con Memoria Limitada",
     nombre: "IA con Memoria Limitada",
-    color: "#f8bbd0",
+    clase: "ia-memoria",
     icon: "🧑‍🔬",
     descripcion:
       "Machine Learning (ML) supervisado/no supervisado, Deep Learning (DL), Reinforcement Learning (RL), Computer Vision y NLP. Aprenden de datos históricos recientes."
@@ -23,7 +22,7 @@ const categorias = [
   {
     id: "ANI (IA Estrecha)",
     nombre: "ANI (IA Estrecha)",
-    color: "#b2dfdb",
+    clase: "ia-estrecha",
     icon: "🤖",
     descripcion:
       "Aplicaciones específicas de ML/DL para tareas concretas como chatbots, traducción automática, reconocimiento de imágenes."
@@ -31,7 +30,7 @@ const categorias = [
   {
     id: "IA con Teoría de la Mente",
     nombre: "IA con Teoría de la Mente",
-    color: "#fff176",
+    clase: "ia-mente",
     icon: "🔣",
     descripcion:
       "Modelos que simulan emociones o intenciones, NLP avanzado, Computer Vision avanzada para detección de gestos o expresiones."
@@ -42,7 +41,7 @@ export default function CategoriasPage() {
   const navigate = useNavigate();
 
   return (
-    <div style={{ background: "#e3f2fd", minHeight: "100vh" }}>
+    <div className="categorias-bg">
       <div
         style={{
           padding: "24px 0 16px 0",
@@ -71,64 +70,20 @@ export default function CategoriasPage() {
             key={cat.id}
             role="button"
             tabIndex={0}
-            style={{
-              background: cat.color,
-              borderRadius: 20,
-              width: 340,
-              minHeight: 200,
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "flex-start",
-              padding: 24,
-              cursor: "pointer",
-              boxShadow: "0 8px 32px #0002",
-              boxSizing: "border-box",
-              transition: "transform 0.2s, box-shadow 0.2s"
-            }}
+            className={`categoria-card ${cat.clase}`}
             onClick={() => navigate(`/categoria/${cat.id}`)}
             onKeyPress={e => {
               if (e.key === "Enter" || e.key === " ") {
                 navigate(`/categoria/${cat.id}`);
               }
             }}
-            onMouseEnter={e => {
-              e.currentTarget.style.transform = "scale(1.035)";
-              e.currentTarget.style.boxShadow = "0 12px 40px #0004";
-            }}
-            onMouseLeave={e => {
-              e.currentTarget.style.transform = "scale(1)";
-              e.currentTarget.style.boxShadow = "0 8px 32px #0002";
-            }}
           >
-            <div style={{ fontSize: 40, marginBottom: 10 }}>{cat.icon}</div>
-            <div
-              style={{
-                fontWeight: "bold",
-                fontSize: 23,
-                textAlign: "center",
-                marginBottom: 10
-              }}
-            >
-              {cat.nombre}
-            </div>
-            <div
-              style={{
-                fontSize: 16,
-                textAlign: "center",
-                lineHeight: 1.4,
-                maxWidth: 280,
-                wordBreak: "break-word",
-                color: "#444"
-              }}
-            >
-              {cat.descripcion}
-            </div>
+            <div className="icono-categoria">{cat.icon}</div>
+            <div className="titulo-categoria">{cat.nombre}</div>
+            <div className="descripcion-categoria">{cat.descripcion}</div>
           </div>
         ))}
       </div>
-
-   
     </div>
   );
 }

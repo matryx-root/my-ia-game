@@ -94,7 +94,7 @@ export default function NavBar({ usuario, onLogout, configuracion }) {
               </div>
 
               <div className="mt-2 mt-lg-0 d-flex flex-column flex-lg-row align-items-lg-center justify-content-lg-end">
-                <span className="text-light fw-bold" style={{ fontSize: 16 }}>
+                <span className="usuario-bienvenida fw-bold" style={{ fontSize: 16 }}>
                   Bienvenido, {usuario.nombre}{" "}
                   {usuario.colegio?.nombre && (
                     <span
