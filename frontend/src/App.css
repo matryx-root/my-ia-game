@@ -2,13 +2,14 @@
   --color-bg: #f8fafc;
   --color-text: #18181c;
   --color-card: #fff;
-  --color-title: #114eeb;
+ 
   --color-card-shadow: #2222;
   --navbar-bg: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
 }
 
 .theme-default {
   --color-bg: #f8fafc;
+   --color-title: #114eeb;
   --color-text: #18181c;
   --color-card: #fff;
   --color-card-shadow: #2222;
@@ -19,9 +20,11 @@
   --color-text: #eee;
   --color-card: #24272e;
   --color-card-shadow: #111a;
-  --color-title: #5db0ff;
+  --color-title: #fff;
   --navbar-bg: #181c24;
+  
 }
+
 .theme-light {
   --color-bg: #f5f6fa;
   --color-text: #18181c;
@@ -87,3 +90,8 @@ button, .btn {
 }
 
 table { width: 100%; }
+
+h1, h2, h3, h4, h5, h6 {
+  color: var(--color-title);
+  transition: color 0.3s;
+}

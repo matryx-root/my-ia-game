@@ -12,9 +12,3 @@ html, body {
   padding-top: 32px;
 }
 
-/* Opcional: NavBar colores generales, sin fondo fuerte */
-.navbar .btn,
-.navbar .navbar-brand,
-.navbar .text-light {
-  color: #033 !important;
-}
