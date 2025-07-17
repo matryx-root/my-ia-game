@@ -1,7 +1,5 @@
-
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-
 
 import IaGame from "../games/iaGame";
 import MlGame from "../games/mlGame";
@@ -37,18 +35,17 @@ const juegosComponentes = {
   vaeGame: VaeGame,
   diffusionGame: DiffusionGame,
   selfSupervisedGame: SelfSupervisedGame,
-  
 };
 
 export default function JuegoPage() {
   const { juego } = useParams();
   const navigate = useNavigate();
 
-  
   const [usuario, setUsuario] = useState(null);
+  const [config, setConfig] = useState(null);
 
   useEffect(() => {
-    
+    // Recupera usuario de localStorage
     let user = null;
     try {
       const raw = localStorage.getItem("usuario");
@@ -60,9 +57,19 @@ export default function JuegoPage() {
       user = null;
     }
     setUsuario(user);
+
+    // Recupera config (configuración de usuario) de localStorage
+    let cfg = null;
+    try {
+      const rawCfg = localStorage.getItem("configuracion");
+      if (rawCfg) {
+        cfg = JSON.parse(rawCfg);
+      }
+    } catch { cfg = null; }
+    setConfig(cfg);
+
   }, []);
 
-  
   if (!usuario) {
     return (
       <div className="container py-5">
@@ -78,13 +85,12 @@ export default function JuegoPage() {
     );
   }
 
-  
   const GameComponent = juegosComponentes[juego];
 
   return (
     <div>
       {GameComponent ? (
-        <GameComponent usuario={usuario} juegoKey={juego}/>
+        <GameComponent usuario={usuario} config={config} juegoKey={juego}/>
       ) : (
         <div className="alert alert-danger text-center my-5" style={{ fontSize: 22 }}>
           Juego no encontrado.
