@@ -276,6 +276,9 @@ export default function MLClusterGame({ usuario }) {
           background: 'rgba(0,0,0,0.3)',
           position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh', zIndex: 1000
         }}>
+          <div className="game-container">
+            
+        
           <div className="modal-dialog" style={{ marginTop: 80 }}>
             <div className="modal-content">
               <div className="modal-header">
@@ -293,11 +296,13 @@ export default function MLClusterGame({ usuario }) {
                 </ul>
                 <p>Tu reto: <b>Arrastra cada punto a su grupo de color.</b> Así “aprende” una IA a organizar datos por similitud.</p>
               </div>
+
               <div className="modal-footer">
                 <button className="btn btn-primary" onClick={iniciarJuego}>¡Jugar!</button>
               </div>
             </div>
           </div>
+        </div>
         </div>
       )}
 

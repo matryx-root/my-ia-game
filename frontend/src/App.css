@@ -11,17 +11,17 @@
 
 /* Tema predeterminado */
 .theme-default {
-  --color-bg: #f8fafc;
+  --color-bg: #6baff3;
   --color-text: #18181c;
   --color-card: #fff;
   --color-title: #114eeb;
   --color-card-shadow: #2222;
-  --navbar-bg: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
+  --navbar-bg: #6baff3;
 }
 
 /* Tema oscuro */
 .theme-dark {
-  --color-bg: #15181c;
+  --color-bg: #181c24;
   --color-text: #eee;
   --color-card: #24272e;
   --color-title: #fff;
@@ -31,7 +31,7 @@
 
 /* Tema claro */
 .theme-light {
-  --color-bg: #f5f6fa;
+  --color-bg: #59a4f0;
   --color-text: #18181c;
   --color-card: #fff;
   --color-title: #003399;
@@ -120,5 +120,73 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 .theme-dark .card {
+  color: #fff !important;
+}
+
+/* General para todos los textos en juegos y modales */
+.game-container,
+.game-card,
+.modal,
+.game-info,
+.game-description,
+#game-root,
+#game-modal,
+#game-content {
+  color: var(--color-text) !important;
+  transition: color 0.3s;
+}
+
+/* Si tienes textos dentro de canvas o SVG, revisa el JS/TS de cada juego para cambiar el fill o stroke a blanco en modo oscuro */
+
+/* Si usas etiquetas p, span, li, ul, etc, dentro de juegos */
+.game-modal h5{
+  color:#15181c;
+}
+.game-container p {
+  color:#15181c;
+}
+.game-container b{
+  color:#15181c;
+}
+.game-container h5{
+  color:#15181c;
+}
+.game-container span{
+  color:#15181c;
+}
+.game-container li{
+  color:#15181c;
+}
+.game-container ul{
+  color:#15181c;
+}
+.game-card p{
+  color:#15181c;
+}
+.game-card h5{
+  color:#15181c;
+}
+.game-card span{
+  color:#15181c;
+}
+.game-card li {
+  color: var(--color-text) !important;
+}
+
+/* Si usas clases particulares para instrucciones, preguntas, respuestas, títulos, etc. */
+.instruccion,
+.pregunta,
+.respuesta,
+.explicacion,
+.ayuda-texto {
+  color: var(--color-text) !important;
+}
+
+.theme-dark .game-container,
+.theme-dark .game-card,
+.theme-dark .modal,
+.theme-dark #game-root,
+.theme-dark #game-modal,
+.theme-dark #game-content {
   color: #fff !important;
 }
