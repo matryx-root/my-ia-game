@@ -112,3 +112,13 @@ h1, h2, h3, h4, h5, h6 {
   color: var(--color-title, #114eeb);
   transition: color 0.3s;
 }
+
+/* Forzar color blanco para los labels de tarjetas del dashboard en modo oscuro */
+.theme-dark .card .fs-6 {
+  color: #fff !important;
+  opacity: 0.95;
+}
+
+.theme-dark .card {
+  color: #fff !important;
+}
