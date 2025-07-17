@@ -139,39 +139,7 @@ h1, h2, h3, h4, h5, h6 {
 /* Si tienes textos dentro de canvas o SVG, revisa el JS/TS de cada juego para cambiar el fill o stroke a blanco en modo oscuro */
 
 /* Si usas etiquetas p, span, li, ul, etc, dentro de juegos */
-.game-modal h5{
-  color:#15181c;
-}
-.game-container p {
-  color:#15181c;
-}
-.game-container b{
-  color:#15181c;
-}
-.game-container h5{
-  color:#15181c;
-}
-.game-container span{
-  color:#15181c;
-}
-.game-container li{
-  color:#15181c;
-}
-.game-container ul{
-  color:#15181c;
-}
-.game-card p{
-  color:#15181c;
-}
-.game-card h5{
-  color:#15181c;
-}
-.game-card span{
-  color:#15181c;
-}
-.game-card li {
-  color: var(--color-text) !important;
-}
+
 
 /* Si usas clases particulares para instrucciones, preguntas, respuestas, títulos, etc. */
 .instruccion,
@@ -185,8 +153,13 @@ h1, h2, h3, h4, h5, h6 {
 .theme-dark .game-container,
 .theme-dark .game-card,
 .theme-dark .modal,
+.theme-dark .modal-dialog,
+.theme-dark .modal-content,
+.theme-dark .modal-header,
+.theme-dark .modal-title,
 .theme-dark #game-root,
 .theme-dark #game-modal,
 .theme-dark #game-content {
-  color: #fff !important;
+  color: #000000 !important;
 }
+
