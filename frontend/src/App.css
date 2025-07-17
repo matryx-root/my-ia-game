@@ -1,37 +1,42 @@
+/* App.css global - Actualizado y probado */
+
+/* Valores por defecto, sólo lo esencial, sin color-title blanco */
 :root {
   --color-bg: #f8fafc;
   --color-text: #18181c;
   --color-card: #fff;
- 
   --color-card-shadow: #2222;
   --navbar-bg: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
 }
 
+/* Tema predeterminado */
 .theme-default {
   --color-bg: #f8fafc;
-   --color-title: #114eeb;
   --color-text: #18181c;
   --color-card: #fff;
+  --color-title: #114eeb;
   --color-card-shadow: #2222;
   --navbar-bg: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
 }
+
+/* Tema oscuro */
 .theme-dark {
   --color-bg: #15181c;
   --color-text: #eee;
   --color-card: #24272e;
-  --color-card-shadow: #111a;
   --color-title: #fff;
+  --color-card-shadow: #111a;
   --navbar-bg: #181c24;
-  
 }
 
+/* Tema claro */
 .theme-light {
   --color-bg: #f5f6fa;
   --color-text: #18181c;
   --color-card: #fff;
-  --color-card-shadow: #2222;
-  --navbar-bg: #f8fafc;
   --color-title: #003399;
+  --color-card-shadow: #2222;
+  --navbar-bg: #59a4f0;
 }
 
 /* Navbar fondo adaptativo */
@@ -43,6 +48,7 @@
   box-shadow: none !important;
 }
 
+/* Tipografía y fondo general */
 body {
   font-family: 'Montserrat', Arial, sans-serif;
   background: var(--color-bg);
@@ -51,7 +57,7 @@ body {
   transition: background 0.3s, color 0.3s;
 }
 
-/* Fondo del body gradiente sólo en Predeterminado */
+/* Fondo gradiente solo en predeterminado */
 .theme-default body {
   background: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
 }
@@ -77,6 +83,7 @@ form, .card, .panel, .app-box, .main-content {
   }
 }
 
+/* Botones */
 button, .btn {
   margin-top: 1em;
   padding: 0.6em 1.5em;
@@ -89,9 +96,19 @@ button, .btn {
   transition: background 0.3s;
 }
 
+/* Tablas */
 table { width: 100%; }
 
+/* Títulos: máximo contraste para cada tema */
+.theme-default h1, .theme-default h2, .theme-default h3, .theme-default h4, .theme-default h5, .theme-default h6,
+.theme-light h1, .theme-light h2, .theme-light h3, .theme-light h4, .theme-light h5, .theme-light h6,
+.theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6 {
+  color: var(--color-title) !important;
+  transition: color 0.3s;
+}
+
+/* Opcional: asegurar contraste en títulos cuando no hay clase theme-* en body */
 h1, h2, h3, h4, h5, h6 {
-  color: var(--color-title);
+  color: var(--color-title, #114eeb);
   transition: color 0.3s;
 }
