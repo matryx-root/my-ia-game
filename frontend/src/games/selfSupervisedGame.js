@@ -3,6 +3,14 @@ import Phaser from 'phaser';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api'; // Importa tu módulo api
 
+// ---- Shuffle para randomizar las opciones ----
+function shuffle(array) {
+  return array
+    .map(value => ({ value, sort: Math.random() }))
+    .sort((a, b) => a.sort - b.sort)
+    .map(({ value }) => value);
+}
+
 export default function SelfSupervisedGame({ usuario }) {
   const gameRef = useRef(null);
   const navigate = useNavigate();
@@ -17,8 +25,12 @@ export default function SelfSupervisedGame({ usuario }) {
   const [errorGuardar, setErrorGuardar] = useState(null);
   const [mostroLogro, setMostroLogro] = useState(false);
 
+  // Historial
+  const [historial, setHistorial] = useState([]);
+  const [cargandoHistorial, setCargandoHistorial] = useState(false);
+
   // IDs únicos para este juego
-  const SELF_GAME_ID = 7;
+  const SELF_GAME_ID = 7; // Cambia por tu ID real si es distinto
   const NOMBRE_LOGRO = "Self-Supervised Completo";
   const DESC_LOGRO = "Completaste todas las frases en el juego de Self-Supervised.";
 
@@ -34,6 +46,30 @@ export default function SelfSupervisedGame({ usuario }) {
     { texto: "Los árboles tienen _____.", opciones: ["hojas", "zapatos", "pelo"], respuesta: "hojas" },
     { texto: "El pez nada en el _____.", opciones: ["agua", "cielo", "pastel"], respuesta: "agua" }
   ];
+
+  // Historial (trae partidas anteriores del usuario para este juego)
+  const cargarHistorial = async () => {
+    if (!usuario || !usuario.id) return;
+    setCargandoHistorial(true);
+    try {
+      // Trae TODOS los progresos del usuario y filtra solo los de este juego
+      const prog = await api.get(`/juegos/progreso/${usuario.id}`);
+      setHistorial(
+        Array.isArray(prog)
+          ? prog.filter(p => p.juegoId === SELF_GAME_ID)
+          : []
+      );
+    } catch (e) {
+      setHistorial([]);
+    } finally {
+      setCargandoHistorial(false);
+    }
+  };
+
+  useEffect(() => {
+    if (usuario && usuario.id) cargarHistorial();
+    // eslint-disable-next-line
+  }, [usuario]);
 
   const iniciarJuego = () => {
     setInstruccion(false);
@@ -52,6 +88,8 @@ export default function SelfSupervisedGame({ usuario }) {
     if (!instruccion && !gameRef.current) {
       let idx = fraseActual;
       let completando = false;
+      // --- Opciones random ---
+      const opcionesRandom = shuffle(frases[idx].opciones);
 
       gameRef.current = new Phaser.Game({
         type: Phaser.AUTO,
@@ -84,7 +122,7 @@ export default function SelfSupervisedGame({ usuario }) {
             }).setOrigin(0.5);
 
             this.botones = [];
-            frases[idx].opciones.forEach((op, i) => {
+            opcionesRandom.forEach((op, i) => {
               const x = 220 + i * 155;
               const y = 200;
 
@@ -122,7 +160,6 @@ export default function SelfSupervisedGame({ usuario }) {
 
                   this.time.delayedCall(1700, () => {
                     completando = false;
-
                     if (idx + 1 < frases.length) {
                       setFraseActual(f => f + 1);
                       setResultado(null);
@@ -190,7 +227,7 @@ export default function SelfSupervisedGame({ usuario }) {
       setMostroLogro(true);
       setGuardado(true);
       setPuedeGuardar(false);
-      // cargarHistorial(); // Si usas historial, lo puedes activar aquí
+      cargarHistorial(); // 👈 Recarga historial después de guardar
     } catch (err) {
       setErrorGuardar("Error al guardar: " + (err?.message || (err?.error ?? "")));
       setGuardado(false);
@@ -279,11 +316,48 @@ export default function SelfSupervisedGame({ usuario }) {
         </div>
       )}
 
-      {puedeGuardar && !guardado && (
+      {puedeGuardar && !guardado && usuario && (
         <div className="d-flex justify-content-center mt-4">
           <button className="btn btn-success" onClick={guardarProgresoYLogro}>
             Guardar progreso y registrar logro
           </button>
+        </div>
+      )}
+
+      {/* HISTORIAL DE PARTIDAS */}
+      {usuario && (
+        <div className="mt-4" style={{ maxWidth: 700, margin: "0 auto" }}>
+          <h5 className="text-center mb-3">Historial de partidas</h5>
+          {cargandoHistorial ? (
+            <div className="text-center">Cargando historial...</div>
+          ) : historial.length === 0 ? (
+            <div className="text-center text-muted">Aún no tienes registros para este juego.</div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-bordered table-striped table-sm">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Fecha</th>
+                    <th>Aciertos</th>
+                    <th>Desaciertos</th>
+                    <th>Completado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historial.map((h, i) => (
+                    <tr key={h.id || i}>
+                      <td>{historial.length - i}</td>
+                      <td>{h.fechaActualizacion ? new Date(h.fechaActualizacion).toLocaleString() : "—"}</td>
+                      <td>{h.aciertos}</td>
+                      <td>{h.desaciertos}</td>
+                      <td>{h.completado ? "✅" : "❌"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 

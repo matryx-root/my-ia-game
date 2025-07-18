@@ -32,7 +32,7 @@ export default function Login({ onLogin }) {
         if (typeof onLogin === "function") onLogin(res.usuario);
 
         
-        window.alert("¡Login exitoso!");
+        window.alert("¡Login exitoso!, Bienvenido/a " + res.usuario.nombre);
 
         
         if (res.usuario.rol === "admin") {

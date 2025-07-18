@@ -1,17 +1,8 @@
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
 
+// Devuelve el token JWT desde localStorage
 function getToken() {
   return localStorage.getItem("token");
-}
-
-// Borra token y datos de usuario (opcional: puedes limpiar más cosas si tienes)
-function logout() {
-  localStorage.removeItem("token");
-  localStorage.removeItem("usuario");
-  // Si usas context o Redux, llama aquí también a setUsuario(null)
-  if (window.location.pathname !== "/login") {
-    window.location.href = "/login";
-  }
 }
 
 // Genera headers para fetch, añadiendo Authorization si hay token
@@ -22,7 +13,7 @@ function headers(custom = {}) {
   return h;
 }
 
-// Maneja la respuesta, controla errores 401/403 y muestra mensajes claros
+// Maneja la respuesta de la API, extrayendo JSON o texto y lanzando errores claros
 async function handleResponse(response) {
   const contentType = response.headers.get("content-type");
   let data;
@@ -31,13 +22,6 @@ async function handleResponse(response) {
   } else {
     data = await response.text();
   }
-
-  // Si el token está vencido o inválido: borra y saca al login
-  if (response.status === 401 || response.status === 403) {
-    logout();
-    throw new Error("Sesión expirada. Debes iniciar sesión de nuevo.");
-  }
-
   if (!response.ok) {
     const errMsg =
       (typeof data === "object" && (data.error || data.message)) ||
@@ -51,19 +35,39 @@ async function handleResponse(response) {
   return data;
 }
 
+// --- AQUI LA CLAVE: login/register SÍ funcionan sin token ---
 const api = {
   get: (url) => {
-    const token = getToken();
-    if (!token) {
-      logout();
+    // Permitir login/register/colegios sin token
+    if (
+      url.startsWith("/usuarios/login") ||
+      url.startsWith("/usuarios/register") ||
+      url.startsWith("/colegios")
+    ) {
+      return fetch(API_URL + url, { headers: headers() }).then(handleResponse);
+    }
+    const t = getToken();
+    if (!t) {
+      // Si requiere token y no hay, rechaza
       return Promise.reject(new Error("Sesión expirada. Debes iniciar sesión."));
     }
     return fetch(API_URL + url, { headers: headers() }).then(handleResponse);
   },
+
   post: (url, data) => {
-    const token = getToken();
-    if (!token) {
-      logout();
+    // Permitir login/register sin token
+    if (
+      url === "/usuarios/login" ||
+      url === "/usuarios/register"
+    ) {
+      return fetch(API_URL + url, {
+        method: "POST",
+        headers: headers(),
+        body: JSON.stringify(data),
+      }).then(handleResponse);
+    }
+    const t = getToken();
+    if (!t) {
       return Promise.reject(new Error("Sesión expirada. Debes iniciar sesión."));
     }
     return fetch(API_URL + url, {
@@ -72,10 +76,10 @@ const api = {
       body: JSON.stringify(data),
     }).then(handleResponse);
   },
+
   put: (url, data) => {
-    const token = getToken();
-    if (!token) {
-      logout();
+    const t = getToken();
+    if (!t) {
       return Promise.reject(new Error("Sesión expirada. Debes iniciar sesión."));
     }
     return fetch(API_URL + url, {
@@ -84,10 +88,10 @@ const api = {
       body: JSON.stringify(data),
     }).then(handleResponse);
   },
+
   delete: (url) => {
-    const token = getToken();
-    if (!token) {
-      logout();
+    const t = getToken();
+    if (!t) {
       return Promise.reject(new Error("Sesión expirada. Debes iniciar sesión."));
     }
     return fetch(API_URL + url, {
@@ -95,22 +99,21 @@ const api = {
       headers: headers(),
     }).then(handleResponse);
   },
+
   postFile: (url, formData) => {
-    const token = getToken();
-    if (!token) {
-      logout();
+    const t = getToken();
+    if (!t) {
       return Promise.reject(new Error("Sesión expirada. Debes iniciar sesión."));
     }
     return fetch(API_URL + url, {
       method: "POST",
       headers: {
         Authorization: "Bearer " + getToken(),
+        // Ojo: *NO* incluyas "Content-Type" aquí, fetch la pone automáticamente en multipart/form-data
       },
       body: formData,
     }).then(handleResponse);
   },
-  logout,
-  getToken,
 };
 
 export default api;

@@ -1,22 +1,62 @@
-// src/games/computerVisionGame.js
 import React, { useEffect, useRef, useState } from "react";
 import Phaser from "phaser";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import api from "../utils/api";
 
-export default function ComputerVisionGame() {
+export default function ComputerVisionGame({ usuario }) {
   const gameRef = useRef(null);
   const navigate = useNavigate();
-  const { id } = useParams();
-  const [nivel, setNivel] = useState(0); 
-  const [fase, setFase] = useState("intro"); 
+
+  const [nivel, setNivel] = useState(0);
+  const [fase, setFase] = useState("intro");
   const [resultado, setResultado] = useState(null);
 
+  // Progreso y logros
+  const [puedeGuardar, setPuedeGuardar] = useState(false);
+  const [guardado, setGuardado] = useState(false);
+  const [mostroLogro, setMostroLogro] = useState(false);
+  const [errorGuardar, setErrorGuardar] = useState(null);
+
+  // Historial
+  const [historial, setHistorial] = useState([]);
+  const [cargandoHistorial, setCargandoHistorial] = useState(false);
+
+  // IDs y textos
+  const COMPUTER_VISION_GAME_ID = 11; // Cambia si corresponde
+  const NOMBRE_LOGRO = "Semáforo Vision Perfecta";
+  const DESC_LOGRO = "Completaste el reto de visión computacional reconociendo todos los colores del semáforo.";
+
+  // Tabla de colores y acciones
   const colores = [
     { color: 0xff0000, nombre: "rojo", accion: "Detenerse 🛑" },
     { color: 0xffeb3b, nombre: "amarillo", accion: "Precaución ⚠️" },
     { color: 0x00e676, nombre: "verde", accion: "Avanzar 🚗💨" }
   ];
 
+  // Cargar historial de partidas
+  const cargarHistorial = async () => {
+    if (!usuario || !usuario.id) return;
+    setCargandoHistorial(true);
+    try {
+      const prog = await api.get(`/juegos/progreso/${usuario.id}`);
+      setHistorial(
+        Array.isArray(prog)
+          ? prog.filter(p => p.juegoId === COMPUTER_VISION_GAME_ID)
+          : []
+      );
+    } catch {
+      setHistorial([]);
+    } finally {
+      setCargandoHistorial(false);
+    }
+  };
+
+  useEffect(() => {
+    if (usuario && usuario.id) cargarHistorial();
+    // eslint-disable-next-line
+  }, [usuario]);
+
+  // Lógica Phaser (juego principal)
   useEffect(() => {
     if ((fase === "jugar" || fase === "fin") && !gameRef.current) {
       gameRef.current = new Phaser.Game({
@@ -74,6 +114,7 @@ export default function ComputerVisionGame() {
                       } else {
                         setFase("fin");
                         setResultado("¡Felicidades! Has aprendido a reconocer el semáforo como un auto inteligente. Así es como los autos autónomos, robots y cámaras inteligentes usan la visión computacional para tomar decisiones.");
+                        setPuedeGuardar(true);
                       }
                     }, 900);
                   } else {
@@ -85,7 +126,6 @@ export default function ComputerVisionGame() {
                     });
                     setTimeout(() => {
                       circ.setStrokeStyle();
-                     
                       this.children.list
                         .filter(t => t.text && t.text.startsWith("¡No es el color"))
                         .forEach(t => t.destroy());
@@ -104,28 +144,66 @@ export default function ComputerVisionGame() {
         gameRef.current = null;
       }
     };
-    
+
   }, [fase, nivel]);
 
-  
+  // Guardar progreso y logro
+  const guardarProgresoYLogro = async () => {
+    if (!usuario || !usuario.id) {
+      setErrorGuardar('No hay usuario logueado.');
+      return;
+    }
+    setErrorGuardar(null);
+    try {
+      const progresoPayload = {
+        usuarioId: usuario.id,
+        juegoId: COMPUTER_VISION_GAME_ID,
+        avance: 100,
+        completado: true,
+        aciertos: 3,
+        desaciertos: 0 // Si agregas fallos, cámbialo
+      };
+      await api.post('/juegos/progreso', progresoPayload);
+
+      await api.post("/usuarios/achievement", {
+        usuarioId: usuario.id,
+        juegoId: COMPUTER_VISION_GAME_ID,
+        nombre: NOMBRE_LOGRO,
+        descripcion: DESC_LOGRO
+      });
+      setMostroLogro(true);
+      setGuardado(true);
+      setPuedeGuardar(false);
+      cargarHistorial();
+    } catch (err) {
+      setErrorGuardar("Error al guardar: " + (err?.message || (err?.error ?? "")));
+      setGuardado(false);
+      setPuedeGuardar(true);
+    }
+  };
+
+  // Reset/restart
   function reiniciar() {
     setNivel(0);
     setFase("jugar");
     setResultado(null);
+    setPuedeGuardar(false);
+    setGuardado(false);
+    setMostroLogro(false);
+    setErrorGuardar(null);
     if (gameRef.current) {
       gameRef.current.destroy(true);
       gameRef.current = null;
     }
   }
 
-  
   function volverCategoria() {
-    navigate(-1); 
+    navigate(-1);
   }
 
   return (
     <div>
-      
+      {/* MODAL DE INSTRUCCIÓN */}
       {fase === "intro" && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -157,7 +235,7 @@ export default function ComputerVisionGame() {
         </div>
       )}
 
-      
+      {/* CONTENEDOR DEL JUEGO */}
       <div
         id="game-container-computervision"
         style={{
@@ -170,21 +248,77 @@ export default function ComputerVisionGame() {
         }}
       />
 
-      
+      {/* MENSAJE DE FIN Y BOTÓN GUARDAR */}
       {fase === "fin" && resultado && (
-        <div className="alert alert-success mt-3" style={{ maxWidth: 600, margin: "40px auto", textAlign: "center" }}>
-          <div style={{ fontSize: 28, marginBottom: 10 }}>🚦</div>
-          <b>
-            ¡Felicidades! Has aprendido a reconocer el semáforo como un auto inteligente.
-          </b>
-          <p style={{ margin: "10px 0" }}>
-            Así es como los autos autónomos, robots y cámaras inteligentes usan la visión computacional para tomar decisiones.
-          </p>
-          <b>¿Puedes ver el semáforo y decidir qué hacer como un auto inteligente?</b>
+        <>
+          <div className="alert alert-success mt-3" style={{ maxWidth: 600, margin: "40px auto", textAlign: "center" }}>
+            <div style={{ fontSize: 28, marginBottom: 10 }}>🚦</div>
+            <b>
+              ¡Felicidades! Has aprendido a reconocer el semáforo como un auto inteligente.
+            </b>
+            <p style={{ margin: "10px 0" }}>
+              Así es como los autos autónomos, robots y cámaras inteligentes usan la visión computacional para tomar decisiones.
+            </p>
+            <b>¿Puedes ver el semáforo y decidir qué hacer como un auto inteligente?</b>
+          </div>
+          {puedeGuardar && !guardado && usuario && (
+            <div className="d-flex justify-content-center mt-4">
+              <button className="btn btn-success" onClick={guardarProgresoYLogro}>
+                Guardar progreso y registrar logro
+              </button>
+            </div>
+          )}
+          {mostroLogro && (
+            <div className="alert alert-success mt-3 text-center fw-bold" style={{ maxWidth: 500, margin: "auto" }}>
+              <i className="bi bi-trophy-fill text-warning me-2"></i>
+              ¡LOGRO GANADO! Semáforo Vision Perfecta 🏆
+            </div>
+          )}
+          {errorGuardar && (
+            <div className="alert alert-danger mt-3 text-center" style={{ maxWidth: 500, margin: "auto" }}>
+              {errorGuardar}
+            </div>
+          )}
+        </>
+      )}
+
+      {/* HISTORIAL DE PARTIDAS */}
+      {usuario && (
+        <div className="mt-4" style={{ maxWidth: 700, margin: "0 auto" }}>
+          <h5 className="text-center mb-3">Historial de partidas</h5>
+          {cargandoHistorial ? (
+            <div className="text-center">Cargando historial...</div>
+          ) : historial.length === 0 ? (
+            <div className="text-center text-muted">Aún no tienes registros para este juego.</div>
+          ) : (
+            <div className="table-responsive">
+              <table className="table table-bordered table-striped table-sm">
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Fecha</th>
+                    <th>Aciertos</th>
+                    <th>Desaciertos</th>
+                    <th>Completado</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {historial.map((h, i) => (
+                    <tr key={h.id || i}>
+                      <td>{historial.length - i}</td>
+                      <td>{h.fechaActualizacion ? new Date(h.fechaActualizacion).toLocaleString() : "—"}</td>
+                      <td>{h.aciertos}</td>
+                      <td>{h.desaciertos}</td>
+                      <td>{h.completado ? "✅" : "❌"}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       )}
 
-      
       {fase !== "intro" && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>
