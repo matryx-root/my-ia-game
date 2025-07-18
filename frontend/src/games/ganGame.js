@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
 import { useNavigate, useParams } from 'react-router-dom';
 
-
+// Figuras
 const figurasReales = [
   { tipo: "circle", color: 0x00bfae, label: "Círculo", texto: "Real" },
   { tipo: "square", color: 0xffb300, label: "Cuadrado", texto: "Real" },
@@ -20,18 +20,14 @@ export default function GANGame() {
   const { id } = useParams();
   const [instruccion, setInstruccion] = useState(true);
   const [resultado, setResultado] = useState(null);
-
-  
   const [juegoKey, setJuegoKey] = useState(0);
 
   const iniciarJuego = () => setInstruccion(false);
 
   useEffect(() => {
     if (!instruccion && !gameRef.current) {
-      
       const figuraReal = figurasReales[Math.floor(Math.random() * figurasReales.length)];
       const figuraFalsa = figurasFalsas[Math.floor(Math.random() * figurasFalsas.length)];
-      
       const realFirst = Math.random() < 0.5;
 
       gameRef.current = new Phaser.Game({
@@ -42,18 +38,15 @@ export default function GANGame() {
         backgroundColor: '#ffe0b2',
         scene: {
           create: function() {
-            this.add.text(60, 40, "👾 GANs: ¿Cuál es la imagen falsa (generada)?", {
+            // CENTRAR TÍTULO EN TODAS LAS RESOLUCIONES
+            this.add.text(325, 52, "👾 GANs: ¿Cuál es la imagen falsa (generada)?", {
               fontSize: '20px', fill: '#333'
-            });
+            }).setOrigin(0.5);
 
-            
-            const posX = [200, 420];
+            // Posiciones X centradas horizontalmente para las figuras
+            const posX = [230, 420];
 
-            
-            let figuras = [];
-            let labels = [];
-            let interactiveObjs = [];
-
+            // Dibuja una figura
             function drawFigura(fig, x, y) {
               let objeto;
               if (fig.tipo === "circle") {
@@ -61,7 +54,6 @@ export default function GANGame() {
               } else if (fig.tipo === "square") {
                 objeto = this.add.rectangle(x, y, 100, 100, fig.color).setInteractive({ useHandCursor: true });
               } else if (fig.tipo === "triangle") {
-                
                 const graphics = this.add.graphics();
                 graphics.fillStyle(fig.color, 1);
                 graphics.beginPath();
@@ -83,41 +75,35 @@ export default function GANGame() {
                 objeto = this.add.text(x - 44, y - 50, fig.emoji, { fontSize: "95px" })
                   .setInteractive({ useHandCursor: true });
               }
-              
-              const etiqueta = this.add.text(x - 30, y + 60, fig.texto, {
+
+              // Etiqueta
+              this.add.text(x - 30, y + 60, fig.texto, {
                 fontSize: '16px',
                 fill: fig.texto === "Real" ? '#00897b' : '#c2185b'
               });
-              return { objeto, etiqueta };
+              return objeto;
             }
 
-            
-            let real, fake;
+            // Lógica: decide cuál figura va a la izquierda o derecha
+            let figuras = [];
             if (realFirst) {
-              real = drawFigura.call(this, figuraReal, posX[0], 200);
-              fake = drawFigura.call(this, figuraFalsa, posX[1], 200);
+              figuras = [
+                drawFigura.call(this, figuraReal, posX[0], 180),
+                drawFigura.call(this, figuraFalsa, posX[1], 180)
+              ];
             } else {
-              fake = drawFigura.call(this, figuraFalsa, posX[0], 200);
-              real = drawFigura.call(this, figuraReal, posX[1], 200);
+              figuras = [
+                drawFigura.call(this, figuraFalsa, posX[0], 180),
+                drawFigura.call(this, figuraReal, posX[1], 180)
+              ];
             }
-            figuras = [real.objeto, fake.objeto];
-            labels = [real.etiqueta, fake.etiqueta];
 
             let mensaje = null;
 
-            
             figuras.forEach((fig, idx) => {
               fig.on('pointerover', function () {
-                if (idx === 0 && realFirst) {
-                  fig.setStrokeStyle?.(6, 0x00897b);
-                  fig.setScale?.(1.08);
-                } else if (idx === 1 && !realFirst) {
-                  fig.setStrokeStyle?.(6, 0x00897b);
-                  fig.setScale?.(1.08);
-                } else {
-                  fig.setStrokeStyle?.(6, 0xc2185b);
-                  fig.setScale?.(1.08);
-                }
+                fig.setStrokeStyle?.(6, idx === (realFirst ? 1 : 0) ? 0xc2185b : 0x00897b);
+                fig.setScale?.(1.09);
               });
               fig.on('pointerout', function () {
                 fig.setStrokeStyle?.();
@@ -125,27 +111,26 @@ export default function GANGame() {
               });
             });
 
-            
-            figuras[realFirst ? 0 : 1].on('pointerdown', () => {
-              
-              if (!mensaje) {
-                mensaje = this.add.text(120, 320, "¡Esa es real! Intenta descubrir la imagen generada...", {
-                  fontSize: '18px',
-                  fill: '#d84315'
-                });
-                figuras[realFirst ? 0 : 1].setFillStyle?.(0x009688);
-                setResultado("¡Casi! La IA engañó bien, sigue practicando para detectar imágenes falsas.");
-              }
-            });
+            // Falsa (GAN): click correcto
             figuras[realFirst ? 1 : 0].on('pointerdown', () => {
-              
               if (!mensaje) {
-                mensaje = this.add.text(90, 320, "¡Correcto! La imagen de la derecha fue creada por una IA (GAN)", {
-                  fontSize: '20px',
+                mensaje = this.add.text(325, 320, "¡Correcto! Esa fue creada por una IA (GAN)", {
+                  fontSize: '19px',
                   fill: '#43a047'
-                });
+                }).setOrigin(0.5);
                 figuras[realFirst ? 1 : 0].setFillStyle?.(0xba68c8);
                 setResultado("¡Excelente! Descubriste la imagen generada. Así funcionan los GANs: crean imágenes tan buenas que pueden engañarnos.");
+              }
+            });
+            // Real: click incorrecto
+            figuras[realFirst ? 0 : 1].on('pointerdown', () => {
+              if (!mensaje) {
+                mensaje = this.add.text(325, 320, "¡Esa es real! Intenta descubrir la imagen generada...", {
+                  fontSize: '19px',
+                  fill: '#d84315'
+                }).setOrigin(0.5);
+                figuras[realFirst ? 0 : 1].setFillStyle?.(0x009688);
+                setResultado("¡Casi! La IA engañó bien, sigue practicando para detectar imágenes falsas.");
               }
             });
           }
@@ -158,14 +143,13 @@ export default function GANGame() {
         gameRef.current = null;
       }
     };
-    
   }, [instruccion, juegoKey]);
 
-  
+  // Botones
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
-    setJuegoKey((k) => k + 1); 
+    setJuegoKey((k) => k + 1);
     if (gameRef.current) {
       gameRef.current.destroy(true);
       gameRef.current = null;
@@ -178,7 +162,7 @@ export default function GANGame() {
 
   return (
     <div>
-      
+      {/* MODAL INSTRUCCIONES */}
       {instruccion &&
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -212,10 +196,18 @@ export default function GANGame() {
         </div>
       }
 
-      
-      <div id="game-container-gan" style={{ margin: 'auto', minHeight: 400 }} />
+      {/* CENTRAR CANVAS Y MÁRGENES */}
+      <div id="game-container-gan"
+        style={{
+          margin: '40px auto 0 auto',
+          minHeight: 400,
+          maxWidth: 700,
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center'
+        }} />
 
-      
+      {/* MENSAJE FINAL */}
       {resultado && (
         <div className="alert alert-success mt-3" style={{ maxWidth: 650, margin: "auto" }}>
           {resultado}
@@ -226,7 +218,7 @@ export default function GANGame() {
         </div>
       )}
 
-      
+      {/* BOTONES FINALES */}
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>
