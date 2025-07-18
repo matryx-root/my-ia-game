@@ -108,26 +108,27 @@ export default function DLGame({ usuario }) {
     if (usuario && usuario.id) cargarHistorial();
   }, [usuario, juegoKey]);
 
-  // Guardar progreso/logro
-  const guardarProgresoYLogro = async () => {
-    if (!usuario || !usuario.id) {
-      setErrorGuardar('No hay usuario logueado.');
-      return;
-    }
-    setErrorGuardar(null);
+// Guardar progreso y logro
+const guardarProgresoYLogro = async () => {
+  if (!usuario || !usuario.id) {
+    setErrorGuardar('No hay usuario logueado.');
+    return;
+  }
+  setErrorGuardar(null);
 
-    try {
-      const progresoPayload = {
-        usuarioId: usuario.id,
-        juegoId: DL_GAME_ID,
-        avance: 100,
-        completado: true,
-        aciertos: TOTAL_NEURONAS,
-        desaciertos: 0
-      };
-      await api.post('/juegos/progreso', progresoPayload);
+  try {
+    const progresoPayload = {
+      usuarioId: usuario.id,
+      juegoId: DL_GAME_ID,
+      avance: 100,
+      completado: true,
+      aciertos: TOTAL_NEURONAS,
+      desaciertos: 0
+    };
+    await api.post('/juegos/progreso', progresoPayload);
 
-      // Se podría agregar validación para clicks dobles si lo deseas
+    // Si hubo 0 errores, registra logro. Si quieres registrar logro sólo cuando acierta todo:
+    if (TOTAL_NEURONAS > 0) {
       await api.post("/usuarios/achievement", {
         usuarioId: usuario.id,
         juegoId: DL_GAME_ID,
@@ -135,16 +136,25 @@ export default function DLGame({ usuario }) {
         descripcion: DESC_LOGRO
       });
       setMostroLogro(true);
-
-      setGuardado(true);
-      setPuedeGuardar(false);
-      cargarHistorial();
-    } catch (err) {
-      setErrorGuardar("Error al guardar: " + (err?.message || (err?.error ?? "")));
-      setGuardado(false);
-      setPuedeGuardar(true);
+    } else {
+      setMostroLogro(false);
     }
-  };
+
+    setGuardado(true);
+    setPuedeGuardar(false);
+    cargarHistorial();
+  } catch (err) {
+    setErrorGuardar("Error al guardar: " + (err?.message || (err?.error ?? "")));
+    setGuardado(false);
+    setPuedeGuardar(true);
+
+    // Opcional: Si el error es por token, api.js ya redirige, pero puedes limpiar localStorage aquí si quieres
+    // if (err.message && err.message.toLowerCase().includes("token")) {
+    //   localStorage.removeItem("token");
+    // }
+  }
+};
+
 
   const handleReset = () => {
     setInstruccion(true);

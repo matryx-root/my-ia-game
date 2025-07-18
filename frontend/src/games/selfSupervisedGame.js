@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Phaser from 'phaser';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import api from '../utils/api'; // Importa tu módulo api
 
-export default function SelfSupervisedGame() {
+export default function SelfSupervisedGame({ usuario }) {
   const gameRef = useRef(null);
   const navigate = useNavigate();
   const [instruccion, setInstruccion] = useState(true);
@@ -10,58 +11,28 @@ export default function SelfSupervisedGame() {
   const [juegoKey, setJuegoKey] = useState(0);
   const [fraseActual, setFraseActual] = useState(0);
 
-  
+  // Progreso y logros
+  const [puedeGuardar, setPuedeGuardar] = useState(false);
+  const [guardado, setGuardado] = useState(false);
+  const [errorGuardar, setErrorGuardar] = useState(null);
+  const [mostroLogro, setMostroLogro] = useState(false);
+
+  // IDs únicos para este juego
+  const SELF_GAME_ID = 7;
+  const NOMBRE_LOGRO = "Self-Supervised Completo";
+  const DESC_LOGRO = "Completaste todas las frases en el juego de Self-Supervised.";
+
   const frases = [
-    {
-      texto: "El gato está _____ en el tejado.",
-      opciones: ["saltando", "nadando", "volando"],
-      respuesta: "saltando"
-    },
-    {
-      texto: "El auto está _____ por la carretera.",
-      opciones: ["corriendo", "volando", "rodando"],
-      respuesta: "rodando"
-    },
-    {
-      texto: "La niña está _____ un libro.",
-      opciones: ["leyendo", "comiendo", "pintando"],
-      respuesta: "leyendo"
-    },
-    {
-      texto: "El sol sale por el _____.",
-      opciones: ["este", "árbol", "techo"],
-      respuesta: "este"
-    },
-    {
-      texto: "Los pájaros están _____ en el cielo.",
-      opciones: ["volando", "corriendo", "nadando"],
-      respuesta: "volando"
-    },
-    {
-      texto: "El niño está _____ la pelota.",
-      opciones: ["pateando", "leyendo", "cantando"],
-      respuesta: "pateando"
-    },
-    {
-      texto: "La casa es de color _____.",
-      opciones: ["rojo", "perro", "mar"],
-      respuesta: "rojo"
-    },
-    {
-      texto: "La vaca da _____.",
-      opciones: ["leche", "plumas", "queso"],
-      respuesta: "leche"
-    },
-    {
-      texto: "Los árboles tienen _____.",
-      opciones: ["hojas", "zapatos", "pelo"],
-      respuesta: "hojas"
-    },
-    {
-      texto: "El pez nada en el _____.",
-      opciones: ["agua", "cielo", "pastel"],
-      respuesta: "agua"
-    }
+    { texto: "El gato está _____ en el tejado.", opciones: ["saltando", "nadando", "volando"], respuesta: "saltando" },
+    { texto: "El auto está _____ por la carretera.", opciones: ["corriendo", "volando", "rodando"], respuesta: "rodando" },
+    { texto: "La niña está _____ un libro.", opciones: ["leyendo", "comiendo", "pintando"], respuesta: "leyendo" },
+    { texto: "El sol sale por el _____.", opciones: ["este", "árbol", "techo"], respuesta: "este" },
+    { texto: "Los pájaros están _____ en el cielo.", opciones: ["volando", "corriendo", "nadando"], respuesta: "volando" },
+    { texto: "El niño está _____ la pelota.", opciones: ["pateando", "leyendo", "cantando"], respuesta: "pateando" },
+    { texto: "La casa es de color _____.", opciones: ["rojo", "perro", "mar"], respuesta: "rojo" },
+    { texto: "La vaca da _____.", opciones: ["leche", "plumas", "queso"], respuesta: "leche" },
+    { texto: "Los árboles tienen _____.", opciones: ["hojas", "zapatos", "pelo"], respuesta: "hojas" },
+    { texto: "El pez nada en el _____.", opciones: ["agua", "cielo", "pastel"], respuesta: "agua" }
   ];
 
   const iniciarJuego = () => {
@@ -69,9 +40,12 @@ export default function SelfSupervisedGame() {
     setFraseActual(0);
     setResultado(null);
     setJuegoKey(k => k + 1);
+    setPuedeGuardar(false);
+    setGuardado(false);
+    setErrorGuardar(null);
+    setMostroLogro(false);
   };
 
-  
   const sceneRef = useRef(null);
 
   useEffect(() => {
@@ -88,7 +62,6 @@ export default function SelfSupervisedGame() {
         scene: {
           create: function () {
             sceneRef.current = this;
-
             this.fondo = this.add.rectangle(375, 220, 650, 390, 0xffffec).setAlpha(0.25);
             this.add.text(60, 40, "🧠 Self-Supervised: ¿Qué falta en la frase?", {
               fontFamily: "Courier New",
@@ -96,7 +69,6 @@ export default function SelfSupervisedGame() {
               color: "#333"
             });
 
-            
             this.frase = this.add.text(375, 120, frases[idx].texto, {
               fontFamily: "Arial",
               fontSize: '30px',
@@ -132,7 +104,7 @@ export default function SelfSupervisedGame() {
               btn.on('pointerout', () => { btn.setFillStyle(btn.defaultColor); });
 
               btn.on('pointerdown', () => {
-                if (completando) return; 
+                if (completando) return;
                 if (op === frases[idx].respuesta) {
                   completando = true;
                   btn.setFillStyle(0xa5d6a7);
@@ -142,7 +114,6 @@ export default function SelfSupervisedGame() {
 
                   setResultado("¡Así aprende una IA a predecir lo que falta! Este tipo de IA se usa para autocompletar, traducir y restaurar información.");
 
-                  
                   this.tweens.add({
                     targets: [this.frase, ...this.botones.map((b, k) => k === i ? b : null).filter(Boolean)],
                     alpha: 0.5,
@@ -151,7 +122,7 @@ export default function SelfSupervisedGame() {
 
                   this.time.delayedCall(1700, () => {
                     completando = false;
-                    
+
                     if (idx + 1 < frases.length) {
                       setFraseActual(f => f + 1);
                       setResultado(null);
@@ -160,8 +131,8 @@ export default function SelfSupervisedGame() {
                         gameRef.current = null;
                       }
                     } else {
-                      
                       setResultado("¡Completaste todas las frases! Eres un experto en predicción como una IA. 🎉");
+                      setPuedeGuardar(true); // Permite guardar progreso/logro al finalizar
                     }
                   });
                 } else {
@@ -189,15 +160,53 @@ export default function SelfSupervisedGame() {
         gameRef.current = null;
       }
     };
-    
   }, [instruccion, juegoKey, fraseActual]);
 
-  
+  // Guardar progreso/logro
+  const guardarProgresoYLogro = async () => {
+    if (!usuario || !usuario.id) {
+      setErrorGuardar('No hay usuario logueado.');
+      return;
+    }
+    setErrorGuardar(null);
+
+    try {
+      const progresoPayload = {
+        usuarioId: usuario.id,
+        juegoId: SELF_GAME_ID,
+        avance: 100,
+        completado: true,
+        aciertos: frases.length,
+        desaciertos: 0
+      };
+      await api.post('/juegos/progreso', progresoPayload);
+
+      await api.post("/usuarios/achievement", {
+        usuarioId: usuario.id,
+        juegoId: SELF_GAME_ID,
+        nombre: NOMBRE_LOGRO,
+        descripcion: DESC_LOGRO
+      });
+      setMostroLogro(true);
+      setGuardado(true);
+      setPuedeGuardar(false);
+      // cargarHistorial(); // Si usas historial, lo puedes activar aquí
+    } catch (err) {
+      setErrorGuardar("Error al guardar: " + (err?.message || (err?.error ?? "")));
+      setGuardado(false);
+      setPuedeGuardar(true);
+    }
+  };
+
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
     setFraseActual(0);
     setJuegoKey(k => k + 1);
+    setPuedeGuardar(false);
+    setGuardado(false);
+    setErrorGuardar(null);
+    setMostroLogro(false);
     if (gameRef.current) {
       gameRef.current.destroy(true);
       gameRef.current = null;
@@ -208,7 +217,6 @@ export default function SelfSupervisedGame() {
 
   return (
     <div>
-      
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
           background: 'rgba(0,0,0,0.3)',
@@ -239,7 +247,6 @@ export default function SelfSupervisedGame() {
         </div>
       )}
 
-      
       <div id="game-container-selfsupervised" style={{
         margin: '30px auto 0 auto',
         minHeight: 420,
@@ -249,7 +256,6 @@ export default function SelfSupervisedGame() {
         boxShadow: '0 2px 8px #ddd'
       }} />
 
-      
       {resultado && (
         <div className="alert alert-info mt-3 text-center" style={{ maxWidth: 800, margin: "auto" }}>
           {resultado}
@@ -260,7 +266,27 @@ export default function SelfSupervisedGame() {
         </div>
       )}
 
-      
+      {mostroLogro && (
+        <div className="alert alert-success mt-3 text-center fw-bold" style={{ maxWidth: 500, margin: "auto" }}>
+          <i className="bi bi-trophy-fill text-warning me-2"></i>
+          ¡LOGRO GANADO! Self-Supervised Completo 🏆
+        </div>
+      )}
+
+      {errorGuardar && (
+        <div className="alert alert-danger mt-3 text-center" style={{ maxWidth: 500, margin: "auto" }}>
+          {errorGuardar}
+        </div>
+      )}
+
+      {puedeGuardar && !guardado && (
+        <div className="d-flex justify-content-center mt-4">
+          <button className="btn btn-success" onClick={guardarProgresoYLogro}>
+            Guardar progreso y registrar logro
+          </button>
+        </div>
+      )}
+
       {!instruccion && (
         <div className="d-flex justify-content-center mt-4 gap-3">
           <button className="btn btn-secondary" onClick={volverCategoria}>
