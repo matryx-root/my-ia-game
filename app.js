@@ -34,26 +34,26 @@ app.use('/api/configuracion', configuracionUsuarioRoutes);
 app.use('/api/logs-juego', logJuegoRoutes);
 app.use('/api/logs-error', logErrorRoutes);
 
+// 404 para APIs no encontradas (antes del catch-all React)
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: '❌ Ruta API no encontrada' });
+});
+
 // Servir React build en producción
 if (process.env.NODE_ENV === 'production') {
   const frontendBuildPath = path.join(__dirname, 'frontend', 'build');
   app.use(express.static(frontendBuildPath));
 
-  // Todas las rutas no API envían index.html para que React maneje el routing
+  // React SPA para todas las demás rutas (no API)
   app.get('*', (req, res) => {
     res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
 } else {
-  // Ruta simple para desarrollo o cuando no está build React
+  // Modo desarrollo simple
   app.get('/', (req, res) => {
     res.send('✅ API funcionando correctamente');
   });
 }
-
-// 404 - Ruta no encontrada para APIs
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ error: '❌ Ruta API no encontrada' });
-});
 
 // Manejo global de errores
 app.use((err, req, res, next) => {
