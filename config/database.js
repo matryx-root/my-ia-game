@@ -3,10 +3,10 @@ require('dotenv').config();
 
 let pool;
 
-if (process.env.DATABASE_URL) {
+if (process.env.RDS_DATABASE_URL) {
   // En producción (Heroku)
   pool = new Pool({
-    connectionString: process.env.DATABASE_URL,
+    connectionString: process.env.RDS_DATABASE_URL,
     ssl: {
       rejectUnauthorized: false, // necesario para conectar a bases remotas en Heroku
     },
