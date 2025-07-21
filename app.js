@@ -36,7 +36,7 @@ app.use('/api/logs-error', logErrorRoutes);
 
 // Frontend en producción (React compilado en frontend/build)
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, '../frontend/build');
+  const frontendPath = path.join(__dirname, 'frontend/build');
   app.use(express.static(frontendPath));
 
   app.get('*', (req, res) => {
