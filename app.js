@@ -35,9 +35,9 @@ app.use('/api/logs-juego', logJuegoRoutes);
 app.use('/api/logs-error', logErrorRoutes);
 
 // 404 para APIs no encontradas (antes del catch-all React)
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ error: '❌ Ruta API no encontrada' });
-});
+//app.use('/api/*', (req, res) => {
+//  res.status(404).json({ error: '❌ Ruta API no encontrada' });
+//});
 
 // Servir React build en producción
 if (process.env.NODE_ENV === 'production') {
