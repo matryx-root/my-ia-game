@@ -17,7 +17,7 @@ const juegosAdminRoutes = require('./routes/juegosAdmin');
 
 const app = express();
 
-// Middlewares
+// Middlewares globales
 app.use(express.json());
 app.use(cors());
 
@@ -34,24 +34,25 @@ app.use('/api/configuracion', configuracionUsuarioRoutes);
 app.use('/api/logs-juego', logJuegoRoutes);
 app.use('/api/logs-error', logErrorRoutes);
 
-// Frontend en producción (React compilado en frontend/build)
+// Servir React build en producción
 if (process.env.NODE_ENV === 'production') {
-  const frontendPath = path.join(__dirname, 'frontend/build');
-  app.use(express.static(frontendPath));
+  const frontendBuildPath = path.join(__dirname, 'frontend', 'build');
+  app.use(express.static(frontendBuildPath));
 
+  // Todas las rutas no API envían index.html para que React maneje el routing
   app.get('*', (req, res) => {
-    res.sendFile(path.join(frontendPath, 'index.html'));
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
+  });
+} else {
+  // Ruta simple para desarrollo o cuando no está build React
+  app.get('/', (req, res) => {
+    res.send('✅ API funcionando correctamente');
   });
 }
 
-// Ruta básica
-app.get('/', (req, res) => {
-  res.send('✅ API funcionando correctamente');
-});
-
-// 404 - Ruta no encontrada
-app.use((req, res, next) => {
-  res.status(404).json({ error: '❌ Ruta no encontrada' });
+// 404 - Ruta no encontrada para APIs
+app.use('/api/*', (req, res) => {
+  res.status(404).json({ error: '❌ Ruta API no encontrada' });
 });
 
 // Manejo global de errores

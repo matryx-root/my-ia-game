@@ -1,17 +1,12 @@
 {
-  "name": "backend",
+  "name": "my-ia-game",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js" ,
+    "start": "node server.js",
     "seed": "node prisma/seed.js",
     "heroku-postbuild": "cd frontend && npm install --legacy-peer-deps && npm run build"
-
   },
-
-
-  
   "keywords": [],
   "author": "",
   "license": "ISC",
