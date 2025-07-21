@@ -1,13 +1,10 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-async function main() {
+async function seedJuegos() {
   await prisma.juego.createMany({
     data: [
-      
       { nombre: "IA Simbólica y Sistemas Expertos", descripcion: "Toma decisiones usando reglas fijas, sin aprendizaje ni memoria." },
-
-      
       { nombre: "Machine Learning", descripcion: "Aprende patrones a partir de datos históricos." },
       { nombre: "Supervised Learning", descripcion: "Aprendizaje supervisado con datos etiquetados." },
       { nombre: "Unsupervised Learning", descripcion: "Aprendizaje no supervisado, encuentra patrones en datos no etiquetados." },
@@ -19,20 +16,14 @@ async function main() {
       { nombre: "Federated Learning", descripcion: "Entrenamiento distribuido sin centralizar los datos." },
       { nombre: "Computer Vision", descripcion: "Interpretación y análisis automático de imágenes o videos." },
       { nombre: "Natural Language Processing", descripcion: "Procesamiento y análisis de lenguaje humano." },
-
-      
       { nombre: "GANs (Generative Adversarial Networks)", descripcion: "Genera imágenes, audio o datos simulando creatividad." },
       { nombre: "VAEs (Variational Autoencoders)", descripcion: "Compresión y generación eficiente de datos." },
       { nombre: "Diffusion Models", descripcion: "Generación de contenido mediante procesos de difusión." },
       { nombre: "Generative AI", descripcion: "Modelos que crean nuevo contenido (texto, imágenes, audio, etc)." },
-
-      
       { nombre: "Teoría de la Mente (Demo)", descripcion: "Simulación de empatía, emociones o intenciones (en desarrollo)." }
     ],
     skipDuplicates: true
   });
 }
 
-main()
-  .catch(e => { console.error(e); process.exit(1); })
-  .finally(() => prisma.$disconnect());
+module.exports = seedJuegos;
