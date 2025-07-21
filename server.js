@@ -14,7 +14,7 @@ app.use('/api/usuarios', require('./routes/usuarioRoutes'));
 app.use('/api/usuarios/achievement', require('./routes/achievementRoutes'));
 app.use('/api/juegos', require('./routes/juegoRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
-app.use('/api/admin/juegos', require('./routes/juegosAdminRoutes'));
+app.use('/api/admin/juegos', require('./routes/juegosAdmin'));
 app.use('/api/colegios', require('./routes/colegioRoutes'));
 app.use('/api/mensajes', require('./routes/mensajes'));
 app.use('/api/dashboard', require('./routes/dashboardAdminRoutes'));
