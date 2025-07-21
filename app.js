@@ -41,7 +41,7 @@ app.use('/api/*', (req, res) => {
 
 // Servir React build en producción
 if (process.env.NODE_ENV === 'production') {
-  const frontendBuildPath = path.join(__dirname, 'frontend', 'build');
+  const frontendBuildPath = path.join(__dirname, './frontend', 'build');
   app.use(express.static(frontendBuildPath));
 
   // React SPA para todas las demás rutas (no API)
