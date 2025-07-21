@@ -2,12 +2,12 @@ const express = require('express');
 const path = require('path');
 const app = require('./app'); // Tu backend con rutas y middlewares
 
-// Servir archivos estáticos desde frontend/build
-app.use(express.static(path.join(__dirname, '../frontend/build')));
+// Servir archivos estáticos desde frontend/build (carpeta frontal en raíz)
+app.use(express.static(path.join(__dirname, 'frontend/build')));
 
-// Redirigir rutas que no sean API al frontend
+// Redirigir rutas que no sean API al frontend para SPA
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
+  res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
 });
 
 // Iniciar el servidor
