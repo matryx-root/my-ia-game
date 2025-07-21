@@ -23,7 +23,7 @@ app.use('/api/logs-juego', require('./routes/logJuegoRoutes'));
 app.use('/api/logs-error', require('./routes/logErrorRoutes'));
 
 // === Frontend en producción (React compilado) ===
-const buildPath = path.join(__dirname, 'frontend', 'build');
+const buildPath = path.join(__dirname, './frontend', 'build');
 app.use(express.static(buildPath));
 app.get('*', (req, res) => {
   res.sendFile(path.join(buildPath, 'index.html'));
