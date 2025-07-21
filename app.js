@@ -61,4 +61,8 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: err.message || 'Error interno del servidor' });
 });
 
+app.get('/test', (req, res) => {
+  res.json({ message: 'Test API funciona' });
+});
+
 module.exports = app;
