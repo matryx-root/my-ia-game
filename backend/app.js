@@ -1,8 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
-
 const app = express();
+const cors = require('cors');
 
 // Importación de rutas
 const usuarioRoutes = require('./routes/usuarioRoutes');
@@ -17,6 +17,11 @@ const logJuegoRoutes = require('./routes/logJuegoRoutes');
 const logErrorRoutes = require('./routes/logErrorRoutes');
 const juegosAdminRoutes = require('./routes/juegosAdmin');
 
+app.use(cors({
+  origin: 'https://my-ia-game-app.herokuapp.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+}));
 // Middleware para parsear JSON y URL encoded con límite alto para payloads grandes
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));

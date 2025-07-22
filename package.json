@@ -5,7 +5,6 @@
   "scripts": {
     "start": "node backend/server.js",
     "heroku-postbuild": "npx prisma generate --schema=./backend/prisma/schema.prisma && cd frontend && npm install --legacy-peer-deps && npm run build"
-
   },
   "keywords": [],
   "author": "",
