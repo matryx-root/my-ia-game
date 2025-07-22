@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors');  // Importa cors solo una vez
+
 const path = require('path');
 require('dotenv').config();
 
@@ -18,17 +18,7 @@ const juegosAdminRoutes = require('./routes/juegosAdmin');
 
 const app = express();
 
-// Configuración CORS (puedes ajustarla a tu whitelist)
-const corsOptions = {
-  origin: [
-    'https://my-ia-game-app.herokuapp.com',
-    'http://localhost:3001'
-  ],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204
-};
-app.use(cors(corsOptions));  // Usa CORS
+
 
 // Middleware para parsear JSON y URL encoded con límite alto para payloads grandes
 app.use(express.json({ limit: '50mb' }));
