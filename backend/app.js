@@ -40,7 +40,7 @@ if (process.env.NODE_ENV !== 'production') {
 const apiRoutes = express.Router();
 
 apiRoutes.use('/usuarios', usuarioRoutes);
-apiRoutes.use('/usuarios/achievement', achievementRoutes);
+apiRoutes.use('/achievements', achievementRoutes);
 apiRoutes.use('/juegos', juegoRoutes);
 apiRoutes.use('/admin', adminRoutes);
 apiRoutes.use('/admin/juegos', juegosAdminRoutes);
