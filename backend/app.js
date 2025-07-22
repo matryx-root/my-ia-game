@@ -18,15 +18,20 @@ const juegosAdminRoutes = require('./routes/juegosAdmin');
 
 const app = express();
 
+
 // Configuración de middleware
 app.use(express.json({ limit: '50mb' }));
+
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Backend operativo' });
+});
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
 // Configuración CORS optimizada
 const corsOptions = {
   origin: [
     'https://my-ia-game-app.herokuapp.com',
-    'http://localhost:3000'
+    'http://localhost:3001'
   ],
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   credentials: true,
