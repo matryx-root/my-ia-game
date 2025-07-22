@@ -1,12 +1,14 @@
 const express = require('express');
+const path = require('path');
+require('dotenv').config();
+
+// Intentar importar cors, pero si falla no romper la app (aunque debería estar instalado)
 let cors;
 try {
   cors = require('cors');
 } catch (e) {
-  // Si ya estaba declarado o hay error, ignoramos para evitar conflicto
+  console.warn('Advertencia: Módulo cors no disponible. Algunas funcionalidades CORS pueden fallar.');
 }
-const path = require('path');
-require('dotenv').config();
 
 // Importación de rutas
 const usuarioRoutes = require('./routes/usuarioRoutes');
@@ -23,15 +25,20 @@ const juegosAdminRoutes = require('./routes/juegosAdmin');
 
 const app = express();
 
-// Configuración de middleware
+// Middleware para parsear JSON y URL encoded con límite alto para payloads grandes
 app.use(express.json({ limit: '50mb' }));
-
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Backend operativo' });
-});
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
-// Configuración CORS optimizada
+// Healthcheck simple para verificar que el backend esté activo
+app.get('/api/health', (req, res) => {
+  res.json({
+    status: 'OK',
+    environment: process.env.NODE_ENV || 'development',
+    timestamp: new Date().toISOString()
+  });
+});
+
+// Configuración CORS con whitelist y credenciales
 const corsOptions = {
   origin: [
     'https://my-ia-game-app.herokuapp.com',
@@ -51,8 +58,9 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
-// Configuración de rutas API
+// Rutas agrupadas con prefijo /api
 const apiRoutes = express.Router();
+
 apiRoutes.use('/usuarios', usuarioRoutes);
 apiRoutes.use('/usuarios/achievement', achievementRoutes);
 apiRoutes.use('/juegos', juegoRoutes);
@@ -65,37 +73,28 @@ apiRoutes.use('/configuracion', configuracionUsuarioRoutes);
 apiRoutes.use('/logs-juego', logJuegoRoutes);
 apiRoutes.use('/logs-error', logErrorRoutes);
 
-// Prefijo /api para todas las rutas
 app.use('/api', apiRoutes);
 
-// Ruta de verificación de salud
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'OK',
-    environment: process.env.NODE_ENV || 'development',
-    timestamp: new Date().toISOString()
-  });
-});
-
-// Manejo de rutas no encontradas
+// Manejo de rutas API no encontradas
 app.use('/api/*', (req, res) => {
-  res.status(404).json({ 
+  res.status(404).json({
     error: 'Ruta API no encontrada',
     path: req.originalUrl,
     method: req.method
   });
 });
 
-// Configuración para servir el frontend en producción
+// Servir frontend estático en producción
 const frontendPath = path.join(__dirname, 'frontend', 'build');
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(frontendPath));
-  
-  // Captura todas las rutas no-API para el frontend
+
+  // Captura todas las rutas no-API para servir index.html (SPA React)
   app.get('*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 } else {
+  // En desarrollo, mostrar mensaje simple en /
   app.get('/', (req, res) => {
     res.send(`
       <h1>API en desarrollo</h1>
@@ -109,7 +108,7 @@ if (process.env.NODE_ENV === 'production') {
   });
 }
 
-// Manejo centralizado de errores
+// Middleware de manejo de errores centralizado
 app.use((err, req, res, next) => {
   console.error('Error global:', {
     message: err.message,
@@ -119,8 +118,8 @@ app.use((err, req, res, next) => {
   });
 
   const response = {
-    error: process.env.NODE_ENV !== 'production' 
-      ? err.message 
+    error: process.env.NODE_ENV !== 'production'
+      ? err.message
       : 'Error interno del servidor'
   };
 
