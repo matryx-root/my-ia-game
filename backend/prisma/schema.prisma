@@ -7,11 +7,11 @@ datasource db {
   url      = env("RDS_DATABASE_URL")
 }
 
-
 enum RolUsuario {
   alumno
   docente
   admin
+  auditor
 }
 enum Tema {
   Predeterminado
