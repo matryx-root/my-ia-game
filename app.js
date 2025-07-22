@@ -1,9 +1,8 @@
-require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+require('dotenv').config();
 
-// Importación de rutas
 const usuarioRoutes = require('./routes/usuarioRoutes');
 const juegoRoutes = require('./routes/juegoRoutes');
 const adminRoutes = require('./routes/adminRoutes');
@@ -18,20 +17,9 @@ const juegosAdminRoutes = require('./routes/juegosAdmin');
 
 const app = express();
 
-// Configuración básica
-app.use(express.json({ limit: '50mb' }));
-app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+// Middlewares globales
+app.use(express.json());
 app.use(cors());
-
-// Configuración para servir archivos estáticos
-app.use('/static', express.static(path.join(__dirname, 'frontend/build/static')));
-app.use(express.static(path.join(__dirname, 'frontend/build')));
-
-// Middleware para log de peticiones
-app.use((req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.path}`);
-  next();
-});
 
 // Rutas API
 app.use('/api/usuarios', usuarioRoutes);
@@ -46,37 +34,35 @@ app.use('/api/configuracion', configuracionUsuarioRoutes);
 app.use('/api/logs-juego', logJuegoRoutes);
 app.use('/api/logs-error', logErrorRoutes);
 
-// Ruta para verificar estado del servidor
-app.get('/api/status', (req, res) => {
-  res.json({ 
-    status: 'OK',
-    environment: process.env.NODE_ENV || 'development',
-    timestamp: new Date().toISOString()
+// 404 para APIs no encontradas (antes del catch-all React)
+//app.use('/api/*', (req, res) => {
+//  res.status(404).json({ error: '❌ Ruta API no encontrada' });
+//});
+
+// Servir React build en producción
+if (process.env.NODE_ENV === 'production') {
+  const frontendBuildPath = path.join(__dirname, './frontend', 'build');
+  app.use(express.static(frontendBuildPath));
+
+  // React SPA para todas las demás rutas (no API)
+  app.get('/', (req, res) => {
+    res.sendFile(path.join(frontendBuildPath, 'index.html'));
   });
-});
-
-// 404 para APIs no encontradas
-app.use('/api/*', (req, res) => {
-  res.status(404).json({ error: '❌ Ruta API no encontrada' });
-});
-
-// Servir aplicación React para todas las demás rutas
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, 'frontend/build', 'index.html'));
-});
+} else {
+  // Modo desarrollo simple
+  app.get('/', (req, res) => {
+    res.send('✅ API funcionando correctamente');
+  });
+}
 
 // Manejo global de errores
 app.use((err, req, res, next) => {
-  console.error('❌ Error global:', err.stack);
-  
-  // Registrar error en base de datos si es necesario
-  // ...
-  
-  res.status(500).json({ 
-    error: process.env.NODE_ENV === 'production' 
-      ? 'Error interno del servidor' 
-      : err.message 
-  });
+  console.error('❌ Error global:', err);
+  res.status(500).json({ error: err.message || 'Error interno del servidor' });
+});
+
+app.get('/test', (req, res) => {
+  res.json({ message: 'Test API funciona' });
 });
 
 module.exports = app;
