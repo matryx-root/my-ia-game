@@ -12,6 +12,7 @@ enum RolUsuario {
   docente
   admin
   auditor
+  tecnico
 }
 enum Tema {
   Predeterminado
