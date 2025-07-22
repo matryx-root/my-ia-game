@@ -66,7 +66,7 @@ app.use('/api/*', (req, res) => {
 });
 
 // Servir frontend estático en producción
-const frontendPath = path.join(__dirname, 'frontend', 'build');
+const frontendPath = path.join(__dirname, '..', 'frontend', 'build');
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(frontendPath));
 
