@@ -1,5 +1,10 @@
 const express = require('express');
-const cors = require('cors');
+let cors;
+try {
+  cors = require('cors');
+} catch (e) {
+  // Si ya estaba declarado o hay error, ignoramos para evitar conflicto
+}
 const path = require('path');
 require('dotenv').config();
 
@@ -17,7 +22,6 @@ const logErrorRoutes = require('./routes/logErrorRoutes');
 const juegosAdminRoutes = require('./routes/juegosAdmin');
 
 const app = express();
-
 
 // Configuración de middleware
 app.use(express.json({ limit: '50mb' }));
@@ -37,7 +41,9 @@ const corsOptions = {
   credentials: true,
   optionsSuccessStatus: 204
 };
-app.use(cors(corsOptions));
+if (cors) {
+  app.use(cors(corsOptions));
+}
 
 // Middleware de logs para desarrollo
 if (process.env.NODE_ENV !== 'production') {
