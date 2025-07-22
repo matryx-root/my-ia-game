@@ -1,7 +1,8 @@
-const express = require('express');
-
-const path = require('path');
 require('dotenv').config();
+const express = require('express');
+const path = require('path');
+
+const app = express();
 
 // Importación de rutas
 const usuarioRoutes = require('./routes/usuarioRoutes');
@@ -15,10 +16,6 @@ const configuracionUsuarioRoutes = require('./routes/configuracionUsuario');
 const logJuegoRoutes = require('./routes/logJuegoRoutes');
 const logErrorRoutes = require('./routes/logErrorRoutes');
 const juegosAdminRoutes = require('./routes/juegosAdmin');
-
-const app = express();
-
-
 
 // Middleware para parsear JSON y URL encoded con límite alto para payloads grandes
 app.use(express.json({ limit: '50mb' }));
@@ -39,7 +36,7 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
-// Rutas agrupadas con prefijo /api
+// Rutas API agrupadas con prefijo /api
 const apiRoutes = express.Router();
 
 apiRoutes.use('/usuarios', usuarioRoutes);
@@ -65,17 +62,17 @@ app.use('/api/*', (req, res) => {
   });
 });
 
-// Servir frontend estático en producción
-const frontendPath = path.join(__dirname, '..', 'frontend', 'build');
+// Servir frontend React estático en producción
 if (process.env.NODE_ENV === 'production') {
+  const frontendPath = path.join(__dirname, '..', 'frontend', 'build');
   app.use(express.static(frontendPath));
 
-  // Captura todas las rutas no-API para servir index.html (SPA React)
+  // Capturar todas las rutas que no son API y enviar index.html para SPA React
   app.get('*', (req, res) => {
     res.sendFile(path.join(frontendPath, 'index.html'));
   });
 } else {
-  // En desarrollo, mostrar mensaje simple en /
+  // En desarrollo, mostrar un mensaje simple en la raíz
   app.get('/', (req, res) => {
     res.send(`
       <h1>API en desarrollo</h1>
@@ -84,12 +81,13 @@ if (process.env.NODE_ENV === 'production') {
         <li><a href="/api/health">/api/health</a> - Verificar estado</li>
         <li>/api/colegios - Gestión de colegios</li>
         <li>/api/usuarios - Gestión de usuarios</li>
+        <!-- agrega más endpoints según tu API -->
       </ul>
     `);
   });
 }
 
-// Middleware de manejo de errores centralizado
+// Middleware centralizado para manejo de errores
 app.use((err, req, res, next) => {
   console.error('Error global:', {
     message: err.message,
@@ -99,9 +97,7 @@ app.use((err, req, res, next) => {
   });
 
   const response = {
-    error: process.env.NODE_ENV !== 'production'
-      ? err.message
-      : 'Error interno del servidor'
+    error: process.env.NODE_ENV !== 'production' ? err.message : 'Error interno del servidor'
   };
 
   if (process.env.NODE_ENV !== 'production') {
