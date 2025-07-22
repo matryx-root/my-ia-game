@@ -3,23 +3,30 @@ require('dotenv').config();
 
 let pool;
 
-if (process.env.RDS_DATABASE_URL) {
-  // En producción (Heroku)
+if (process.env.NODE_ENV === 'production') {
   pool = new Pool({
     connectionString: process.env.RDS_DATABASE_URL,
     ssl: {
-      rejectUnauthorized: false, // necesario para conectar a bases remotas en Heroku
+      rejectUnauthorized: false,
     },
   });
 } else {
-  // En desarrollo local
   pool = new Pool({
-    host: process.env.DB_HOST || 'localhost',
-    port: process.env.DB_PORT || 5432,
-    user: process.env.DB_USER || 'postgres',
-    password: process.env.DB_PASS || 'Simi1935',
-    database: process.env.DB_NAME || 'GameAdm',
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME,
   });
 }
 
-module.exports = pool;
+// Añade esto para debug
+pool.on('connect', () => console.log('✔ Connected to DB'));
+pool.on('error', (err) => console.error('❌ DB connection error', err));
+
+module.exports = {
+  query: (text, params) => {
+    console.log('Executing query:', text);
+    return pool.query(text, params);
+  },
+};

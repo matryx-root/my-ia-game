@@ -19,7 +19,14 @@ const app = express();
 
 // Middlewares globales
 app.use(express.json());
-app.use(cors());
+const cors = require('cors');
+app.use(cors({
+  origin: [
+    'https://my-ia-game-app.herokuapp.com',
+    'http://localhost:3000'
+  ],
+  credentials: true
+}));
 
 // Rutas API
 app.use('/api/usuarios', usuarioRoutes);
