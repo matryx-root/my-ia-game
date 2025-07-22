@@ -1,12 +1,12 @@
 {
   "name": "my-ia-game",
   "version": "1.0.0",
-  "main": "backend/server.js",
+  "main": "server.js",
   "scripts": {
-    "start": "node backend/server.js",
-    "seed": "node prisma/seed.js",
-    "heroku-postbuild": "cd frontend && npm install --legacy-peer-deps && npm run build"
+    "start": "node server.js",
+    "heroku-postbuild": "cd ../frontend && npm install --legacy-peer-deps && npm run build"
   },
+  
   "keywords": [],
   "author": "",
   "license": "ISC",

@@ -1,14 +1,7 @@
 const express = require('express');
+const cors = require('cors');  // Importa cors solo una vez
 const path = require('path');
 require('dotenv').config();
-
-// Intentar importar cors, pero si falla no romper la app (aunque debería estar instalado)
-let cors;
-try {
-  cors = require('cors');
-} catch (e) {
-  console.warn('Advertencia: Módulo cors no disponible. Algunas funcionalidades CORS pueden fallar.');
-}
 
 // Importación de rutas
 const usuarioRoutes = require('./routes/usuarioRoutes');
@@ -25,6 +18,18 @@ const juegosAdminRoutes = require('./routes/juegosAdmin');
 
 const app = express();
 
+// Configuración CORS (puedes ajustarla a tu whitelist)
+const corsOptions = {
+  origin: [
+    'https://my-ia-game-app.herokuapp.com',
+    'http://localhost:3001'
+  ],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  credentials: true,
+  optionsSuccessStatus: 204
+};
+app.use(cors(corsOptions));  // Usa CORS
+
 // Middleware para parsear JSON y URL encoded con límite alto para payloads grandes
 app.use(express.json({ limit: '50mb' }));
 app.use(express.urlencoded({ extended: true, limit: '50mb' }));
@@ -37,20 +42,6 @@ app.get('/api/health', (req, res) => {
     timestamp: new Date().toISOString()
   });
 });
-
-// Configuración CORS con whitelist y credenciales
-const corsOptions = {
-  origin: [
-    'https://my-ia-game-app.herokuapp.com',
-    'http://localhost:3001'
-  ],
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-  credentials: true,
-  optionsSuccessStatus: 204
-};
-if (cors) {
-  app.use(cors(corsOptions));
-}
 
 // Middleware de logs para desarrollo
 if (process.env.NODE_ENV !== 'production') {
