@@ -1,6 +1,6 @@
 const { PrismaClient } = require('@prisma/client');
-const prisma = new PrismaClient();
 
+const prisma = require('../prismaClient');
 
 exports.registrarProgreso = async (req, res) => {
   try {
