@@ -9,51 +9,47 @@ export default function Login({ onLogin }) {
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    setErrorMsg("");
-    setLoading(true);
+const handleLogin = async (e) => {
+  e.preventDefault();
+  setErrorMsg("");
+  setLoading(true);
 
-    try {
-      const res = await api.post("/usuarios/login", { email, password });
-      setLoading(false);
+  try {
+    const res = await api.post("/usuarios/login", { email, password });
+    setLoading(false);
 
-      if (res.token && res.usuario) {
-        
-        localStorage.setItem("usuario", JSON.stringify(res.usuario));
-        localStorage.setItem("token", res.token);
-
-        
-        localStorage.setItem("userId", res.usuario.id);
-        localStorage.setItem("rol", res.usuario.rol || "");
-        if (res.usuario.colegioId)
-          localStorage.setItem("colegioId", res.usuario.colegioId);
-
-        if (typeof onLogin === "function") onLogin(res.usuario);
-
-        
-        window.alert("¡Login exitoso!, Bienvenido/a " + res.usuario.nombre);
-
-        
-        if (res.usuario.rol === "admin") {
-          navigate("/admin");
-        } else if (res.usuario.rol === "docente") {
-          navigate("/panel-game");
-        } else {
-          navigate("/categorias");
-        }
-      } else if (res.error === "correo_no_existe") {
-        setErrorMsg("Login fallido, su correo no está registrado.");
-      } else if (res.error === "password_incorrecta") {
-        setErrorMsg("Login fallido, su contraseña no es la misma a la registrada.");
-      } else {
-        setErrorMsg(res.mensaje || res.error || "Login fallido. Verifica tu email y contraseña.");
+    if (res.token && res.usuario) {
+      localStorage.setItem("usuario", JSON.stringify(res.usuario));
+      localStorage.setItem("token", res.token);
+      localStorage.setItem("userId", res.usuario.id);
+      localStorage.setItem("rol", res.usuario.rol || "");
+      if (res.usuario.colegioId) {
+        localStorage.setItem("colegioId", res.usuario.colegioId);
       }
-    } catch (err) {
-      setLoading(false);
-      setErrorMsg("Login fallido. Usuario o contraseña incorrectos, o no tienes cuenta registrada.");
+
+      if (typeof onLogin === "function") onLogin(res.usuario);
+
+      window.alert("¡Login exitoso!, Bienvenido/a " + res.usuario.nombre);
+
+      if (res.usuario.rol === "admin") {
+        navigate("/admin");
+      } else if (res.usuario.rol === "docente") {
+        navigate("/panel-game");
+      } else {
+        navigate("/categorias");
+      }
+    } else if (res.error === "correo_no_existe") {
+      setErrorMsg("Login fallido, su correo no está registrado.");
+    } else if (res.error === "password_incorrecta") {
+      setErrorMsg("Login fallido, su contraseña no es la misma a la registrada.");
+    } else {
+      setErrorMsg(res.mensaje || res.error || "Login fallido. Verifica tu email y contraseña.");
     }
-  };
+  } catch (err) {
+    setLoading(false);
+    setErrorMsg("Login fallido. Usuario o contraseña incorrectos, o no tienes cuenta registrada.");
+  }
+};
 
   return (
     <div className="d-flex justify-content-center align-items-center vh-100">
