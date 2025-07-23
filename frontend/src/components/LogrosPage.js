@@ -6,7 +6,7 @@ export default function LogrosPage({ usuario }) {
   const [logros, setLogros] = useState([]);
   useEffect(() => {
     if (usuario)
-      api.get(`/usuarios/achievement/${usuario.id}`)
+      api.get(`/achievements/usuario/${usuario.id}`)
         .then(setLogros)
         .catch(() => setLogros([]));
   }, [usuario]);
