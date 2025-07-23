@@ -1,11 +1,12 @@
+const cors = require('cors');
 require('dotenv').config();
 const express = require('express');
 const path = require('path');
 const app = express();
-const cors = require('cors');
+
 
 app.use(cors({
-  origin: 'https://my-ia-game-app.herokuapp.com',
+  origin: 'https://my-ia-game-app-f2c48d5cab78.herokuapp.com',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
