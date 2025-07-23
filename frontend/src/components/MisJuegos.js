@@ -14,7 +14,7 @@ export default function MisJuegos({ usuario }) {
     setLoading(true);
     Promise.all([
      api.get(`/juegos/progreso/${usuario.id}`),           // ✅ Correcta
-      api.get(`/achievements/usuario/${usuario.id}`)  
+      api.get(`/usuarios/achievement/${usuario.id}`)  
     ])
       .then(([prog, achv]) => {
         setProgreso(Array.isArray(prog) ? prog : []);

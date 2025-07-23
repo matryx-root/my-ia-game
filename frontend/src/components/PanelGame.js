@@ -56,7 +56,7 @@ export default function PanelGame({ usuario }) {
       setLoading(true);
       Promise.all([
         api.get(`/juegos/progreso/${user.id}`),
-        api.get(`/achievements/usuario/${user.id}`)
+        api.get(`/usuarios/achievement/${user.id}`)
       ])
         .then(([prog, achv]) => {
           setProgreso(Array.isArray(prog) ? prog : []);
