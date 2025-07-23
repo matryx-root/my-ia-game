@@ -13,8 +13,8 @@ export default function MisJuegos({ usuario }) {
     if (!usuario) return;
     setLoading(true);
     Promise.all([
-      api.get(`/juegos/progreso/${usuario.id}`),
-      api.get(`/usuarios/achievement/${usuario.id}`)
+     api.get(`/juegos/progreso/${usuario.id}`),           // ✅ Correcta
+      api.get(`/achievements/usuario/${usuario.id}`)  
     ])
       .then(([prog, achv]) => {
         setProgreso(Array.isArray(prog) ? prog : []);
