@@ -6,7 +6,7 @@ const app = express();
 
 
 app.use(cors({
-  origin: 'https://my-ia-game-app-f2c48d5cab78.herokuapp.com',
+  origin: 'https://my-ia-game-app-f2c48d5cab78.herokuapp.com', // ✅ Sin espacios
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
   credentials: true,
 }));
