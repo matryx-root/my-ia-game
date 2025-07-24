@@ -63,7 +63,7 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
 
     try {
       // ✅ Cambiado de POST a PUT para que incluya el token JWT
-      await api.put(`/configuracion/${usuario.id}`, config);
+      await api.post(`/configuracion/${usuario.id}`, config);
       setSuccess("¡Configuración guardada correctamente!");
       
       // Notificar al componente padre (App.js) para actualizar el tema visual
