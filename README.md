@@ -8,6 +8,10 @@
 Plataforma educativa de juegos interactivos para aprender sobre Inteligencia Artificial.  
 Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, mensajería interna y seguimiento de progreso gamificado.
 
+Sitio hosting :
+https://my-ia-game-app-f2c48d5cab78.herokuapp.com/
+
+
 ---
 
 ## 📁 Estructura del Repositorio
