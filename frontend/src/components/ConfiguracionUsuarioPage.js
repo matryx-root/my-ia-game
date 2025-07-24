@@ -62,7 +62,6 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
       {success && <div className="alert alert-success">{success}</div>}
 
       <form style={{ maxWidth: 550, margin: "auto" }} onSubmit={guardarConfig}>
-        {/* Tema */}
         <div className="mb-3">
           <label className="form-label fw-bold">Tema visual</label>
           <select
@@ -78,55 +77,44 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
           </select>
         </div>
 
-        {/* Idioma - En construcción */}
-        <div className="mb-3 tooltip-hover">
+        <div className="mb-3">
           <label className="form-label fw-bold">Idioma</label>
           <select
             className="form-select"
             name="idioma"
             value={config.idioma}
-            disabled
-            title="Función en desarrollo. Próximamente disponible."
+            onChange={handleChange}
+            disabled={cargando}
           >
             <option value="Español">Español</option>
             <option value="Inglés">Inglés</option>
           </select>
-          <small className="text-muted">Idioma: en desarrollo</small>
-          <span className="tooltip-text">Esta función está en desarrollo. Próximamente podrás cambiar el idioma de la aplicación.</span>
         </div>
 
-        {/* Sonido - En construcción */}
-        <div className="form-check form-switch mb-3 tooltip-hover">
+        <div className="form-check form-switch mb-3">
           <input
             className="form-check-input"
             type="checkbox"
             id="sonido"
             name="sonido"
             checked={!!config.sonido}
-            disabled
-            title="Función en desarrollo. Próximamente disponible."
+            onChange={handleChange}
+            disabled={cargando}
           />
           <label className="form-check-label fw-bold" htmlFor="sonido">Sonido Activado</label>
-          <br />
-          <small className="text-muted">En desarrollo</small>
-          <span className="tooltip-text">La gestión de sonido está en desarrollo. Próximamente podrás activarlo o desactivarlo.</span>
         </div>
 
-        {/* Notificaciones - En construcción */}
-        <div className="form-check form-switch mb-4 tooltip-hover">
+        <div className="form-check form-switch mb-4">
           <input
             className="form-check-input"
             type="checkbox"
             id="notificaciones"
             name="notificaciones"
             checked={!!config.notificaciones}
-            disabled
-            title="Función en desarrollo. Próximamente disponible."
+            onChange={handleChange}
+            disabled={cargando}
           />
           <label className="form-check-label fw-bold" htmlFor="notificaciones">Notificaciones Activadas</label>
-          <br />
-          <small className="text-muted">En desarrollo</small>
-          <span className="tooltip-text">Las notificaciones están en desarrollo. Próximamente podrás gestionarlas desde aquí.</span>
         </div>
 
         <button
