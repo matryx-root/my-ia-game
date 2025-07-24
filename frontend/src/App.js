@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import './App.css'; 
+import './App.css';
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Registro from "./components/Registro";
@@ -19,7 +19,7 @@ import MisJuegos from "./components/MisJuegos";
 import JuegosAdmin from "./components/JuegosAdmin";
 import api from "./utils/api";
 
-// Importar todos los juegos aquí
+// Importar todos los juegos
 import IAGame from "./games/iaGame";
 import MLGame from "./games/mlGame";
 import DLGame from "./games/dlGame";
@@ -60,10 +60,11 @@ export const juegosComponentes = {
 };
 export const juegosMap = {};
 
+// Componente para rutas protegidas
 function RutaPrivada({ usuario, children }) {
   const location = useLocation();
   if (!usuario && location.pathname === "/") return children;
-  if (!usuario) return <Navigate to="/login" />;
+  if (!usuario) return <Navigate to="/login" replace />;
   return children;
 }
 
@@ -73,7 +74,7 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [juegosCargados, setJuegosCargados] = useState(false);
 
-  // Utilidad para normalizar el nombre del juego
+  // Normaliza nombres de juegos para mapeo
   function toKey(nombre) {
     return nombre
       .toLowerCase()
@@ -81,48 +82,59 @@ function App() {
       .replace(/ñ/g, "n").replace(/[^a-z0-9]/g, "");
   }
 
-  // Carga usuario y configuración al iniciar
+  // Cargar usuario y configuración al iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
-      api.get("/usuarios/perfil/me")
-        .then(res => {
-          if (res && !res.error) {
-            setUsuario(res);
-            return api.get(`/configuracion/${res.id}`);
-          } else {
-            localStorage.removeItem("token");
-            localStorage.removeItem("userId");
-            setUsuario(null);
-            setConfiguracion(null);
-          }
-        })
-        .then(cfg => {
-          if (cfg) setConfiguracion(cfg);
-        })
-        .catch(() => {
-          setUsuario(null);
-          setConfiguracion(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
+    const userId = localStorage.getItem("userId");
+
+    if (!token || !userId) {
       setUsuario(null);
       setConfiguracion(null);
       setLoading(false);
+      return;
     }
+
+    api.get("/usuarios/perfil/me")
+      .then(user => {
+        if (user && user.id) {
+          setUsuario(user);
+          return api.get(`/configuracion/${user.id}`);
+        } else {
+          throw new Error("Usuario no válido");
+        }
+      })
+      .then(cfg => {
+        if (cfg) {
+          setConfiguracion(cfg);
+        }
+      })
+      .catch(err => {
+        console.error("Error al cargar usuario o configuración:", err);
+        localStorage.removeItem("token");
+        localStorage.removeItem("userId");
+        setUsuario(null);
+        setConfiguracion(null);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
-  // Carga listado de juegos al iniciar
+  // Cargar lista de juegos
   useEffect(() => {
     async function fetchJuegos() {
       try {
         const juegos = await api.get("/juegos");
-        for (let juego of juegos) {
-          if (juego.archivo) juegosMap[juego.archivo.replace(/\.js$/, "")] = juego.id;
-          else if (juego.nombre && juegosComponentes[toKey(juego.nombre)]) {
-            juegosMap[toKey(juego.nombre)] = juego.id;
+        juegos.forEach(juego => {
+          if (juego.archivo) {
+            juegosMap[juego.archivo.replace(/\.js$/, "")] = juego.id;
+          } else if (juego.nombre) {
+            const key = toKey(juego.nombre);
+            if (juegosComponentes[key]) {
+              juegosMap[key] = juego.id;
+            }
           }
-        }
+        });
         setJuegosCargados(true);
       } catch (err) {
         console.error("Error cargando juegos:", err);
@@ -132,7 +144,7 @@ function App() {
     fetchJuegos();
   }, []);
 
-  // Aplica tema visual al body según config
+  // Aplicar tema visual al body
   useEffect(() => {
     let claseTema = "theme-default";
     if (configuracion) {
@@ -142,13 +154,36 @@ function App() {
     document.body.className = claseTema;
   }, [configuracion]);
 
-  // Login exitoso: guarda usuario y trae config
-  const handleLogin = (user) => {
+  // ✅ handleLogin actualizado: guarda token y carga configuración
+  const handleLogin = (user, token) => {
+    // Validación básica
+    if (!user?.id || !token) {
+      console.error("Datos de login incompletos");
+      return;
+    }
+
+    // Guardar en estado y almacenamiento
     setUsuario(user);
+    setConfiguracion(prev => prev); // Mantiene configuración previa hasta cargar la nueva
+
+    // Guardar en localStorage
+    localStorage.setItem("token", token);
     localStorage.setItem("userId", user.id);
-    api.get(`/configuracion/${user.id}`).then(cfg => {
-      if (cfg) setConfiguracion(cfg);
-    });
+
+    // Cargar configuración del usuario desde la API
+    api.get(`/configuracion/${user.id}`)
+      .then(cfg => {
+        if (cfg) {
+          setConfiguracion(cfg);
+        } else {
+          // Opcional: crear configuración predeterminada
+          console.log("Usuario sin configuración guardada. Usando valores por defecto.");
+        }
+      })
+      .catch(err => {
+        console.error("No se pudo cargar la configuración del usuario:", err);
+        // Continúa con valores por defecto
+      });
   };
 
   // Logout
@@ -163,20 +198,18 @@ function App() {
     }, 100);
   };
 
-  // Cargando inicial
+  // Pantalla de carga
   if (loading || !juegosCargados) {
     return (
-      <div
-        style={{
-          width: "100vw",
-          height: "100vh",
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          fontSize: 28,
-          color: "#888",
-        }}
-      >
+      <div style={{
+        width: "100vw",
+        height: "100vh",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 28,
+        color: "#888",
+      }}>
         Cargando...
       </div>
     );
@@ -189,11 +222,11 @@ function App() {
         <Route path="/" element={<LandingPage />} />
         <Route
           path="/login"
-          element={usuario ? <Navigate to="/categorias" /> : <Login onLogin={handleLogin} />}
+          element={usuario ? <Navigate to="/categorias" replace /> : <Login onLogin={handleLogin} />}
         />
         <Route
           path="/register"
-          element={usuario ? <Navigate to="/categorias" /> : <Registro onRegister={() => {}} />}
+          element={usuario ? <Navigate to="/categorias" replace /> : <Registro onRegister={() => {}} />}
         />
         <Route
           path="/categorias"
@@ -288,7 +321,7 @@ function App() {
             </RutaPrivada>
           }
         />
-        <Route path="*" element={<Navigate to="/" />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );

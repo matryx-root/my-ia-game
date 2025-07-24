@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import api from "../utils/api";
 
+/**
+ * Página de configuración del usuario
+ * Permite cambiar tema, idioma, sonido y notificaciones
+ * El cambio de tema se aplica inmediatamente si onConfigChange está definido
+ */
 export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
   const [config, setConfig] = useState({
     tema: "Predeterminado",
@@ -12,6 +17,7 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
   const [error, setError] = useState(null);
   const [success, setSuccess] = useState(null);
 
+  // Cargar configuración desde la API al montar o cambiar usuario
   useEffect(() => {
     if (!usuario?.id) return;
     setCargando(true);
@@ -27,28 +33,46 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
         }
         setError(null);
       })
-      .catch(() => setError("No se pudo cargar la configuración"))
-      .finally(() => setCargando(false));
+      .catch(() => {
+        setError("No se pudo cargar la configuración. Usando valores predeterminados.");
+      })
+      .finally(() => {
+        setCargando(false);
+      });
   }, [usuario]);
 
+  // Manejar cambios en los inputs
   const handleChange = e => {
     const { name, value, type, checked } = e.target;
-    setConfig(c => ({
-      ...c,
+    setConfig(prev => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value
     }));
   };
 
+  // Guardar configuración en la base de datos
   const guardarConfig = async (e) => {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
+    if (!usuario?.id) {
+      setError("Usuario no autenticado.");
+      return;
+    }
+
     try {
-      await api.post(`/configuracion/${usuario.id}`, config);
+      // ✅ Cambiado de POST a PUT para que incluya el token JWT
+      await api.put(`/configuracion/${usuario.id}`, config);
       setSuccess("¡Configuración guardada correctamente!");
-      if (onConfigChange) onConfigChange({ ...config });
+      
+      // Notificar al componente padre (App.js) para actualizar el tema visual
+      if (onConfigChange) {
+        onConfigChange(config);
+      }
     } catch (err) {
-      setError("No se pudo guardar la configuración.");
+      console.error("Error al guardar configuración:", err);
+      setError(`No se pudo guardar la configuración: ${err.message}`);
     }
   };
 
@@ -59,7 +83,9 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
       </h2>
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+      
       <form style={{ maxWidth: 550, margin: "auto" }} onSubmit={guardarConfig}>
+        {/* Selección de Tema */}
         <div className="mb-3">
           <label className="form-label fw-bold">Tema visual</label>
           <select
@@ -74,6 +100,8 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
             <option value="Claro">Claro</option>
           </select>
         </div>
+
+        {/* Selección de Idioma */}
         <div className="mb-3">
           <label className="form-label fw-bold">Idioma</label>
           <select
@@ -87,6 +115,8 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
             <option value="Inglés">Inglés</option>
           </select>
         </div>
+
+        {/* Activar Sonido */}
         <div className="form-check form-switch mb-3">
           <input
             className="form-check-input"
@@ -101,6 +131,8 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
             Sonido Activado
           </label>
         </div>
+
+        {/* Activar Notificaciones */}
         <div className="form-check form-switch mb-4">
           <input
             className="form-check-input"
@@ -115,8 +147,14 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
             Notificaciones Activadas
           </label>
         </div>
-        <button className="btn btn-primary" type="submit" disabled={cargando}>
-          Guardar configuración
+
+        {/* Botón de Guardar */}
+        <button 
+          className="btn btn-primary w-100" 
+          type="submit" 
+          disabled={cargando}
+        >
+          {cargando ? 'Guardando...' : 'Guardar configuración'}
         </button>
       </form>
     </div>
