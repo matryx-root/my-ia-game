@@ -17,24 +17,26 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
     setCargando(true);
     api.get(`/configuracion/${usuario.id}`)
       .then(res => {
-        if (res) {
-          setConfig({
-            tema: res.tema || "Predeterminado",
-            idioma: res.idioma || "Español",
-            sonido: res.sonido ?? true,
-            notificaciones: res.notificaciones ?? true,
-          });
-        }
+        setConfig(prev => ({
+          ...prev,
+          tema: res.tema || prev.tema,
+          idioma: res.idioma || prev.idioma,
+          sonido: res.sonido ?? prev.sonido,
+          notificaciones: res.notificaciones ?? prev.notificaciones,
+        }));
         setError(null);
       })
-      .catch(() => setError("No se pudo cargar la configuración"))
+      .catch(err => {
+        console.error("Error cargando configuración:", err);
+        setError("No se pudo cargar la configuración.");
+      })
       .finally(() => setCargando(false));
   }, [usuario]);
 
-  const handleChange = e => {
+  const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setConfig(c => ({
-      ...c,
+    setConfig(prev => ({
+      ...prev,
       [name]: type === "checkbox" ? checked : value
     }));
   };
@@ -43,23 +45,24 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
     e.preventDefault();
     setError(null);
     setSuccess(null);
+
     try {
-      await api.post(`/configuracion/${usuario.id}`, config);
+      await api.put(`/configuracion/${usuario.id}`, config);
       setSuccess("¡Configuración guardada correctamente!");
-      if (onConfigChange) onConfigChange({ ...config });
+      if (onConfigChange) onConfigChange(config);
     } catch (err) {
-      setError("No se pudo guardar la configuración.");
+      setError(`No se pudo guardar: ${err.message}`);
     }
   };
 
   return (
     <div className="container py-4">
-      <h2 className="text-primary fw-bold mb-4 text-center">
-        Configuración de Usuario
-      </h2>
+      <h2 className="text-primary fw-bold mb-4 text-center">Configuración de Usuario</h2>
       {error && <div className="alert alert-danger">{error}</div>}
       {success && <div className="alert alert-success">{success}</div>}
+
       <form style={{ maxWidth: 550, margin: "auto" }} onSubmit={guardarConfig}>
+        {/* Tema */}
         <div className="mb-3">
           <label className="form-label fw-bold">Tema visual</label>
           <select
@@ -74,49 +77,64 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
             <option value="Claro">Claro</option>
           </select>
         </div>
-        <div className="mb-3">
+
+        {/* Idioma - En construcción */}
+        <div className="mb-3 tooltip-hover">
           <label className="form-label fw-bold">Idioma</label>
           <select
             className="form-select"
             name="idioma"
             value={config.idioma}
-            onChange={handleChange}
-            disabled={cargando}
+            disabled
+            title="Función en desarrollo. Próximamente disponible."
           >
             <option value="Español">Español</option>
             <option value="Inglés">Inglés</option>
           </select>
+          <small className="text-muted">Idioma: en desarrollo</small>
+          <span className="tooltip-text">Esta función está en desarrollo. Próximamente podrás cambiar el idioma de la aplicación.</span>
         </div>
-        <div className="form-check form-switch mb-3">
+
+        {/* Sonido - En construcción */}
+        <div className="form-check form-switch mb-3 tooltip-hover">
           <input
             className="form-check-input"
             type="checkbox"
             id="sonido"
             name="sonido"
             checked={!!config.sonido}
-            onChange={handleChange}
-            disabled={cargando}
+            disabled
+            title="Función en desarrollo. Próximamente disponible."
           />
-          <label className="form-check-label fw-bold" htmlFor="sonido">
-            Sonido Activado
-          </label>
+          <label className="form-check-label fw-bold" htmlFor="sonido">Sonido Activado</label>
+          <br />
+          <small className="text-muted">En desarrollo</small>
+          <span className="tooltip-text">La gestión de sonido está en desarrollo. Próximamente podrás activarlo o desactivarlo.</span>
         </div>
-        <div className="form-check form-switch mb-4">
+
+        {/* Notificaciones - En construcción */}
+        <div className="form-check form-switch mb-4 tooltip-hover">
           <input
             className="form-check-input"
             type="checkbox"
             id="notificaciones"
             name="notificaciones"
             checked={!!config.notificaciones}
-            onChange={handleChange}
-            disabled={cargando}
+            disabled
+            title="Función en desarrollo. Próximamente disponible."
           />
-          <label className="form-check-label fw-bold" htmlFor="notificaciones">
-            Notificaciones Activadas
-          </label>
+          <label className="form-check-label fw-bold" htmlFor="notificaciones">Notificaciones Activadas</label>
+          <br />
+          <small className="text-muted">En desarrollo</small>
+          <span className="tooltip-text">Las notificaciones están en desarrollo. Próximamente podrás gestionarlas desde aquí.</span>
         </div>
-        <button className="btn btn-primary" type="submit" disabled={cargando}>
-          Guardar configuración
+
+        <button
+          className="btn btn-primary w-100"
+          type="submit"
+          disabled={cargando}
+        >
+          {cargando ? 'Guardando...' : 'Guardar configuración'}
         </button>
       </form>
     </div>

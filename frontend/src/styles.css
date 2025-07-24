@@ -1,5 +1,11 @@
-/* styles.css */
+/* ========================================
+   styles.css (contenido adicional)
+   ======================================== */
 
-h1, h2, h3,h4,h5,h6 {
+/* Títulos: heredan color del tema */
+h1, h2, h3, h4, h5, h6 {
   color: var(--color-title, #114eeb);
+  margin-top: 0;
+  line-height: 1.3;
+  font-weight: 700;
 }

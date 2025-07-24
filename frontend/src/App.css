@@ -1,179 +1,168 @@
-/* App.css global - Actualizado y probado */
+/* ========================================
+   1. VARIABLES GLOBALES Y TEMAS
+   Define colores base y variantes por tema
+   ======================================== */
 
-/* Valores por defecto, sólo lo esencial, sin color-title blanco */
 :root {
+  /* Paleta base (tema claro) */
   --color-bg: #f8fafc;
   --color-text: #18181c;
-  --color-card: #fff;
-  --color-card-shadow: #2222;
+  --color-card: #ffffff;
+  --color-title: #114eeb;
+  --color-card-shadow: rgba(0, 0, 0, 0.1);
   --color-categorias-bg: #e3f2fd;
-  --navbar-bg: linear-gradient(135deg, #7ef0f8 0%, #586168 100%);
+  --navbar-bg: linear-gradient(135deg, #7ef0f8, #586168);
 }
 
-/* Tema predeterminado */
+/* --- Tema Predeterminado (Gradiente Verde-Azul) --- */
 .theme-default {
   --color-bg: #83e0c4;
   --color-text: #18181c;
-  --color-card: #fff;
+  --color-card: #ffffff;
   --color-title: #114eeb;
-  --color-card-shadow: #2222;
+  --color-card-shadow: rgba(0, 0, 0, 0.1);
   --color-categorias-bg: #83e0c4;
-  
 }
 
-/* Tema oscuro */
+/* --- Tema Oscuro (Moderno y elegante) --- */
 .theme-dark {
   --color-bg: #181c24;
-  --color-text: #eee;
+  --color-text: #e0e0e0;
   --color-card: #24272e;
-  --color-title: #fff;
-  --color-card-shadow: #111a;
+  --color-title: #ffffff;
+  --color-card-shadow: rgba(0, 0, 0, 0.3);
   --navbar-bg: #181c24;
   --color-categorias-bg: #181a1c;
 }
 
-/* Tema claro */
+/* --- Tema Claro (Limpio y profesional) --- */
 .theme-light {
   --color-bg: #f4fafd;
   --color-text: #18181c;
-  --color-card: #fff;
+  --color-card: #ffffff;
   --color-title: #18181c;
-  --color-card-shadow: #2222;
+  --color-card-shadow: rgba(0, 0, 0, 0.1);
   --navbar-bg: #f4fafd;
   --color-categorias-bg: #f4fafd;
 }
 
-/* Navbar fondo adaptativo */
-.navbar {
-  background: var(--navbar-bg) !important;
-  color: var(--color-text) !important;
-  transition: background 0.3s, color 0.3s;
-  border: none !important;
-  box-shadow: none !important;
-}
+/* ========================================
+   2. ESTILOS GLOBALES
+   Fuentes, body, transiciones
+   ======================================== */
 
-/* Tipografía y fondo general */
 body {
-  font-family: 'Montserrat', Arial, sans-serif;
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   background: var(--color-bg);
   color: var(--color-text);
   margin: 0;
-  transition: background 0.3s, color 0.3s;
+  padding: 0;
+  transition: background 0.4s ease, color 0.4s ease;
+  line-height: 1.6;
 }
 
-/* Fondo gradiente solo en predeterminado */
+/* Aplica gradiente solo en tema predeterminado */
 .theme-default body {
   background: linear-gradient(135deg, #6de8ca 0%, #95c9eb 100%);
 }
-.theme-dark body,
-.theme-light body {
-  background: var(--color-bg);
-}
 
-/* Cartas, formularios y paneles */
+/* ========================================
+   3. COMPONENTES BASE
+   Formularios, cartas, botones, tablas
+   ======================================== */
+
+/* Cartas, formularios, paneles */
 form, .card, .panel, .app-box, .main-content {
-  margin: 1em auto;
+  margin: 1.5em auto;
   max-width: 350px;
-  padding: 1em;
+  padding: 1.5em;
   background: var(--color-card);
-  border-radius: 0.8em;
-  box-shadow: 0 2px 8px var(--color-card-shadow);
-  transition: background 0.3s, color 0.3s;
+  border-radius: 1rem;
+  box-shadow: 0 4px 16px var(--color-card-shadow);
+  transition: all 0.3s ease;
 }
 
 @media (min-width: 650px) {
   form, .card, .panel, .app-box, .main-content {
     max-width: 900px;
+    padding: 2em;
   }
 }
 
 /* Botones */
 button, .btn {
-  margin-top: 1em;
-  padding: 0.6em 1.5em;
-  border-radius: 0.5em;
+  margin-top: 1.2em;
+  padding: 0.7em 1.8em;
+  border-radius: 0.6em;
   border: none;
   background: #0d6efd;
   color: #fff;
-  font-weight: bold;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background 0.3s ease, transform 0.1s ease;
+  font-family: inherit;
+}
+
+button:hover, .btn:hover {
+  transform: translateY(-1px);
+  background: #0b5ed7;
+}
+
+button:active, .btn:active {
+  transform: translateY(0);
 }
 
 /* Tablas */
-table { width: 100%; }
-
-/* Títulos: máximo contraste para cada tema */
-.theme-default h1, .theme-default h2, .theme-default h3, .theme-default h4, .theme-default h5, .theme-default h6,
-.theme-light h1, .theme-light h2, .theme-light h3, .theme-light h4, .theme-light h5, .theme-light h6,
-.theme-dark h1, .theme-dark h2, .theme-dark h3, .theme-dark h4, .theme-dark h5, .theme-dark h6 {
-  color: var(--color-title) !important;
-  transition: color 0.3s;
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1em 0;
 }
 
-/* Opcional: asegurar contraste en títulos cuando no hay clase theme-* en body */
+table th, table td {
+  padding: 0.75em;
+  text-align: left;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Títulos */
 h1, h2, h3, h4, h5, h6 {
-  color: var(--color-title, #114eeb);
-  transition: color 0.3s;
+  color: var(--color-title);
+  transition: color 0.3s ease;
+  margin-top: 0;
+  margin-bottom: 0.8em;
+  font-weight: 700;
 }
 
-/* Forzar color blanco para los labels de tarjetas del dashboard en modo oscuro */
-.theme-dark .card .fs-6 {
-  color: #fff !important;
-  opacity: 0.95;
-}
+/* ========================================
+   4. NAVBAR
+   Fondo adaptativo por tema
+   ======================================== */
 
-.theme-dark .card {
-  color: #fff !important;
-}
-
-/* General para todos los textos en juegos y modales */
-.game-container,
-.game-card,
-.modal,
-.game-info,
-.game-description,
-#game-root,
-#game-modal,
-#game-content {
+.navbar {
+  background: var(--navbar-bg) !important;
   color: var(--color-text) !important;
-  transition: color 0.3s;
+  transition: background 0.4s ease, color 0.4s ease;
+  border: none !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-/* Si tienes textos dentro de canvas o SVG, revisa el JS/TS de cada juego para cambiar el fill o stroke a blanco en modo oscuro */
-
-/* Si usas etiquetas p, span, li, ul, etc, dentro de juegos */
-
-
-/* Si usas clases particulares para instrucciones, preguntas, respuestas, títulos, etc. */
-.instruccion,
-.pregunta,
-.respuesta,
-.explicacion,
-.ayuda-texto {
-  color: var(--color-text) !important;
+.navbar-brand, .navbar .badge {
+  color: inherit;
+  transition: color 0.3s ease;
 }
 
-.theme-dark .game-container,
-.theme-dark .game-card,
-.theme-dark .modal,
-.theme-dark .modal-dialog,
-.theme-dark .modal-content,
-.theme-dark .modal-header,
-.theme-dark .modal-title,
-.theme-dark #game-root,
-.theme-dark #game-modal,
-.theme-dark #game-content {
-  color: #000000 !important;
-}
+/* ========================================
+   5. CATEGORÍAS
+   Fondo y tarjetas de categorías
+   ======================================== */
 
-/* Fondo base para la página de categorías según tema */
 .categorias-bg {
   background: var(--color-categorias-bg);
   min-height: 100vh;
+  padding: 2em 1em;
 }
 
-/* Tarjeta base */
 .categoria-card {
   border-radius: 20px;
   width: 340px;
@@ -184,64 +173,31 @@ h1, h2, h3, h4, h5, h6 {
   justify-content: flex-start;
   padding: 24px;
   cursor: pointer;
-  box-shadow: 0 8px 32px #0002;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
   box-sizing: border-box;
-  transition: transform 0.2s, box-shadow 0.2s, background 0.3s, color 0.3s;
-  font-family: 'Montserrat', Arial, sans-serif;
+  transition: all 0.3s ease;
+  font-family: 'Montserrat', sans-serif;
+  background: var(--color-card);
+  color: var(--color-text);
 }
 
 .categoria-card:hover {
   transform: scale(1.035);
-  box-shadow: 0 12px 40px #0004;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
 }
 
-/* Colores por categoría y tema */
-.theme-default .categoria-card.ia-reactiva {
-  background: #ffab91;
-  color: #222;
-}
-.theme-default .categoria-card.ia-memoria {
-  background: #f8bbd0;
-  color: #222;
-}
-.theme-default .categoria-card.ia-estrecha {
-  background: #b2dfdb;
-  color: #222;
-}
-.theme-default .categoria-card.ia-mente {
-  background: #fff176;
-  color: #222;
-}
-
-.theme-dark .categoria-card.ia-reactiva {
-  background: #c86e53;
-  color: #fff;
-}
-.theme-dark .categoria-card.ia-memoria {
-  background: #b87698;
-  color: #fff;
-}
-.theme-dark .categoria-card.ia-estrecha {
-  background: #629b97;
-  color: #fff;
-}
-.theme-dark .categoria-card.ia-mente {
-  background: #e0ce68;
-  color: #222;
-}
-
-
-/* Otros estilos */
 .categoria-card .icono-categoria {
   font-size: 40px;
   margin-bottom: 10px;
 }
+
 .categoria-card .titulo-categoria {
   font-weight: bold;
   font-size: 23px;
   text-align: center;
   margin-bottom: 10px;
 }
+
 .categoria-card .descripcion-categoria {
   font-size: 16px;
   text-align: center;
@@ -251,30 +207,23 @@ h1, h2, h3, h4, h5, h6 {
   margin: 0;
 }
 
+/* Colores por categoría (tema predeterminado) */
+.theme-default .categoria-card.ia-reactiva { background: #ffab91; }
+.theme-default .categoria-card.ia-memoria { background: #f8bbd0; }
+.theme-default .categoria-card.ia-estrecha { background: #b2dfdb; }
+.theme-default .categoria-card.ia-mente { background: #fff176; }
 
+/* Colores por categoría (tema oscuro) */
+.theme-dark .categoria-card.ia-reactiva { background: #c86e53; color: #fff; }
+.theme-dark .categoria-card.ia-memoria { background: #b87698; color: #fff; }
+.theme-dark .categoria-card.ia-estrecha { background: #629b97; color: #fff; }
+.theme-dark .categoria-card.ia-mente { background: #e0ce68; color: #222; }
 
-.theme-light .navbar-brand,
-.theme-light .badge{
-  color: #140202;
-}
+/* ========================================
+   6. PÁGINA DE INICIO (LANDING)
+   Estilos específicos con tema
+   ======================================== */
 
-/* Color adaptable para el texto de bienvenida */
-.usuario-bienvenida {
-  color: #111; /* Negro por defecto (modo claro) */
-  transition: color 0.2s;
-}
-.theme-dark .usuario-bienvenida {
-  color: #fff; /* Blanco en modo oscuro */
-}
-.theme-light .usuario-bienvenida {
-  color: #111; /* Negro en modo claro */
-}
-.theme-default .usuario-bienvenida {
-  color: #1565c0; /* Azul oscuro, si quieres diferenciar el tema default */
-}
-
-
-/* FONDO GENERAL DEL LANDING SEGÚN TEMA */
 .landing-bg {
   min-height: 100vh;
   min-width: 100vw;
@@ -284,29 +233,27 @@ h1, h2, h3, h4, h5, h6 {
   align-items: center;
   font-family: 'Poppins', 'Segoe UI', Arial, sans-serif;
   background: var(--landing-bg);
-  transition: background 0.4s;
+  transition: background 0.4s ease;
 }
 
-/* CARD DEL LANDING */
 .landing-card {
   background: var(--landing-card-bg, #fff);
   border-radius: 2em;
-  box-shadow: 0 6px 32px #1d35577a;
+  box-shadow: 0 6px 32px rgba(29, 53, 87, 0.46);
   padding: 48px 44px 32px 44px;
   text-align: center;
   min-width: 370px;
   max-width: 520px;
-  transition: background 0.4s, color 0.4s;
+  transition: all 0.4s ease;
 }
 
-/* TITULO */
 .landing-title {
   font-weight: 800;
   font-size: 2.5rem;
   margin-bottom: 12px;
   letter-spacing: 0.5px;
   color: var(--landing-title, #222b48);
-  text-shadow: 0 1px 3px #b0e0ef60;
+  text-shadow: 0 1px 3px rgba(176, 224, 239, 0.38);
 }
 
 .landing-title-highlight {
@@ -314,13 +261,12 @@ h1, h2, h3, h4, h5, h6 {
   text-shadow: none;
 }
 
-/* DESCRIPCIÓN */
 .landing-desc {
   font-size: 1.4rem;
   color: var(--landing-desc, #1b406b);
   font-weight: 500;
   margin: 18px 0 32px 0;
-  text-shadow: 0 1px 2px #fff8;
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
 }
 
 .landing-ai {
@@ -328,21 +274,16 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 700;
 }
 
-/* EDUCACION / ETIQUETAS */
 .landing-edu {
   font-size: 18px;
   color: var(--landing-edu, #383858);
   font-weight: 500;
   margin-bottom: 30px;
 }
-.edu-alumno {
-  color: var(--edu-alumno, #ff9900);
-}
-.edu-docente {
-  color: var(--edu-docente, #902de4);
-}
 
-/* BOTÓN */
+.edu-alumno { color: var(--edu-alumno, #ff9900); }
+.edu-docente { color: var(--edu-docente, #902de4); }
+
 .landing-btn {
   background: var(--landing-btn-bg, linear-gradient(90deg, #1864ab 80%, #16b973 100%));
   color: #fff;
@@ -353,38 +294,27 @@ h1, h2, h3, h4, h5, h6 {
   cursor: pointer;
   margin-bottom: 8px;
   font-weight: bold;
-  box-shadow: 0 2px 18px #16b97360;
-  transition: background 0.3s;
+  box-shadow: 0 2px 18px rgba(22, 185, 115, 0.38);
+  transition: all 0.3s ease;
 }
+
 .landing-btn:hover {
+  transform: translateY(-2px);
   filter: brightness(1.1);
 }
 
-/* NOTA INFERIOR */
 .landing-note {
   margin-top: 38px;
   font-size: 15px;
   color: var(--landing-note, #555c6e);
 }
+
 .landing-docente {
   color: var(--landing-ai, #1864ab);
   font-weight: 600;
 }
 
-/* THEMES - Variables */
-:root {
-  --landing-bg: linear-gradient(135deg, #60a3d9 0%, #65e1c8 100%);
-  --landing-card-bg: #fff;
-  --landing-title: #222b48;
-  --landing-title-highlight: #16b973;
-  --landing-desc: #1b406b;
-  --landing-ai: #1864ab;
-  --landing-edu: #383858;
-  --edu-alumno: #ff9900;
-  --edu-docente: #902de4;
-  --landing-btn-bg: linear-gradient(90deg, #1864ab 80%, #16b973 100%);
-  --landing-note: #555c6e;
-}
+/* Variables para el Landing (deben ir después de :root para sobrescribir) */
 .theme-dark {
   --landing-bg: linear-gradient(135deg, #192029 0%, #232931 100%);
   --landing-card-bg: #24272e;
@@ -398,6 +328,7 @@ h1, h2, h3, h4, h5, h6 {
   --landing-btn-bg: linear-gradient(90deg, #5db0ff 80%, #41e196 100%);
   --landing-note: #eee;
 }
+
 .theme-light {
   --landing-bg: linear-gradient(135deg, #f8fafc 0%, #d0f0fd 100%);
   --landing-card-bg: #fff;
@@ -410,4 +341,91 @@ h1, h2, h3, h4, h5, h6 {
   --edu-docente: #902de4;
   --landing-btn-bg: linear-gradient(90deg, #003399 80%, #16b973 100%);
   --landing-note: #222;
+}
+
+/* ========================================
+   7. ESTILOS ESPECÍFICOS
+   Textos, juegos, tooltips, etc.
+   ======================================== */
+
+/* Textos generales */
+.usuario-bienvenida {
+  color: #111;
+  transition: color 0.2s ease;
+}
+
+.theme-dark .usuario-bienvenida { color: #fff; }
+.theme-light .usuario-bienvenida { color: #111; }
+.theme-default .usuario-bienvenida { color: #1565c0; }
+
+/* Juegos y modales */
+.game-container,
+.game-card,
+.modal,
+#game-root,
+#game-modal,
+#game-content,
+.instruccion,
+.pregunta,
+.respuesta,
+.explicacion,
+.ayuda-texto {
+  color: var(--color-text) !important;
+  transition: color 0.3s ease;
+}
+
+/* Asegurar legibilidad en modo oscuro */
+.theme-dark .card .fs-6,
+.theme-dark .card {
+  color: #fff !important;
+}
+
+/* Tooltips para configuración (en desarrollo) */
+.tooltip-hover {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+.tooltip-hover .tooltip-text {
+  visibility: hidden;
+  width: 250px;
+  background-color: #444;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 8px;
+  position: absolute;
+  z-index: 10;
+  bottom: 130%;
+  left: 50%;
+  margin-left: -125px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  font-size: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  font-family: 'Montserrat', sans-serif;
+}
+
+.tooltip-hover .tooltip-text::after {
+  content: "";
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: #444 transparent transparent transparent;
+}
+
+.tooltip-hover:hover .tooltip-text {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* Desactivar campos "en desarrollo" */
+.form-select:disabled,
+.form-check-input:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }

@@ -1,35 +1,74 @@
-/* index.css */
-/* Solo estilos mínimos, NO PONGAS FONDO AQUÍ */
+/* ========================================
+   index.css
+   Estilos base mínimos y esenciales
+   No aplicar fondos ni colores aquí
+   ======================================== */
 
-html, body {
-  min-height: 100vh;
-  margin: 0;
-  padding: 0;
-}
-
-.container {
-  margin-top: 0 !important;
-  padding-top: 32px;
-}
-
+/* Reset básico y dimensiones */
 html, body, #root {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
-   /* Elimina cualquier fondo residual */
+  min-height: 100vh;
+  box-sizing: border-box;
 }
 
-body,
+/* Aplica box-sizing a todos los elementos */
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+/* Body: sin fondo, solo configuración */
+body {
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* Evita scroll horizontal accidental */
+}
+
+/* Contenedor principal */
+.container {
+  margin-top: 0 !important;
+  padding-top: 32px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Elementos de la app */
 #root,
 .landing-bg {
   margin: 0 !important;
   padding: 0 !important;
+  width: 100%;
+  min-height: 100vh;
+}
+
+/* Navbar: estilos mínimos */
+.navbar {
+  margin: 0 !important;
+  padding: 0.6em 1.2em;
+  width: 100%;
   box-sizing: border-box;
 }
 
-.navbar {
-  margin: 0 !important;
-  padding: 0.6em 1.2em; /* Ajusta a tu diseño */
-  width: 100%;
+/* Tipografía base */
+body,
+button,
+input,
+select,
+textarea {
+  font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Evita zoom en inputs en móviles */
+input,
+textarea,
+select,
+button {
+  font-size: 100%;
 }
