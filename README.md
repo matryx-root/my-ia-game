@@ -1,7 +1,7 @@
 ¡Por supuesto! Aquí tienes el **README.md** listo para copiar, con un formato profesional, instrucciones claras y adaptado a tu proyecto **my-ia-game**:
 
 ---
-
+# Cambios de PULL
 
 ## My IA Game
 
