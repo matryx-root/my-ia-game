@@ -1,8 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import './App.css';
-
-// Componentes
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Registro from "./components/Registro";
@@ -19,8 +17,9 @@ import LogsJuegoPage from "./components/LogsJuegoPage";
 import LogsErrorPage from "./components/LogsErrorPage";
 import MisJuegos from "./components/MisJuegos";
 import JuegosAdmin from "./components/JuegosAdmin";
+import api from "./utils/api";
 
-// Juegos
+// Importar todos los juegos
 import IAGame from "./games/iaGame";
 import MLGame from "./games/mlGame";
 import DLGame from "./games/dlGame";
@@ -39,9 +38,6 @@ import DiffusionGame from "./games/diffusionGame";
 import SelfSupervisedGame from "./games/selfSupervisedGame";
 
 import "bootstrap-icons/font/bootstrap-icons.css";
-
-// API
-import api from "./utils/api";
 
 // Mapeo de componentes de juegos
 export const juegosComponentes = {
@@ -62,7 +58,6 @@ export const juegosComponentes = {
   diffusionGame: DiffusionGame,
   selfSupervisedGame: SelfSupervisedGame,
 };
-
 export const juegosMap = {};
 
 // Componente para rutas protegidas
@@ -93,18 +88,25 @@ function App() {
     const userId = localStorage.getItem("userId");
 
     if (!token || !userId) {
+      setUsuario(null);
+      setConfiguracion(null);
       setLoading(false);
       return;
     }
 
     api.get("/usuarios/perfil/me")
       .then(user => {
-        if (!user || !user.id) throw new Error("Usuario inválido");
-        setUsuario(user);
-        return api.get(`/configuracion/${user.id}`);
+        if (user && user.id) {
+          setUsuario(user);
+          return api.get(`/configuracion/${user.id}`);
+        } else {
+          throw new Error("Usuario no válido");
+        }
       })
       .then(cfg => {
-        if (cfg) setConfiguracion(cfg);
+        if (cfg) {
+          setConfiguracion(cfg);
+        }
       })
       .catch(err => {
         console.error("Error al cargar usuario o configuración:", err);
@@ -136,7 +138,7 @@ function App() {
         setJuegosCargados(true);
       } catch (err) {
         console.error("Error cargando juegos:", err);
-        setJuegosCargados(true); // No bloquear la app si falla
+        setJuegosCargados(true);
       }
     }
     fetchJuegos();
@@ -144,33 +146,42 @@ function App() {
 
   // Aplicar tema visual al body
   useEffect(() => {
-    const temaClase = configuracion?.tema === "Oscuro" ? "theme-dark" :
-                      configuracion?.tema === "Claro" ? "theme-light" : "theme-default";
-    document.body.className = temaClase;
+    let claseTema = "theme-default";
+    if (configuracion) {
+      if (configuracion.tema === "Oscuro") claseTema = "theme-dark";
+      else if (configuracion.tema === "Claro") claseTema = "theme-light";
+    }
+    document.body.className = claseTema;
   }, [configuracion]);
 
   // ✅ handleLogin actualizado: guarda token y carga configuración
   const handleLogin = (user, token) => {
+    // Validación básica
     if (!user?.id || !token) {
-      console.error("Login fallido: datos incompletos");
+      console.error("Datos de login incompletos");
       return;
     }
 
+    // Guardar en estado y almacenamiento
     setUsuario(user);
+    setConfiguracion(prev => prev); // Mantiene configuración previa hasta cargar la nueva
+
+    // Guardar en localStorage
     localStorage.setItem("token", token);
     localStorage.setItem("userId", user.id);
 
-    // Cargar configuración
+    // Cargar configuración del usuario desde la API
     api.get(`/configuracion/${user.id}`)
       .then(cfg => {
         if (cfg) {
           setConfiguracion(cfg);
         } else {
+          // Opcional: crear configuración predeterminada
           console.log("Usuario sin configuración guardada. Usando valores por defecto.");
         }
       })
       .catch(err => {
-        console.error("Error al cargar configuración:", err);
+        console.error("No se pudo cargar la configuración del usuario:", err);
         // Continúa con valores por defecto
       });
   };
@@ -187,7 +198,7 @@ function App() {
     }, 100);
   };
 
-  // Pantalla de carga inicial
+  // Pantalla de carga
   if (loading || !juegosCargados) {
     return (
       <div style={{
