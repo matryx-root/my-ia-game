@@ -1,7 +1,10 @@
 import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+
 import Phaser from 'phaser';
 import { useNavigate } from 'react-router-dom';
 import api from '../utils/api';
+
+
 
 export default function IAGameBrainNetwork({ usuario }) {
   const navigate = useNavigate();
@@ -23,8 +26,6 @@ export default function IAGameBrainNetwork({ usuario }) {
   const IA_GAME_ID = 1;
   const NOMBRE_LOGRO = "Red Neuronal Perfecta";
   const DESC_LOGRO = "Conectaste todos los nodos de la red neuronal sin errores.";
-
-  // Nodos del cerebro (memorizados)
   const brainNodes = useMemo(() => [
     { x: 210, y: 210 }, { x: 250, y: 180 }, { x: 300, y: 150 }, { x: 370, y: 140 },
     { x: 440, y: 150 }, { x: 510, y: 180 }, { x: 570, y: 230 }, { x: 600, y: 300 },
@@ -32,10 +33,9 @@ export default function IAGameBrainNetwork({ usuario }) {
     { x: 370, y: 480 }, { x: 300, y: 470 }, { x: 250, y: 430 }, { x: 220, y: 370 },
     { x: 230, y: 290 }, { x: 340, y: 230 }, { x: 470, y: 230 }, { x: 370, y: 310 }
   ], []);
-
   const TOTAL_CONEXIONES = brainNodes.length - 1;
 
-  // Cargar historial
+  // Cargar historial (memoizado para evitar warning)
   const cargarHistorial = useCallback(async () => {
     if (!usuario || !usuario.id) return;
     try {
@@ -50,19 +50,8 @@ export default function IAGameBrainNetwork({ usuario }) {
     }
   }, [usuario, IA_GAME_ID]);
 
-  useEffect(() => {
-    if (usuario && usuario.id) cargarHistorial();
-  }, [usuario, juegoKey, cargarHistorial]);
-
   // Iniciar juego
   const iniciarJuego = () => setInstruccion(false);
-
-  // Calcular tamaño responsivo
-  const getGameSize = () => {
-    const width = Math.min(window.innerWidth * 0.95, 820);
-    const height = Math.min(window.innerHeight * 0.8, 600);
-    return { width, height };
-  };
 
   // Phaser GAME
   useEffect(() => {
@@ -70,7 +59,6 @@ export default function IAGameBrainNetwork({ usuario }) {
       gameRef.current.destroy(true);
       gameRef.current = null;
     }
-
     setPuedeGuardar(false);
     setGuardado(false);
     setErrorGuardar(null);
@@ -79,12 +67,11 @@ export default function IAGameBrainNetwork({ usuario }) {
 
     if (instruccion) return;
 
-    const { width, height } = getGameSize();
-
     let connectedPairs = [];
     let lastIdx = null;
     let circuits = [];
     let erroresTemp = 0;
+    let width = 820, height = 600;
 
     gameRef.current = new Phaser.Game({
       type: Phaser.AUTO,
@@ -92,10 +79,6 @@ export default function IAGameBrainNetwork({ usuario }) {
       height,
       parent: 'game-container-ia-network',
       backgroundColor: '#fff3e0',
-      scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH
-      },
       scene: {
         create: function () {
           this.completed = false;
@@ -103,55 +86,38 @@ export default function IAGameBrainNetwork({ usuario }) {
           connectedPairs = [];
           lastIdx = null;
           erroresTemp = 0;
+          let graphics = this.add.graphics();
 
-          const graphics = this.add.graphics();
-
-          // Título responsivo
-          const titleSize = Math.min(width * 0.04, 24);
-          this.add.text(20, 20, '🤖 Juego IA: ¡Une los puntos para simular una red neuronal cerebral!', {
-            fontFamily: 'Montserrat, monospace',
-            fontSize: `${titleSize}px`,
-            fill: '#333',
-            wordWrap: { width: width - 40 }
-          });
-
-          // Barra de progreso
-          const barHeight = height * 0.03;
-          const barWidth = width * 0.6;
-          const barX = width / 2;
-          const barY = height - barHeight * 2;
-
-          this.add.rectangle(barX, barY, barWidth, barHeight, 0xe1bee7).setOrigin(0.5);
-          this.barraRelleno = this.add.rectangle(barX - barWidth / 2, barY, 0, barHeight, 0x7e57c2).setOrigin(0, 0.5);
-
-          const progressSize = Math.min(width * 0.035, 18);
-          const textoProgreso = this.add.text(width - 120, barY - barHeight / 2 - 5, `0/${TOTAL_CONEXIONES}`, {
+          this.add.text(60, 20, '🤖 Juego IA: ¡Une los puntos para simular una red neuronal cerebral!', {
             fontFamily: 'monospace',
-            fontSize: `${progressSize}px`,
+            fontSize: '22px',
             fill: '#333'
           });
 
-          // Crear nodos
-          brainNodes.forEach((coord, i) => {
-            const nodeRadius = Math.min(width * 0.03, 20);
-            const circuit = this.add.circle(coord.x, coord.y, nodeRadius, 0x9575cd, 0.9)
-              .setStrokeStyle(Math.max(2, Math.floor(width * 0.003)), 0x512da8)
-              .setInteractive({ useHandCursor: true });
+          this.add.rectangle(410, 570, 480, 22, 0xe1bee7).setOrigin(0.5);
+          this.barraRelleno = this.add.rectangle(170, 570, 0, 22, 0x7e57c2).setOrigin(0, 0.5);
+          let textoProgreso = this.add.text(680, 565, `0/${TOTAL_CONEXIONES} conexiones`, {
+            fontFamily: 'monospace',
+            fontSize: '16px',
+            fill: '#333'
+          });
 
+          brainNodes.forEach((coord, i) => {
+            const circuit = this.add.circle(coord.x, coord.y, 20, 0x9575cd, 0.9)
+              .setStrokeStyle(2, 0x512da8)
+              .setInteractive({ useHandCursor: true });
             circuit.index = i;
             circuit.connected = false;
 
-            circuit.on('pointerover', () => {
-              if (!this.completed && !circuit.connected) circuit.setScale(1.3);
+            circuit.on('pointerover', function () {
+              if (!this.connected) circuit.setScale(1.28);
             });
-
-            circuit.on('pointerout', () => {
-              if (!this.completed && !circuit.connected) circuit.setScale(1.0);
+            circuit.on('pointerout', function () {
+              if (!this.connected) circuit.setScale(1.0);
             });
 
             circuit.on('pointerdown', () => {
               if (this.completed) return;
-
               if (lastIdx === null) {
                 lastIdx = i;
                 circuit.setFillStyle(0xffe082, 1);
@@ -159,7 +125,7 @@ export default function IAGameBrainNetwork({ usuario }) {
                 lastIdx !== i &&
                 !connectedPairs.find(p => (p[0] === lastIdx && p[1] === i) || (p[0] === i && p[1] === lastIdx))
               ) {
-                // Conexión correcta
+                // Correcta
                 connectedPairs.push([lastIdx, i]);
                 circuit.setFillStyle(0xffe082, 1);
                 circuits[lastIdx].setFillStyle(0xffe082, 1);
@@ -168,29 +134,22 @@ export default function IAGameBrainNetwork({ usuario }) {
 
                 graphics.clear();
                 connectedPairs.forEach(([a, b], idx) => {
-                  const c1 = circuits[a], c2 = circuits[b];
-                  graphics.lineStyle(
-                    Math.max(3, Math.floor(width * 0.004)),
-                    0x9575cd,
-                    0.65 + idx / brainNodes.length
-                  );
+                  let c1 = circuits[a], c2 = circuits[b];
+                  graphics.lineStyle(4, 0x9575cd, 0.65 + idx/brainNodes.length);
                   graphics.strokeLineShape(new Phaser.Geom.Line(c1.x, c1.y, c2.x, c2.y));
                 });
 
-                // Actualizar barra
-                this.barraRelleno.width = (connectedPairs.length / TOTAL_CONEXIONES) * barWidth;
-                textoProgreso.setText(`${connectedPairs.length}/${TOTAL_CONEXIONES}`);
+                this.barraRelleno.width = (connectedPairs.length / TOTAL_CONEXIONES) * 480;
+                textoProgreso.setText(`${connectedPairs.length}/${TOTAL_CONEXIONES} conexiones`);
 
                 if (connectedPairs.length === TOTAL_CONEXIONES) {
                   this.completed = true;
-                  const msgSize = Math.min(width * 0.05, 28);
-                  this.add.text(width * 0.15, height * 0.85, '¡Conectaste todos los nodos de la red neuronal cerebral! 🧠✨', {
-                    fontFamily: 'Montserrat, monospace',
-                    fontSize: `${msgSize}px`,
+                  this.add.text(120, 520, '¡Conectaste todos los nodos de la red neuronal cerebral! 🧠✨', {
+                    fontFamily: 'monospace',
+                    fontSize: '28px',
                     fill: '#388e3c',
-                    fontWeight: 'bold'
+                    fontStyle: 'bold'
                   });
-
                   setResultado(
                     "¡Así se construye una red neuronal artificial! Más nodos, más conexiones... más inteligencia. ¿Cuántas conexiones crees que hay en tu cerebro real?"
                   );
@@ -202,7 +161,6 @@ export default function IAGameBrainNetwork({ usuario }) {
                 erroresTemp++;
               }
             });
-
             circuits.push(circuit);
           });
         }
@@ -215,7 +173,12 @@ export default function IAGameBrainNetwork({ usuario }) {
         gameRef.current = null;
       }
     };
-  }, [instruccion, juegoKey, brainNodes, TOTAL_CONEXIONES]);
+  }, [instruccion, juegoKey, usuario, brainNodes, TOTAL_CONEXIONES]);
+
+  // Cargar historial de progreso
+  useEffect(() => {
+    if (usuario && usuario.id) cargarHistorial();
+  }, [usuario, juegoKey, cargarHistorial]);
 
   // Guardar progreso/logro
   const guardarProgresoYLogro = async () => {
@@ -224,6 +187,7 @@ export default function IAGameBrainNetwork({ usuario }) {
       return;
     }
     setErrorGuardar(null);
+
     try {
       const progresoPayload = {
         usuarioId: usuario.id,
@@ -243,8 +207,9 @@ export default function IAGameBrainNetwork({ usuario }) {
           descripcion: DESC_LOGRO
         });
         setMostroLogro(true);
+      } else {
+        setMostroLogro(false);
       }
-
       setGuardado(true);
       setPuedeGuardar(false);
       cargarHistorial();
@@ -255,7 +220,7 @@ export default function IAGameBrainNetwork({ usuario }) {
     }
   };
 
-  // Reiniciar juego
+  // Resetear juego
   const handleReset = () => {
     setInstruccion(true);
     setResultado(null);
@@ -272,34 +237,20 @@ export default function IAGameBrainNetwork({ usuario }) {
   };
 
   return (
-    <div
-      ref={containerRef}
-      className="game-container"
-      style={{
-        width: '100%',
-        maxWidth: 'clamp(300px, 95vw, 900px)',
-        margin: 'clamp(20px, 5vw, 40px) auto',
-        padding: '0 10px'
-      }}
-    >
-      {/* Modal de instrucción */}
+    <div ref={containerRef} style={{ width: "100%", maxWidth: 900, margin: "auto" }}>
       {instruccion && (
         <div className="modal show d-block" tabIndex="-1" style={{
-          background: 'rgba(0,0,0,0.4)',
-          position: 'fixed',
-          inset: 0,
-          zIndex: 1050
+          background: 'rgba(0,0,0,0.3)',
+          position: 'fixed', left: 0, top: 0, width: '100vw', height: '100vh', zIndex: 1000
         }}>
-          <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-dialog" style={{ marginTop: 80 }}>
             <div className="modal-content">
               <div className="modal-header">
                 <h5 className="modal-title">¿Cómo es una red neuronal?</h5>
               </div>
               <div className="modal-body">
                 <p>
-                  <b>Una red neuronal artificial</b> se inspira en el cerebro, donde cada nodo es como una neurona y las conexiones son como sinapsis.
-                </p>
-                <p>
+                  <b>Una red neuronal artificial</b> se inspira en el cerebro, donde cada nodo es como una neurona y las conexiones son como sinapsis.<br />
                   <b>Tu reto:</b> Une todos los puntos del “cerebro” conectando pares uno a uno para completar la red.
                 </p>
               </div>
@@ -311,132 +262,75 @@ export default function IAGameBrainNetwork({ usuario }) {
         </div>
       )}
 
-      {/* Contenedor del juego */}
-      <div
-        id="game-container-ia-network"
-        style={{
-          width: '100%',
-          minHeight: 'clamp(300px, 80vh, 600px)',
-          borderRadius: '16px',
-          overflow: 'hidden',
-          boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
-          background: '#fff'
-        }}
-      />
+      <div id="game-container-ia-network" style={{ margin: 'auto', minHeight: 350 }} />
 
-      {/* Resultado */}
       {resultado && (
-        <div
-          className="alert alert-success mt-3"
-          style={{
-            maxWidth: 'clamp(300px, 90vw, 800px)',
-            margin: 'clamp(20px, 5vw, 40px) auto',
-            fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
-            textAlign: 'center'
-          }}
-        >
+        <div className="alert alert-success mt-3" style={{ maxWidth: 800, margin: "auto" }}>
           {resultado}
           <br />
-          <small style={{ fontSize: '0.9em' }}>
+          <small>
             Así funcionan las IA modernas: ¡Miles de nodos y millones de conexiones como tu cerebro!
           </small>
         </div>
       )}
 
-      {/* Logro ganado */}
       {mostroLogro && (
-        <div
-          className="alert alert-info text-center mt-3 fw-bold"
-          style={{
-            maxWidth: 'clamp(300px, 90vw, 500px)',
-            margin: 'auto',
-            fontSize: 'clamp(0.9rem, 4vw, 1.1rem)'
-          }}
-        >
+        <div className="alert alert-info text-center mt-3 fw-bold" style={{ maxWidth: 500, margin: "auto" }}>
           <i className="bi bi-trophy-fill text-warning me-2"></i>
           ¡FELICITACIONES! Lograste el <span className="text-success">Puntaje Perfecto</span> y ganaste un logro 🏆
         </div>
       )}
 
-      {/* Botón guardar */}
       {puedeGuardar && !guardado && (
         <div className="d-flex justify-content-center mt-4">
-          <button
-            className="btn btn-success"
-            onClick={guardarProgresoYLogro}
-            style={{
-              fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
-              padding: '0.6em 1.5em'
-            }}
-          >
+          <button className="btn btn-success" onClick={guardarProgresoYLogro}>
             Guardar progreso {errores === 0 && "y registrar logro"}
           </button>
         </div>
       )}
 
-      {/* Historial */}
       {historialProgreso.length > 0 && (
-        <div
-          className="my-4"
-          style={{ maxWidth: 'clamp(300px, 90vw, 800px)', margin: 'auto' }}
-        >
-          <h5 className="text-center mb-3">Historial de partidas</h5>
-          <div className="table-responsive">
-            <table className="table table-bordered table-sm">
-              <thead>
-                <tr>
-                  <th>ID</th>
-                  <th>Completado</th>
-                  <th>Fecha</th>
-                  <th>Aciertos</th>
-                  <th>Desaciertos</th>
+        <div className="my-4" style={{ maxWidth: 800, margin: "auto" }}>
+          <h5>Historial de partidas</h5>
+          <table className="table table-bordered table-sm">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Avance</th>
+                <th>Completado</th>
+                <th>Fecha y Hora</th>
+                <th>Aciertos</th>
+                <th>Desaciertos</th>
+              </tr>
+            </thead>
+            <tbody>
+              {historialProgreso.map((p) => (
+                <tr key={p.id}>
+                  <td>{p.id}</td>
+                  <td>{p.avance ?? "-"}</td>
+                  <td>{p.completado ? "✅" : "❌"}</td>
+                  <td>{new Date(p.fechaActualizacion).toLocaleString()}</td>
+                  <td>{typeof p.desaciertos === "number" ? (TOTAL_CONEXIONES - p.desaciertos) : "-"}</td>
+                  <td>{p.desaciertos ?? "-"}</td>
                 </tr>
-              </thead>
-              <tbody>
-                {historialProgreso.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.id}</td>
-                    <td>{p.completado ? "✅" : "❌"}</td>
-                    <td>{new Date(p.fechaActualizacion).toLocaleString()}</td>
-                    <td>{TOTAL_CONEXIONES - (p.desaciertos || 0)}</td>
-                    <td>{p.desaciertos ?? 0}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
       )}
 
-      {/* Error */}
       {errorGuardar && (
-        <div
-          className="alert alert-danger mt-3 text-center"
-          style={{
-            maxWidth: 'clamp(300px, 90vw, 500px)',
-            margin: 'auto',
-            fontSize: 'clamp(0.9rem, 4vw, 1.1rem)'
-          }}
-        >
+        <div className="alert alert-danger mt-3 text-center" style={{ maxWidth: 500, margin: "auto" }}>
           {errorGuardar}
         </div>
       )}
 
-      {/* Botones de navegación */}
       {!instruccion && (
-        <div className="d-flex justify-content-center mt-4 gap-3 flex-wrap">
-          <button
-            className="btn btn-secondary"
-            onClick={() => navigate(-1)}
-            style={{ fontSize: 'clamp(0.9rem, 4vw, 1rem)' }}
-          >
+        <div className="d-flex justify-content-center mt-4 gap-3">
+          <button className="btn btn-secondary" onClick={() => navigate(-1)}>
             Volver a Categoría
           </button>
-          <button
-            className="btn btn-primary"
-            onClick={handleReset}
-            style={{ fontSize: 'clamp(0.9rem, 4vw, 1rem)' }}
-          >
+          <button className="btn btn-primary" onClick={handleReset}>
             Jugar de nuevo
           </button>
         </div>
