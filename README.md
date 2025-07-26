@@ -34,6 +34,8 @@ Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, m
 ```bash
 git clone https://github.com/matryx-root/my-ia-game.git
 cd my-ia-game
+/backend
+/frontend
 ````
 
 
@@ -41,8 +43,18 @@ cd my-ia-game
 
 * Crea una base de datos vacía llamada, por ejemplo, `myiagame`
 * Guarda usuario, contraseña, host y puerto (default: 5432)
-* Mas informacion en 
 
+
+cd backend
+/backend
+
+npx prisma db push --schema=prisma/schema.prisma --accept-data-loss --env-file=../.env
+
+
+npx prisma generate --schema=prisma/schema.prisma --env-file=../.env
+
+
+* Hacerlo manual : 
 - [Script de creación de base de datos](./backend/postgreSQL/db_create.sql)
 - [Ver carpeta completa de SQL + ER](./backend/postgreSQL/)
 
@@ -58,7 +70,7 @@ JWT_SECRET="pon_un_secreto_fuerte_aqui"
 PORT=4000
 ```
 
-Este archivo no se sube o comparte publicamente en entorno de produccion, pero como es labortatorio, se hace disponible.
+Este archivo no se sube o comparte publicamente en entorno de produccion, pero como es labortatorio y no hay informacion sencible o privada, se hace disponible.
 
 #### Frontend
 
@@ -70,13 +82,9 @@ Tanto en el Backend como en Frontend las dependencias y sus versiones se pueden 
 
 
 
-```bash
-cd backend
-npm install --legacy-peer-deps
+/my-ia-game
+npm install
 
-cd ../frontend
-npm install --legacy-peer-deps
-```
 
 ### 5. Migraciones y Seeds (Prisma)
 
