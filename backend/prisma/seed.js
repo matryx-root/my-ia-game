@@ -1,3 +1,5 @@
+const { PrismaClient } = require('@prisma/client');
+require('dotenv').config({ path: '../../.env' }); 
 const seedUsuarios = require('./seedUsuarios');
 const seedColegios = require("./seedColegios");
 const seedJuegos = require("./seedJuegos");
