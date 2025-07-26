@@ -44,29 +44,23 @@ my-ia-game-app/
 ### 1. Clonar el repositorio
 
 ```bash
-git clone https://github.com/matryx-root/my-ia-game.git
-cd my-ia-game
+git clone https://github.com/matryx-root/my-ia-game-app.git
+cd my-ia-game-app
 ```
 
+
+
+---
+### 2. Configuración de variables de entorno
 
 ---
 Ver, revisar y ajustar los datos de las 
 variables de entorno
 ---
 ```bash
- 📄 [.env](.env)
+ 📄 [.env](/my-ia-game-app/.env)
 ```
 
----
-### 2. Configuración de variables de entorno
-
-#### 🔐 Backend (y Prisma)
-
-
-
-> ⚠️ **Nunca subas `.env` a GitHub**. Usa `.env.example` para documentar la estructura.
-
----
 
 ### 3. Instalar dependencias
 
