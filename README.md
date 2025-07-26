@@ -101,7 +101,8 @@ npx prisma generate --schema=prisma/schema.prisma --env-file=../.env
 Desde la **raíz del proyecto**:
 
 ```bash
-# Ejecutar todos los seeds
+cd backend/prisma/
+node seed.js
 npm run seed
 ```
 
