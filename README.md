@@ -9,10 +9,10 @@ Este es el sitio web oficial para navegar :
   https://my-ia-game-app-f2c48d5cab78.herokuapp.com/
 </a>
 
-```bash
+
 ![Portada](ImagenesReadme/landing.png)
 
-
+---
 
 Como notará ha sido subido a un hosting de Heroku. Puede ingresar y jugar, usando estas credenciales :
 
