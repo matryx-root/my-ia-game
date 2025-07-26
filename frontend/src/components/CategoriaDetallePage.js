@@ -6,26 +6,26 @@ export default function CategoriaDetallePage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  // Mapeo de IDs a nombres legibles
+  // Mapeo de nombres de categorías (opcional, para mostrar mejor)
   const nombresCategorias = {
-    "IA Reactiva": "IA Reactiva",
-    "IA con Memoria Limitada": "IA con Memoria Limitada",
-    "ANI (IA Estrecha)": "ANI (IA Estrecha)",
-    "IA con Teoría de la Mente": "IA con Teoría de la Mente"
+    iaReactiva: "IA Reactiva",
+    iaMemoria: "IA con Memoria",
+    iaEstrecha: "IA Estrecha",
+    iaMente: "IA con Mente"
   };
 
-  // Buscar la categoría por nombre exacto (como está en categoriasJuegos.js)
-  const categoria = Object.keys(categoriasJuegos).find(key => key === id);
+  const nombreCategoria = nombresCategorias[id] || id;
+  const juegos = categoriasJuegos[id] || [];
 
-  if (!categoria) {
+  // Validar si la categoría existe
+  if (!categoriasJuegos.hasOwnProperty(id)) {
     return (
       <div className="container-fluid py-4 px-3">
         <div className="row justify-content-center">
           <div className="col-12 col-md-8 col-lg-6">
-            <div
-              className="alert alert-danger text-center"
-              style={{ fontSize: 'clamp(0.9rem, 4vw, 1rem)' }}
-            >
+            <div className="alert alert-danger text-center" style={{
+              fontSize: 'clamp(0.9rem, 4vw, 1rem)'
+            }}>
               Categoría no encontrada.
             </div>
             <div className="text-center mt-3">
@@ -42,9 +42,6 @@ export default function CategoriaDetallePage() {
       </div>
     );
   }
-
-  const nombreCategoria = nombresCategorias[categoria] || categoria;
-  const juegos = categoriasJuegos[categoria] || [];
 
   return (
     <div className="container-fluid py-4 px-2">
@@ -65,14 +62,11 @@ export default function CategoriaDetallePage() {
 
           {/* Mensaje si no hay juegos */}
           {juegos.length === 0 ? (
-            <div
-              className="alert alert-warning text-center mb-5"
-              style={{
-                fontSize: 'clamp(0.9rem, 4vw, 1rem)',
-                maxWidth: 600,
-                margin: '2rem auto'
-              }}
-            >
+            <div className="alert alert-warning text-center mb-5" style={{
+              fontSize: 'clamp(0.9rem, 4vw, 1rem)',
+              maxWidth: 600,
+              margin: '2rem auto'
+            }}>
               No hay juegos disponibles para esta categoría aún.
             </div>
           ) : (
@@ -109,19 +103,16 @@ export default function CategoriaDetallePage() {
                     }}
                   >
                     <div>
-                      <h4
-                        className="fw-bold text-center mb-2"
-                        style={{ fontSize: 'clamp(1.1rem, 4vw, 1.3rem)' }}
-                      >
+                      <h4 className="fw-bold text-center mb-2" style={{
+                        fontSize: 'clamp(1.1rem, 4vw, 1.3rem)'
+                      }}>
                         {j.nombre}
                       </h4>
-                      <p
-                        style={{
-                          fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
-                          lineHeight: 1.5,
-                          color: 'var(--color-text)'
-                        }}
-                      >
+                      <p style={{
+                        fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
+                        lineHeight: 1.5,
+                        color: 'var(--color-text)'
+                      }}>
                         {j.descripcion}
                       </p>
                     </div>

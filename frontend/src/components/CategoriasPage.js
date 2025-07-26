@@ -1,7 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-// Datos de categorías
+// Ahora en vez de color, usamos una clave de clase CSS
 const categorias = [
   {
     id: "IA Reactiva",
@@ -41,30 +41,28 @@ export default function CategoriasPage() {
   const navigate = useNavigate();
 
   return (
-    <div className="categorias-bg" style={{ minHeight: '100vh' }}>
-      {/* Título */}
+    <div className="categorias-bg">
       <div
         style={{
-          padding: 'clamp(20px, 5vw, 24px) 0 clamp(10px, 3vw, 16px) 0',
-          textAlign: 'center',
+          padding: "24px 0 16px 0",
+          textAlign: "center",
           fontWeight: 700,
-          fontSize: 'clamp(1.75rem, 8vw, 2.5rem)',
-          letterSpacing: '-1px',
-          color: 'var(--color-title, #1565c0)'
+          fontSize: 34,
+          letterSpacing: "-1px",
+          color: "#1565c0"
         }}
       >
         ¡Elige una categoría de IA!
-        <span style={{ marginLeft: '0.5em', fontSize: 'clamp(1.75rem, 8vw, 2.5rem)' }}>🧑‍🎓</span>
+        <span style={{ marginLeft: 10, fontSize: 34 }}>🧑‍🎓</span>
       </div>
 
-      {/* Grid de categorías */}
       <div
         style={{
-          display: 'flex',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: 'clamp(20px, 5vw, 40px)',
-          padding: 'clamp(20px, 5vw, 24px) clamp(10px, 5vw, 10px) 60px clamp(10px, 5vw, 10px)'
+          display: "flex",
+          flexWrap: "wrap",
+          justifyContent: "center",
+          gap: 40,
+          padding: "24px 10px 60px 10px"
         }}
       >
         {categorias.map(cat => (
@@ -75,12 +73,9 @@ export default function CategoriasPage() {
             className={`categoria-card ${cat.clase}`}
             onClick={() => navigate(`/categoria/${cat.id}`)}
             onKeyPress={e => {
-              if (e.key === 'Enter' || e.key === ' ') {
+              if (e.key === "Enter" || e.key === " ") {
                 navigate(`/categoria/${cat.id}`);
               }
-            }}
-            style={{
-              transition: 'transform 0.2s ease, box-shadow 0.2s ease'
             }}
           >
             <div className="icono-categoria">{cat.icon}</div>
