@@ -27,7 +27,7 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
         }
         setError(null);
       })
-      .catch(() => setError("No se pudo cargar la configuración"))
+      .catch(() => setError("No se pudo cargar la configuración."))
       .finally(() => setCargando(false));
   }, [usuario]);
 
@@ -53,72 +53,150 @@ export default function ConfiguracionUsuarioPage({ usuario, onConfigChange }) {
   };
 
   return (
-    <div className="container py-4">
-      <h2 className="text-primary fw-bold mb-4 text-center">
-        Configuración de Usuario
-      </h2>
-      {error && <div className="alert alert-danger">{error}</div>}
-      {success && <div className="alert alert-success">{success}</div>}
-      <form style={{ maxWidth: 550, margin: "auto" }} onSubmit={guardarConfig}>
-        <div className="mb-3">
-          <label className="form-label fw-bold">Tema visual</label>
-          <select
-            className="form-select"
-            name="tema"
-            value={config.tema}
-            onChange={handleChange}
-            disabled={cargando}
-          >
-            <option value="Predeterminado">Predeterminado</option>
-            <option value="Oscuro">Oscuro</option>
-            <option value="Claro">Claro</option>
-          </select>
+    <div className="container-fluid py-3 px-2">
+      <div className="row justify-content-center">
+        <div className="col-12 col-md-8 col-lg-6 col-xl-5">
+          {/* Título */}
+          <h2 className="text-primary fw-bold text-center mb-4" style={{
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+            color: 'var(--color-title, #114eeb)'
+          }}>
+            Configuración de Usuario
+          </h2>
+
+          {/* Mensajes */}
+          {error && (
+            <div className="alert alert-danger text-center mb-3" style={{
+              fontSize: 'clamp(0.9rem, 4vw, 1rem)'
+            }}>
+              {error}
+            </div>
+          )}
+
+          {success && (
+            <div className="alert alert-success text-center mb-3" style={{
+              fontSize: 'clamp(0.9rem, 4vw, 1rem)'
+            }}>
+              {success}
+            </div>
+          )}
+
+          {cargando ? (
+            <div className="text-center my-5">
+              <div className="spinner-border text-primary" role="status">
+                <span className="visually-hidden">Cargando...</span>
+              </div>
+              <p className="mt-3" style={{ fontSize: 'clamp(0.9rem, 4vw, 1rem)' }}>
+                Cargando configuración...
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={guardarConfig} style={{
+              maxWidth: '100%',
+              margin: 'auto'
+            }}>
+              {/* Tema visual */}
+              <div className="mb-4">
+                <label className="form-label fw-bold" style={{
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)'
+                }}>
+                  Tema visual
+                </label>
+                <select
+                  className="form-select"
+                  name="tema"
+                  value={config.tema}
+                  onChange={handleChange}
+                  disabled={cargando}
+                  style={{ fontSize: 'clamp(0.9rem, 4vw, 1.1rem)' }}
+                >
+                  <option value="Predeterminado">Predeterminado</option>
+                  <option value="Oscuro">Oscuro</option>
+                  <option value="Claro">Claro</option>
+                </select>
+              </div>
+
+              {/* Idioma */}
+              <div className="mb-4">
+                <label className="form-label fw-bold" style={{
+                  fontSize: 'clamp(1rem, 4vw, 1.2rem)'
+                }}>
+                  Idioma
+                </label>
+                <select
+                  className="form-select"
+                  name="idioma"
+                  value={config.idioma}
+                  onChange={handleChange}
+                  disabled={cargando}
+                  style={{ fontSize: 'clamp(0.9rem, 4vw, 1.1rem)' }}
+                >
+                  <option value="Español">Español</option>
+                  <option value="Inglés">Inglés</option>
+                </select>
+              </div>
+
+              {/* Sonido */}
+              <div className="form-check form-switch mb-4">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="sonido"
+                  name="sonido"
+                  checked={!!config.sonido}
+                  onChange={handleChange}
+                  disabled={cargando}
+                  style={{ fontSize: 'clamp(0.9rem, 4vw, 1.1rem)' }}
+                />
+                <label className="form-check-label fw-bold" htmlFor="sonido" style={{
+                  fontSize: 'clamp(0.95rem, 4vw, 1.1rem)'
+                }}>
+                  Sonido Activado
+                </label>
+              </div>
+
+              {/* Notificaciones */}
+              <div className="form-check form-switch mb-4">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="notificaciones"
+                  name="notificaciones"
+                  checked={!!config.notificaciones}
+                  onChange={handleChange}
+                  disabled={cargando}
+                  style={{ fontSize: 'clamp(0.9rem, 4vw, 1.1rem)' }}
+                />
+                <label className="form-check-label fw-bold" htmlFor="notificaciones" style={{
+                  fontSize: 'clamp(0.95rem, 4vw, 1.1rem)'
+                }}>
+                  Notificaciones Activadas
+                </label>
+              </div>
+
+              {/* Botón de guardar */}
+              <div className="d-flex justify-content-center mt-4">
+                <button
+                  className="btn btn-primary btn-lg px-4"
+                  type="submit"
+                  disabled={cargando}
+                  style={{
+                    fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
+                    fontWeight: 500
+                  }}
+                >
+                  {cargando ? (
+                    <>
+                      <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                      Guardando...
+                    </>
+                  ) : "Guardar configuración"}
+                </button>
+              </div>
+            </form>
+          )}
         </div>
-        <div className="mb-3">
-          <label className="form-label fw-bold">Idioma</label>
-          <select
-            className="form-select"
-            name="idioma"
-            value={config.idioma}
-            onChange={handleChange}
-            disabled={cargando}
-          >
-            <option value="Español">Español</option>
-            <option value="Inglés">Inglés</option>
-          </select>
-        </div>
-        <div className="form-check form-switch mb-3">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            id="sonido"
-            name="sonido"
-            checked={!!config.sonido}
-            onChange={handleChange}
-            disabled={cargando}
-          />
-          <label className="form-check-label fw-bold" htmlFor="sonido">
-            Sonido Activado
-          </label>
-        </div>
-        <div className="form-check form-switch mb-4">
-          <input
-            className="form-check-input"
-            type="checkbox"
-            id="notificaciones"
-            name="notificaciones"
-            checked={!!config.notificaciones}
-            onChange={handleChange}
-            disabled={cargando}
-          />
-          <label className="form-check-label fw-bold" htmlFor="notificaciones">
-            Notificaciones Activadas
-          </label>
-        </div>
-        <button className="btn btn-primary" type="submit" disabled={cargando}>
-          Guardar configuración
-        </button>
-      </form>
+      </div>
     </div>
   );
 }
