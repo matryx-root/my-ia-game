@@ -24,7 +24,7 @@ export default function LandingPage() {
           className="landing-btn"
           onClick={() => navigate("/login")}
         >
-          ¡Quiero jugar Perlita!
+          ¡Quiero jugar!
         </button>
 
         <div className="landing-note">
