@@ -9,7 +9,7 @@ Una aplicación web completa que combina juegos educativos, gestión de usuarios
 ## 📁 Estructura del Proyecto
 
 ```
-my-ia-game/
+my-ia-game-app/
 ├── backend/               # API REST (Node.js + Express + Prisma)
 │   ├── prisma/            # Esquema, migraciones y seeds
 │   ├── controllers/       # Lógica de negocio
