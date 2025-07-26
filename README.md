@@ -43,7 +43,7 @@ cd my-ia-game
 * Guarda usuario, contraseña, host y puerto (default: 5432)
 * Mas informacion en 
 
-- [Script de creación de base de datos](./postgreSQL/db_create.sql)
+- [Script de creación de base de datos](./backend/postgreSQL/db_create.sql)
 - [Ver carpeta completa de SQL + ER](./postgreSQL/)
 
 ### 3. Variables de entorno
