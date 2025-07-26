@@ -2,8 +2,8 @@
 
 ---
 
-Cambios de PUSH...
-## My IA Game
+
+## My IA Game App
 
 Plataforma educativa de juegos interactivos para aprender sobre Inteligencia Artificial.  
 Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, mensajería interna y seguimiento de progreso gamificado.
