@@ -4,9 +4,21 @@
 
 Una aplicación web completa que combina juegos educativos, gestión de usuarios, seguimiento de progreso y herramientas administrativas. Ideal para estudiantes, docentes y administradores que desean aprender IA de forma divertida y estructurada.
 
-Este es el sitio web oficial para navegar : https://my-ia-game-app-f2c48d5cab78.herokuapp.com/
+Este es el sitio web oficial para navegar : 
+<a href="https://my-ia-game-app-f2c48d5cab78.herokuapp.com/" target="_blank" rel="noopener noreferrer">
+  https://my-ia-game-app-f2c48d5cab78.herokuapp.com/
+</a>
 
-Como notará ha sido subido a un hosting de Heroku.
+
+
+
+Como notará ha sido subido a un hosting de Heroku. Puede ingresar y jugar, usando estas credenciales :
+
+```bash
+
+
+
+```
 ---
 
 ## 📁 Estructura del Proyecto
@@ -139,13 +151,15 @@ npm start
 
 ## 👤 Usuarios de prueba
 
-| Email | Contraseña | Rol |
-|------|-----------|-----|
-| admin@gmail.com | 123 | admin |
-| valdivia@gmail.com | 123456 | docente |
-| test1@example.com | 123456 | alumno |
+Estos son los usuarios predefinidos para probar las funcionalidades del sistema. Puedes usarlos para iniciar sesión y explorar diferentes roles.
 
-> Puedes crear más usuarios desde el formulario de registro.
+| Nombre       | Email                | Rol     | Contraseña |
+|--------------|----------------------|---------|------------|
+| **ADMIN**    | `ad@gmail.com`       | admin   | `SIMI1935` |
+| **DOCENTEUNO** | `docente1@gmail.com` | docente | `SIMI1935` |
+| **ALUMNAUNO**  | `alumnauno@gmail.com` | alumno  | `SIMI1935` |
+
+> ⚠️ **Nota**: Las contraseñas son todas iguales (`SIMI1935`) para facilitar el acceso durante pruebas, pero en producción deberían ser únicas y seguras.
 
 ---
 
