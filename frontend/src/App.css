@@ -396,8 +396,3 @@ button, .btn {
   font-size: clamp(0.9rem, 4vw, 1.1rem); /* Añade esto */
 }
 
-/* Tablas */
-table {
-  width: 100%;
-  font-size: clamp(0.9rem, 4vw, 1.1rem); /* Añade esto */
-}
