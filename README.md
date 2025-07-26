@@ -4,6 +4,9 @@
 
 Una aplicación web completa que combina juegos educativos, gestión de usuarios, seguimiento de progreso y herramientas administrativas. Ideal para estudiantes, docentes y administradores que desean aprender IA de forma divertida y estructurada.
 
+Este es el sitio web oficial para navegar : https://my-ia-game-app-f2c48d5cab78.herokuapp.com/
+
+Como notará ha sido subido a un hosting de Heroku.
 ---
 
 ## 📁 Estructura del Proyecto
