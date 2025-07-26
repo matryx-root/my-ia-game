@@ -47,10 +47,12 @@ my-ia-game/
 git clone https://github.com/matryx-root/my-ia-game.git
 cd my-ia-game
 ```
+
 ```bash
 Ver archivo .env
----
+```
 
+---
 ### 2. Configuración de variables de entorno
 
 #### 🔐 Backend (y Prisma)
