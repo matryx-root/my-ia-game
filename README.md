@@ -55,8 +55,8 @@ npx prisma generate --schema=prisma/schema.prisma --env-file=../.env
 
 
 * Hacerlo manual : 
-- [Script de creación de base de datos](./backend/postgreSQL/db_create.sql)
-- [Ver carpeta completa de SQL + ER](./backend/postgreSQL/)
+- [Script de creación de base de datos](backend/postgreSQL/db_create.sql)
+- [Ver carpeta completa de SQL + ER](backend/postgreSQL/)
 
 ### 3. Variables de entorno
 
