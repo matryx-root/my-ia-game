@@ -9,7 +9,7 @@ Este es el sitio web oficial para navegar :
   https://my-ia-game-app-f2c48d5cab78.herokuapp.com/
 </a>
 
-![Landing](/my-ia-game-app/ImagenesReadme/landing.png)
+![Portada](ImagenesReadme/landing.png)
 
 
 
@@ -18,7 +18,7 @@ Como notará ha sido subido a un hosting de Heroku. Puede ingresar y jugar, usan
 
 
 
-![Landing](/my-ia-game-app/ImagenesReadme/login.png)
+![Inicio](ImagenesReadme/login.png)
 
 ```bash
 
