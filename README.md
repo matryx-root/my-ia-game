@@ -20,9 +20,21 @@ Como notará ha sido subido a un hosting de Heroku. Puede ingresar y jugar, usan
 
 ![Inicio](ImagenesReadme/login.png)
 
-```bash
+
 
 ![Usuario](ImagenesReadme/Usuarios.png)
+
+```bash
+Email                     Contraseña
+ad@gmail.com              SIMI1935
+
+
+Email                     Contraseña
+docente1@gmail.com        SIMI1935
+
+
+Email                     Contraseña
+alumnauno@gmail.com       SIMI1935
 
 ```
 ---
