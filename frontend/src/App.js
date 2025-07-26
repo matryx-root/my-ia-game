@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate, useLocation } from "react-router-dom";
-import './App.css'; 
 import LandingPage from "./components/LandingPage";
 import Login from "./components/Login";
 import Registro from "./components/Registro";
