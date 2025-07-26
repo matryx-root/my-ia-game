@@ -15,16 +15,17 @@ export default function PanelGame({ usuario }) {
 
   const navigate = useNavigate();
 
+  // Validación de acceso
   useEffect(() => {
     if (!usuario || (usuario.rol !== "admin" && usuario.rol !== "docente")) {
-      alert("No tienes permiso para acceder a este panel.");
-      navigate("/");
+      setError("No tienes permiso para acceder a este panel.");
+      setTimeout(() => navigate("/"), 1500);
     }
-    
-  }, [usuario]);
+  }, [usuario, navigate]);
 
+  // Cargar usuarios
   useEffect(() => {
-    if (!usuario) return;
+    if (!usuario || error) return;
     setLoading(true);
     api.get("/admin/usuarios")
       .then(res => {
@@ -32,17 +33,16 @@ export default function PanelGame({ usuario }) {
         if (usuario.rol === "admin") {
           filtered = res.filter(u => u.rol !== "admin");
         } else if (usuario.rol === "docente") {
-          filtered = res.filter(
-            u => u.rol === "alumno" && u.colegioId === usuario.colegioId
-          );
+          filtered = res.filter(u => u.rol === "alumno" && u.colegioId === usuario.colegioId);
         }
         setUsuarios(filtered);
         setError(null);
       })
-      .catch(() => setError("No se pudo conectar a usuarios"))
+      .catch(() => setError("No se pudo cargar la lista de usuarios."))
       .finally(() => setLoading(false));
-  }, [usuario]);
+  }, [usuario, error]);
 
+  // Cargar progreso y logros del usuario seleccionado
   useEffect(() => {
     if (!selectedId) {
       setSelectedUser(null);
@@ -64,15 +64,15 @@ export default function PanelGame({ usuario }) {
           setError(null);
         })
         .catch(() => {
+          setError("No se pudo cargar el progreso o logros del usuario.");
           setProgreso([]);
           setLogros([]);
-          setError("No se pudo conectar al progreso o logros.");
         })
         .finally(() => setLoading(false));
     }
   }, [selectedId, usuarios]);
 
-  
+  // Agrupar progreso por juego
   const progresoPorJuego = {};
   progreso.forEach(p => {
     if (!progresoPorJuego[p.juegoId]) {
@@ -86,83 +86,125 @@ export default function PanelGame({ usuario }) {
   });
 
   return (
-    <div className="container py-3 px-1">
+    <div className="container-fluid py-3 px-2">
       <div className="row justify-content-center">
-        <div className="col-12 col-lg-10">
-          <h2 className="text-center mb-4 text-primary fw-bold" style={{ fontSize: 28 }}>
+        <div className="col-12 col-lg-10 col-xl-9">
+          {/* Título */}
+          <h2 className="text-center mb-4 text-primary fw-bold" style={{
+            fontSize: 'clamp(1.5rem, 5vw, 2rem)',
+            lineHeight: 1.3
+          }}>
             Panel de Juegos y Progreso por Usuario
           </h2>
+
+          {/* Mensajes de error */}
           {error && (
-            <div className="alert alert-danger text-center mb-3">
+            <div className="alert alert-danger text-center mb-3" style={{
+              fontSize: 'clamp(0.9rem, 4vw, 1rem)'
+            }}>
               {error}
             </div>
           )}
 
+          {/* Cargando */}
           {loading && (
             <div className="text-center my-3">
-              <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-              <span className="ms-2">Cargando datos...</span>
+              <span className="spinner-border spinner-border-sm" aria-hidden="true"></span>
+              <span className="ms-2" style={{ fontSize: 'clamp(0.9rem, 4vw, 1rem)' }}>
+                Cargando datos...
+              </span>
             </div>
           )}
 
+          {/* Selector de alumno */}
           <div className="mb-4">
-            <label htmlFor="selectAlumno" className="form-label fw-semibold" style={{ fontSize: 18 }}>
+            <label htmlFor="selectAlumno" className="form-label fw-semibold" style={{
+              fontSize: 'clamp(1rem, 4vw, 1.2rem)'
+            }}>
               Selecciona un alumno para ver su historial de juegos:
             </label>
             <select
               id="selectAlumno"
               className="form-select form-select-lg"
               value={selectedId}
-              style={{ maxWidth: 400 }}
               onChange={e => setSelectedId(e.target.value)}
+              style={{
+                fontSize: 'clamp(0.9rem, 4vw, 1.1rem)',
+                maxWidth: '100%'
+              }}
             >
               <option value="">Selecciona un alumno</option>
               {usuarios.map(u => (
                 <option key={u.id} value={u.id}>
-                  {u.nombre} ({u.email})
-                  {u.colegio?.nombre ? ` - ${u.colegio.nombre}` : ""}
+                  {u.nombre} ({u.email}){u.colegio?.nombre ? ` - ${u.colegio.nombre}` : ""}
                 </option>
               ))}
             </select>
           </div>
 
-          
+          {/* Información del usuario seleccionado */}
           {selectedUser && (
-            <div className="card shadow mt-4">
-              <div className="card-body">
-                <h4 className="mb-2 fw-bold text-center" style={{ fontSize: 22 }}>
-                  Progreso de <span className="text-primary">{selectedUser.nombre}</span>
+            <div className="card shadow-sm border-0 mt-4" style={{
+              borderRadius: '1rem',
+              overflow: 'hidden'
+            }}>
+              <div className="card-body p-3 p-md-4">
+                <h4 className="mb-3 fw-bold text-center" style={{
+                  fontSize: 'clamp(1.25rem, 5vw, 1.5rem)'
+                }}>
+                  Progreso de{' '}
+                  <span className="text-primary">{selectedUser.nombre}</span>
                 </h4>
-                <div className="d-flex flex-wrap flex-column flex-md-row gap-2 justify-content-center mb-2">
-                  <div><strong>Email:</strong> {selectedUser.email}</div>
-                  <div><strong>Colegio:</strong> {selectedUser.colegio?.nombre || "-"}</div>
-                  <div><strong>Edad:</strong> {selectedUser.edad || "-"}</div>
-                </div>
-                <hr />
 
-               
+                {/* Info básica */}
+                <div className="d-flex flex-wrap gap-2 justify-content-center mb-3">
+                  <div className="badge bg-light text-dark border">
+                    <strong>Email:</strong> {selectedUser.email}
+                  </div>
+                  <div className="badge bg-light text-dark border">
+                    <strong>Colegio:</strong> {selectedUser.colegio?.nombre || "-"}
+                  </div>
+                  <div className="badge bg-light text-dark border">
+                    <strong>Edad:</strong> {selectedUser.edad || "-"}
+                  </div>
+                </div>
+
+                <hr className="my-3" />
+
+                {/* Progreso por juego */}
                 {Object.keys(progresoPorJuego).length === 0 ? (
-                  <span className="text-muted">No hay progresos registrados.</span>
+                  <p className="text-muted text-center my-3" style={{
+                    fontSize: 'clamp(0.9rem, 4vw, 1rem)'
+                  }}>
+                    No hay progresos registrados.
+                  </p>
                 ) : (
                   Object.entries(progresoPorJuego).map(([juegoId, juego]) => (
                     <div className="my-3" key={juegoId}>
-                      <h5 className="fw-bold mb-2">
-                        {juego.nombre} <span className="text-secondary" style={{ fontWeight: 400 }}>({juegoId})</span>
+                      <h5 className="fw-bold mb-2" style={{
+                        fontSize: 'clamp(1.1rem, 4vw, 1.3rem)'
+                      }}>
+                        {juego.nombre}{' '}
+                        <small className="text-secondary" style={{ fontWeight: 400 }}>
+                          (ID: {juegoId})
+                        </small>
                       </h5>
                       {juego.descripcion && (
-                        <div className="mb-1 text-muted" style={{ fontSize: 15 }}>
+                        <p className="text-muted mb-2" style={{
+                          fontSize: '0.9rem'
+                        }}>
                           <strong>Descripción:</strong> {juego.descripcion}
-                        </div>
+                        </p>
                       )}
                       <div className="table-responsive">
-                        <table className="table table-sm table-bordered align-middle mb-0">
+                        <table className="table table-sm table-bordered table-hover align-middle mb-0">
                           <thead className="table-light">
                             <tr>
                               <th>ID</th>
-                              <th>Nombre Juego</th>
+                              <th>Juego</th>
                               <th>Avance</th>
                               <th>Completado</th>
-                              <th>Fecha y Hora</th>
+                              <th>Fecha</th>
                               <th>Aciertos</th>
                               <th>Desaciertos</th>
                             </tr>
@@ -173,16 +215,20 @@ export default function PanelGame({ usuario }) {
                               .map((p) => (
                                 <tr key={p.id}>
                                   <td>{p.id}</td>
-                                  <td>{p.juego?.nombre || "-"}</td>
+                                  <td style={{ maxWidth: 150 }}>
+                                    <div className="text-truncate" title={p.juego?.nombre || "-"}>
+                                      {p.juego?.nombre || "-"}
+                                    </div>
+                                  </td>
                                   <td>{p.avance ?? "-"}</td>
                                   <td>{p.completado ? "✅" : "❌"}</td>
-                                  <td style={{ minWidth: 120 }}>{new Date(p.fechaActualizacion).toLocaleString()}</td>
+                                  <td style={{ whiteSpace: 'nowrap', fontSize: '0.85rem' }}>
+                                    {new Date(p.fechaActualizacion).toLocaleString()}
+                                  </td>
                                   <td>
                                     {typeof p.desaciertos === "number"
                                       ? (TOTAL_PUNTOS - p.desaciertos)
-                                      : (typeof p.aciertos === "number"
-                                        ? p.aciertos
-                                        : "-")}
+                                      : (typeof p.aciertos === "number" ? p.aciertos : "-")}
                                   </td>
                                   <td>{p.desaciertos ?? "-"}</td>
                                 </tr>
@@ -194,24 +240,46 @@ export default function PanelGame({ usuario }) {
                   ))
                 )}
 
-                
-                <h5 className="fw-bold mt-4 mb-2">Logros</h5>
+                {/* Logros */}
+                <h5 className="fw-bold mt-4 mb-2" style={{
+                  fontSize: 'clamp(1.1rem, 4vw, 1.3rem)'
+                }}>
+                  Logros
+                </h5>
                 {logros.length === 0 ? (
-                  <span className="text-muted">No hay logros registrados.</span>
+                  <p className="text-muted" style={{
+                    fontSize: 'clamp(0.9rem, 4vw, 1rem)'
+                  }}>
+                    No hay logros registrados.
+                  </p>
                 ) : (
-                  <ul style={{ paddingLeft: 18, fontSize: 15 }}>
+                  <ul className="list-unstyled" style={{
+                    paddingLeft: '1rem',
+                    fontSize: 'clamp(0.9rem, 4vw, 1rem)'
+                  }}>
                     {logros.map(l => (
-                      <li key={l.id}>
+                      <li key={l.id} className="mb-2">
                         <strong>{l.nombre}</strong>
                         {l.descripcion && <>: {l.descripcion}</>}
-                        <span className="text-muted ms-2">
+                        <div className="text-muted" style={{ fontSize: '0.85rem' }}>
                           ({new Date(l.fechaHora).toLocaleString()})
-                        </span>
+                        </div>
                       </li>
                     ))}
                   </ul>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Mensaje cuando no hay usuario seleccionado */}
+          {!selectedUser && !error && !loading && (
+            <div className="text-center my-5">
+              <p className="text-muted" style={{
+                fontSize: 'clamp(1rem, 5vw, 1.2rem)'
+              }}>
+                Selecciona un alumno para ver su progreso.
+              </p>
             </div>
           )}
         </div>
