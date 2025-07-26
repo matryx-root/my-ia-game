@@ -48,9 +48,13 @@ git clone https://github.com/matryx-root/my-ia-game.git
 cd my-ia-game
 ```
 
-```bash
+
+---
 Ver, revisar y ajustar los datos de las 
-variables de enterno - 📄 [.env](/.env)
+variables de entorno
+---
+```bash
+ 📄 [.env](.env)
 ```
 
 ---
