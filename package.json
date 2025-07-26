@@ -5,7 +5,9 @@
   "scripts": {
     "start": "node backend/server.js",
     "heroku-postbuild": "npx prisma generate --schema=./backend/prisma/schema.prisma && cd frontend && npm install --legacy-peer-deps && npm run build",
-     "seed": "node backend/prisma/seed.js"
+     "seed": "node backend/prisma/seed.js",
+     "push": "npx prisma db push --schema=./backend/prisma/schema.prisma --accept-data-loss",
+    "generate": "npx prisma generate --schema=./backend/prisma/schema.prisma"
   },
   "keywords": [],
   "author": "",
