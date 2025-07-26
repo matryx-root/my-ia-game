@@ -49,7 +49,8 @@ cd my-ia-game
 ```
 
 ```bash
-Ver archivo .env
+Ver, revisar y ajustar los datos de las 
+variables de enterno - 📄 [.env](/.env)
 ```
 
 ---
