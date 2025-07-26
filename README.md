@@ -12,7 +12,7 @@ Incluye gestión de usuarios (alumnos, docentes, administradores), dashboards, m
 
 ## 📁 Estructura del Repositorio
 
-![Directorio Proyecto](./Directorio.png)
+![Directorio Proyecto](./ImagenesReadme/Directorio.png) 
 
 
 ---
