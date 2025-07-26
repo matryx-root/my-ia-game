@@ -26,7 +26,6 @@ my-ia-game/
 └── README.md              # Documentación principal
 ```
 
-![Estructura del Proyecto](./ImagenesReadme/Directorio.png)
 
 ---
 
@@ -48,39 +47,15 @@ my-ia-game/
 git clone https://github.com/matryx-root/my-ia-game.git
 cd my-ia-game
 ```
-
+```bash
+Ver archivo .env
 ---
 
 ### 2. Configuración de variables de entorno
 
 #### 🔐 Backend (y Prisma)
 
-Copia el archivo de ejemplo y ajusta las credenciales:
 
-```bash
-# Desde la raíz del proyecto
-cp .env.example .env
-```
-
-Edita `.env` con tus credenciales de PostgreSQL:
-
-```env
-# .env
-DB_HOST=localhost
-DB_NAME=myiagame
-DB_USER=tu_usuario
-DB_PASS=tu_contraseña
-DB_PORT=5432
-
-# URL de conexión para Prisma
-RDS_DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?schema=public&sslmode=require
-
-# JWT
-JWT_SECRET=claveSuperSecreta123
-
-# Puerto del backend
-PORT=5000
-```
 
 > ⚠️ **Nunca subas `.env` a GitHub**. Usa `.env.example` para documentar la estructura.
 
