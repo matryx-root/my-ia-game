@@ -40,7 +40,7 @@ alumnauno@gmail.com       SIMI1935
 ```
 ---
 
-## 📁 Estructura del Proyecto
+## 📁 Estructura principal del Proyecto
 
 ```
 my-ia-game-app/
@@ -92,7 +92,7 @@ Ver, revisar y ajustar los datos de las
 variables de entorno
 ---
 ```bash
- 📄 [.env](/my-ia-game-app/.env)
+ 📄 [.env](.env)
 ```
 
 
