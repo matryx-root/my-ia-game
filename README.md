@@ -89,10 +89,13 @@ cd my-ia-game-app
 
 ---
 Ver, revisar y ajustar los datos de las 
-variables de entorno
+variables de entorno personales:
+
 ---
+
 ```bash
- 📄 [.env](.env)
+- 🔹 [Ir al directorio env`](/my-ia-game-app/.env)
+ 
 ```
 
 
