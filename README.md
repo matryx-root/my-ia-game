@@ -94,7 +94,7 @@ variables de entorno personales:
 ---
 
 ```bash
-- 🔹 [Ir al directorio env`](/my-ia-game-app/.env)
+- 🔹 [Ver .env`](.env)
  
 ```
 
