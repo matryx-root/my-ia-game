@@ -1,19 +1,23 @@
-import React, { useEffect, useRef, useState, useMemo, useCallback } from "react";
-import Phaser from "phaser";
-import { useNavigate } from "react-router-dom";
-import api from "../utils/api";
+import React, { useEffect, useRef, useState, useMemo, useCallback } from 'react';
+import Phaser from 'phaser';
+import { useNavigate } from 'react-router-dom';
+import api from '../utils/api';
 
 export default function IAGameBrainNetwork({ usuario }) {
-  const gameRef = useRef(null);
   const navigate = useNavigate();
+  const containerRef = useRef(null);
+  const gameRef = useRef(null);
+
+  // Estado principal
   const [instruccion, setInstruccion] = useState(true);
   const [resultado, setResultado] = useState(null);
   const [juegoKey, setJuegoKey] = useState(0);
   const [puedeGuardar, setPuedeGuardar] = useState(false);
   const [guardado, setGuardado] = useState(false);
-  const [mostroLogro, setMostroLogro] = useState(false);
   const [errorGuardar, setErrorGuardar] = useState(null);
   const [errores, setErrores] = useState(0);
+  const [mostroLogro, setMostroLogro] = useState(false);
+  const [historialProgreso, setHistorialProgreso] = useState([]);
 
   // ID y datos de logro
   const IA_GAME_ID = 1;
@@ -48,12 +52,12 @@ export default function IAGameBrainNetwork({ usuario }) {
 
   useEffect(() => {
     if (usuario && usuario.id) cargarHistorial();
-  }, [usuario]);
+  }, [usuario, juegoKey, cargarHistorial]);
 
   // Iniciar juego
   const iniciarJuego = () => setInstruccion(false);
 
-  // Calcular tamaño del canvas responsivo
+  // Calcular tamaño responsivo
   const getGameSize = () => {
     const width = Math.min(window.innerWidth * 0.95, 820);
     const height = Math.min(window.innerHeight * 0.8, 600);
@@ -164,8 +168,7 @@ export default function IAGameBrainNetwork({ usuario }) {
 
                 graphics.clear();
                 connectedPairs.forEach(([a, b], idx) => {
-                  const c1 = circuits[a];
-                  const c2 = circuits[b];
+                  const c1 = circuits[a], c2 = circuits[b];
                   graphics.lineStyle(
                     Math.max(3, Math.floor(width * 0.004)),
                     0x9575cd,
@@ -270,6 +273,7 @@ export default function IAGameBrainNetwork({ usuario }) {
 
   return (
     <div
+      ref={containerRef}
       className="game-container"
       style={{
         width: '100%',
