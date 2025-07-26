@@ -1,24 +1,3 @@
-¡Claro! Aquí tienes tu **README.md** mejorado, listo para descargar como archivo con extensión `.md`.
-
----
-
-### ✅ Cómo usarlo:
-1. Haz clic en el botón de descarga.
-2. Guarda el archivo como `README.md` en la raíz de tu proyecto.
-3. Reemplaza tu archivo anterior.
-
----
-
-### 📥 [Descargar README.md](sandbox:/mnt/data/README.md)
-
-> 🔗 **[Si el enlace no funciona, haz clic aquí para generarlo nuevamente](#)**  
-> (En entornos de sandbox, a veces el enlace no se genera automáticamente)
-
----
-
-### 📄 Contenido del archivo (por si prefieres copiarlo manualmente):
-
-```markdown
 # My IA Game App
 
 🎮 **Plataforma educativa interactiva para aprender sobre Inteligencia Artificial**
