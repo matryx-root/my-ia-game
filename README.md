@@ -44,7 +44,7 @@ cd my-ia-game
 * Mas informacion en 
 
 - [Script de creación de base de datos](./backend/postgreSQL/db_create.sql)
-- [Ver carpeta completa de SQL + ER](./postgreSQL/)
+- [Ver carpeta completa de SQL + ER](./backend/postgreSQL/)
 
 ### 3. Variables de entorno
 
